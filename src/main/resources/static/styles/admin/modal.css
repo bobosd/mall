@@ -1,0 +1,69 @@
+/* red dot*/
+.close-btn-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-right: 60px;
+    position: relative;
+    cursor: default;
+}
+
+.close-btn-dot:last-child {
+    margin-right: 0;
+}
+
+.close-btn-dot:before, .close-btn-dot:after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    border-radius: 1px;
+    opacity: 0;
+    width: 1px;
+    height: 70%;
+    background: #460100;
+}
+
+.close-btn-dot {
+    background: #FF5D5B;
+    border: 1px solid #CF544D;
+}
+
+.close-btn-dot:before {
+    transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.close-btn-dot:after {
+    transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+.close-btn-dot:hover:before, .close-btn-dot:hover:after {
+    top: 50%;
+    opacity: 1;
+}
+
+/* modal */
+.modal-content {
+    border-radius: 14px;
+    -webkit-box-shadow: 0 5px 15px rgba(0,0,0,0);
+    -moz-box-shadow: 0 5px 15px rgba(0,0,0,0);
+    -o-box-shadow: 0 5px 15px rgba(0,0,0,0);
+    box-shadow: 0 5px 15px rgba(0,0,0,0);
+}
+
+.modal-backdrop.show {
+    backdrop-filter: blur(2px);
+    background-color: rgba(240, 240, 240, 0.6);
+}
+
+.modal-header {
+    border-bottom: none;
+}
+
+.modal-footer {
+    border-top: none;
+}
+
+.modal-title {
+    font-weight: 800;
+}

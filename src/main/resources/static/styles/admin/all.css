@@ -1,0 +1,41 @@
+.no-text-select {
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+    user-select: none; /* Non-prefixed version, currently supported by Chrome and Opera */
+}
+
+body {
+    font-family: tahoma, arial, "Microsoft YaHei", "Hiragino Sans GB", u5b8bu4f53, sans-serif;
+}
+
+.main {
+    margin-left: 240px;
+    transition-duration: 0.4s;
+}
+
+.sidebar.minimized ~ .main {
+    margin-left: 72px;
+    transition-duration: 0.4s;
+}
+
+.button {
+    font-weight: 800;
+    border-radius: 4px;
+    font-size: 12px;
+    background-color: #c6c6c6;
+    color: #3d3d3d;
+    padding: 2px 12px;
+    border: none;
+}
+
+.button-blue {
+    background-color: #0078ff;
+    color: white;
+}
+
+.button-gray {
+    background-color: #b4b4b4;
+    color: white;
+}

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<div th:fragment="user-settings-modal">
+    <!-- Modal -->
+    <div class="modal" id="user-settings-modal" tabindex="-1">
+        <div class="modal-dialog no-text-select">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" th:text="#{settings}"></h5>
+                    <span class="close-btn-dot" data-bs-dismiss="modal" data-backdrop="false"></span>
+                </div>
+                <div class="modal-body">
+                    <div class="user-setting-section">
+
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="button" data-bs-dismiss="modal" th:text="#{close}"></button>
+                    <button type="button" class="button button-blue" th:text="#{save}"></button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</html>
