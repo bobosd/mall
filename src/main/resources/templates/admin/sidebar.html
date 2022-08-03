@@ -48,12 +48,13 @@
         </div>
         <div class="navbar-right-content">
             <div class="navbar-option-list no-text-select">
-                <div class="navbar-option">OPTION</div>
                 <div class="navbar-option dropdown-list">
-                    <span class="user-language" th:text="#{user_language}"></span>
-                    <span>
-                        <i class="fa-solid fa-earth-europe"></i>
-                    </span>
+                    <div class="navbar-option-text">
+                        <span th:text="#{user_language}"></span>
+                        <span>
+                            <i class="fa-solid fa-earth-europe"></i>
+                        </span>
+                    </div>
                     <div class="dropdown-content">
                         <div class="dropdown-option" onclick="location.href='?lang=zh_CN'">
                             <span><img src="/assets/img/1f1e8-1f1f3.png" alt="chinese" class="user-language-flag"></span>
@@ -61,16 +62,18 @@
                         </div>
                         <div class="dropdown-option" onclick="location.href='?lang=es_ES'">
                             <span><img src="/assets/img/1f1ea-1f1f8.png" alt="spanish" class="user-language-flag"></span>
-                            <span>Español</span>
+                            <span>español</span>
                         </div>
                         <div class="dropdown-option" onclick="location.href='?lang=en_US'">
                             <span><img src="/assets/img/1f1fa-1f1f8.png" alt="english" class="user-language-flag"></span>
-                            <span>English</span>
+                            <span>english</span>
                         </div>
                     </div>
                 </div>
                 <div class="navbar-option dropdown-list">
-                    <span th:text="#{user}"></span>
+                    <div class="navbar-option-text">
+                        <span th:text="#{user}"></span>
+                    </div>
                     <div class="dropdown-content user-dropdown">
                         <div class="dropdown-option" data-bs-toggle="modal" data-bs-target="#user-settings-modal" th:text="#{settings}"></div>
                         <div class="dropdown-option">test option</div>
