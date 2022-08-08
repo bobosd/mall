@@ -41,6 +41,7 @@
 
 .login-panel-body {
     padding: 20px 0;
+    transition: all 0.3s linear;
 }
 
 .login-panel-footer {
@@ -48,6 +49,7 @@
 }
 
 .button-login {
+    cursor: pointer;
     font-weight: 800;
     border-radius: 7px;
     width: 100%;
@@ -55,4 +57,55 @@
     background-color: #0078ff;
     color: white;
     padding: 6px 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.button-login[disabled] {
+    background-color: #afd6ff;
+}
+
+.button-login[disabled]:hover {
+    cursor: default;
+}
+
+.spinner-border {
+    width: 16px;
+    height: 16px;
+}
+
+.login-alert {
+    padding: 6px;
+    display: none;
+}
+
+.language-option {
+    display: flex;
+    justify-content: right;
+}
+
+.login-panel-header .dropdown-list {
+    background-color: #e6e6e6;
+    border-radius: 5px;
+    cursor: default;
+    font-size: 14px;
+}
+
+.login-panel-header .dropdown-list img {
+    height: 12px;
+    width: 12px;
+}
+
+.dropdown-label {
+    padding: 2px 8px;
+}
+
+.dropdown-option {
+    font-weight: 400;
+    padding: 1px 8px;
+}
+
+.dropdown-content {
+    padding: 1px 8px;
 }

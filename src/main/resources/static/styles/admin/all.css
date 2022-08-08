@@ -44,3 +44,32 @@ body {
     border-color: #86b7fe;
     box-shadow: 0 0 0 0.25rem rgb(13 110 253 / 25%);
 }
+
+.dropdown-content {
+    padding: 3px 8px;
+    display: none;
+    position: absolute;
+    left: inherit;
+    color: black;
+    border-radius: 5px;
+    background-color: rgba(240, 240, 240, 82%);
+    -webkit-backdrop-filter: blur(7px);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 0 5px 0 rgba(180, 180, 180, 0.8);
+}
+
+.dropdown-list:hover .dropdown-content {
+    display: block;
+}
+
+.dropdown-option {
+    font-size: 14px;
+    border-radius: 5px;
+    padding: 0 12px;
+    margin: 2px 0;
+}
+
+.dropdown-option:hover {
+    background-color: #0078ff;
+    color: white;
+}

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--  xmlns="http://mybatis.org/schema/mybatis-mapper"  -->
+<mapper namespace="com.jiezipoi.mall.dao.AdminUserDao">
+    <resultMap id="BaseResultMap" type="com.jiezipoi.mall.entity.AdminUser">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="login_user_name" jdbcType="VARCHAR" property="loginUserName"/>
+        <result column="login_password" jdbcType="VARCHAR" property="loginPassword"/>
+        <result column="nick_name" jdbcType="VARCHAR" property="nickName"/>
+        <result column="locked" jdbcType="TINYINT" property="locked"/>
+    </resultMap>
+
+    <select id="login" resultMap="BaseResultMap">
+        SELECT id, login_user_name, login_password, nick_name, locked
+        FROM admin_user
+        WHERE login_user_name = #{userName} AND login_password = #{password} AND locked = 0
+    </select>
+</mapper>
