@@ -11,33 +11,19 @@
             <span class="logo-name">POI商城</span>
         </div>
         <div class="sidebar-option-list no-text-select">
-            <div class="sidebar-option" option-selected="true">
-                <a href="#">
+            <a href="/admin/index">
+                <div class="sidebar-option dashboard">
                     <i class="fa-solid fa-chart-line"></i>
                     <span class="sidebar-option-text" th:text="#{dashboard}"></span>
-                </a>
-            </div>
+                </div>
+            </a>
 
-            <div class="sidebar-option">
-                <a href="#">
+            <a href="/admin/product-category">
+                <div class="sidebar-option product-category">
                     <i class="fa-solid fa-tag"></i>
                     <span class="sidebar-option-text" th:text="#{product_categories}"></span>
-                </a>
-            </div>
-
-            <div class="sidebar-option">
-                <a href="#">
-                    <i class="fa-solid fa-circle-question"></i>
-                    <span class="sidebar-option-text">OPTION</span>
-                </a>
-            </div>
-
-            <div class="sidebar-option">
-                <a href="#">
-                    <span class="sidebar-option-svg"><i class="fa-solid fa-circle-question"></i></span>
-                    <span class="sidebar-option-text">OPTION</span>
-                </a>
-            </div>
+                </div>
+            </a>
         </div>
     </div>
     <div class="navbar">
@@ -72,12 +58,12 @@
                 </div>
                 <div class="navbar-option dropdown-list">
                     <div class="navbar-option-text">
-                        <span th:text="#{user}"></span>
+                        <span th:text="${#session.getAttribute('nickname')}"></span>
+                        <i class="fa-solid fa-user"></i>
                     </div>
-                    <div class="dropdown-content user-dropdown">
+                    <div class="dropdown-content user-dropdown" th:style="'left:calc(100% - '+#{css.admin.user.dropdown.left}+'px);'">
                         <div class="dropdown-option" data-bs-toggle="modal" data-bs-target="#user-settings-modal" th:text="#{settings}"></div>
-                        <div class="dropdown-option">test option</div>
-                        <div class="dropdown-option">large test option</div>
+                        <div class="dropdown-option" th:text="#{logout}"></div>
                     </div>
                 </div>
             </div>
@@ -118,6 +104,10 @@
                     $(this).attr("option-selected", true);
                 }
             });
+        }
+
+        function sidebarSetSelected(node) {
+            node.attr("option-selected", "true");
         }
     </script>
 </body>
