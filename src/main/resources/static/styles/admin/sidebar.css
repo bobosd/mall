@@ -65,7 +65,7 @@
     margin: 2px 0;
 }
 
-.sidebar-option a {
+.sidebar-option-list a {
     color: black;
     font-weight: 400;
     text-decoration: none;
@@ -89,7 +89,7 @@
     background-color: #0078ff;
 }
 
-.sidebar-option[option-selected="true"] a {
+.sidebar-option[option-selected="true"] {
     background-color: #0078ff;
     color: white;
 }
@@ -179,10 +179,4 @@
 .user-language-flag {
     height: 22px;
     width: 22px;
-}
-
-.user-dropdown.dropdown-content {
-    left:-webkit-calc(100% - 153px);
-    left:-moz-calc(100% - 153px);
-    left:calc(100% - 153px);
 }
