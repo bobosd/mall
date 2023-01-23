@@ -1,7 +1,7 @@
 package com.jiezipoi.mall.entity;
 
 public class AdminUser {
-    private int id;
+    private Integer id;
     private String loginUserName;
     private String loginPassword;
     private String nickName;
@@ -11,7 +11,7 @@ public class AdminUser {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

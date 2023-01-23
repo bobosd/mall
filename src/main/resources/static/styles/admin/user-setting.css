@@ -1,0 +1,12 @@
+#modal-password input {
+    margin-bottom: 10px;
+}
+
+.password-validation-container {
+    padding: 5px 10px;
+    font-size: 12px;
+}
+
+#modal-password .alert {
+    display: none;
+}

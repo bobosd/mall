@@ -15,4 +15,22 @@
         FROM admin_user
         WHERE login_user_name = #{userName} AND login_password = #{password} AND locked = 0
     </select>
+
+    <select id="getUserById" resultMap="BaseResultMap">
+        SELECT id, login_user_name, login_password, nick_name, locked
+        FROM admin_user
+        WHERE id = ${id};
+    </select>
+
+    <update id="updateNickname">
+        UPDATE admin_user
+        SET nick_name = #{nickname}
+        WHERE id = #{id};
+    </update>
+
+    <update id="updatePassword">
+        UPDATE admin_user
+        SET login_password = #{newMD5Password}
+        WHERE id = #{id};
+    </update>
 </mapper>

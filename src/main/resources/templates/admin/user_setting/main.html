@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="admin/header::general-libraries-and-styles">
+    <title id="page-title"></title>
+</head>
+<link rel="stylesheet" href="/styles/admin/user-setting.css">
+<body>
+<div th:replace="admin/sidebar::sidebar-fragment"></div>
+
+<div class="main">
+    <!-- Edit username modal -->
+    <div class="modal" id="modal-username" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" th:text="#{settings}"></h5>
+                    <span class="close-btn-dot" data-bs-dismiss="modal" data-backdrop="false"></span>
+                </div>
+                <div class="modal-body">
+                    <div class="user-setting-section">
+                        <input class="form-control form-control-sm input-username" type="text" aria-label="username">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="button" data-bs-dismiss="modal" th:text="#{close}"></button>
+                    <button type="button" class="button button-blue" th:text="#{save}" onclick="changeNickName()"></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit password modal -->
+    <div class="modal" id="modal-password" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" th:text="#{settings}"></h5>
+                    <span class="close-btn-dot" data-bs-dismiss="modal" data-backdrop="false"></span>
+                </div>
+                <div class="modal-body">
+                    <div class="user-setting-section">
+                        <label for="input-original-password" th:text="#{current.password}"></label>
+                        <input class="form-control form-control-sm" id="input-original-password" type="password">
+
+                        <label for="input-new-password" th:text="#{new.password}"></label>
+                        <input class="form-control form-control-sm" id="input-new-password"
+                               type="password" oninput="validatePassword()">
+                        <div class="password-validation-container" style="display: none">
+                            <div id="password-validation-length">
+                                <i class="fa-solid fa-xmark"></i>
+                                <span th:text="#{password.validation.length}"></span>
+                            </div>
+                            <div id="password-validation-character">
+                                <i class="fa-solid fa-xmark"></i>
+                                <span th:text="#{password.validation.contains}"></span>
+                            </div>
+                        </div>
+                        <label for="input-confirm-password" th:text="#{confirm.password}"></label>
+                        <input class="form-control form-control-sm" id="input-confirm-password"
+                               type="password" oninput="checkConfirmPsw()">
+                    </div>
+
+                    <div class="alert alert-danger"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="button" data-bs-dismiss="modal" th:text="#{close}"></button>
+                    <button type="button" class="button button-blue" th:text="#{save}" onclick="updatePassword()"></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="block">
+        <div class="block-title" th:text="#{account}"></div>
+        <div class="block-content">
+
+            <div class="block-row row justify-content-center hover">
+                <div class="col-10">
+                    <div class="fw-bold" th:text="#{username} + ':'"></div>
+                    <div class="nickname" th:text="${user.getNickName()}"></div>
+                </div>
+                <div class="col-2 text-centre-right">
+                    <div class="button button-blue" th:text="#{edit}" onclick="showNicknameModal()"></div>
+                </div>
+            </div>
+
+            <div class="block-row row justify-content-center hover">
+                <div class="col-10">
+                    <div class="fw-bold" th:text="#{password} + ':'"></div>
+                    <div>******</div>
+                </div>
+                <div class="col-2 text-centre-right">
+                    <div class="button button-blue" th:text="#{edit}"
+                         data-bs-target="#modal-password" data-bs-toggle="modal"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+
+
+<script>
+    const nicknameModal = new bootstrap.Modal(document.getElementById("modal-username"), null);
+    const passwordModal = new bootstrap.Modal(document.getElementById("modal-password"), null);
+
+    $(document).ready(function () {
+        //reset password edit modal on close
+        $("#modal-password").on("hidden.bs.modal", (e) => {
+            console.log(e);
+            $("#modal-password input").val("");
+            $(".password-validation-container").hide();
+        });
+    });
+
+    function showNicknameModal() {
+        const nickname = $(".nickname").first().text();
+        const input = $("#modal-username .input-username");
+        input.val(nickname);
+        input.attr("placeholder", nickname);
+        nicknameModal.show();
+    }
+
+    function changeNickName() {
+        const nickName = $(".input-username").val();
+        const btnConfirm = $("#modal-username .button-blue");
+        btnConfirm.addSpinner();
+        $.ajax({
+            url: "/admin/setNickName",
+            method: "POST",
+            data: {nickname: nickName},
+            success: (res) => {
+                if (res.code === 0) {
+                    $(".nickname").text(nickName);
+                    Swal.fire({
+                        title: res.message,
+                        icon: "success",
+                        showConfirmButton: false,
+                        timer: 1000
+                    });
+                } else {
+                    Swal.fire({
+                        title: res.message,
+                        icon: "error",
+                        showConfirmButton: false,
+                        timer: 1000
+                    });
+                }
+            },
+            error: (err) => {
+                console.log(err);
+            },
+            complete: () => {
+                // noinspection JSUnresolvedFunction
+                nicknameModal.hide();
+                btnConfirm.removeSpinner();
+            },
+        });
+    }
+
+    function isValidPassword(password) {
+        return has8Length(password) &&
+            hasAlphabet(password) &&
+            hasNumber(password) &&
+            hasSpecialCharacter(password);
+    }
+
+    function has8Length(str) {
+        return str.length >= 8;
+    }
+
+    function hasAlphabet(str) {
+        const regEx = new RegExp("\\w+");
+        return regEx.test(str);
+    }
+
+    function hasNumber(str) {
+        const regEx = new RegExp("\\d+");
+        return regEx.test(str);
+    }
+
+    function hasSpecialCharacter(str) {
+        const regEx = new RegExp("[~!@#$%^&*()_+=\\-\\[\\]{};:/.,<>?]");
+        return regEx.test(str);
+    }
+
+    function showValidationMessage() {
+        $(".password-validation-container").show(400);
+    }
+
+    function validatePassword() {
+        showValidationMessage();
+        const password = $("#input-new-password").val();
+        if (has8Length(password)) {
+            $("#password-validation-length").find(".fa-xmark").removeClass("fa-xmark").addClass("fa-check");
+        } else {
+            $("#password-validation-length").find(".fa-check").removeClass("fa-check").addClass("fa-xmark");
+        }
+
+        if (hasAlphabet(password) && hasNumber(password) && hasSpecialCharacter(password)) {
+            $("#password-validation-character").find(".fa-xmark").removeClass("fa-xmark").addClass("fa-check");
+        } else {
+            $("#password-validation-character").find(".fa-check").removeClass("fa-check").addClass("fa-xmark");
+        }
+    }
+
+    function updatePassword() {
+        const inputNewPsw = $("#input-new-password");
+        const inputConfirmPsw = $("#input-confirm-password");
+        const inputOriginalPsw = $("#input-original-password");
+
+        const originalPsw = inputOriginalPsw.val();
+        const newPsw = inputNewPsw.val();
+        const confirmPsw = inputConfirmPsw.val();
+
+        if (!isValidPassword(newPsw)) {
+            inputNewPsw.setInvalid();
+            return;
+        }
+
+        if (newPsw !== confirmPsw) {
+            inputConfirmPsw.setInvalid();
+            return;
+        }
+
+        $.ajax({
+            url: "/admin/updatePassword",
+            method: "POST",
+            data: {
+                originalPassword: originalPsw,
+                newPassword: newPsw
+            },
+            success: (res) => {
+                console.log(res)
+                if (res.code === 0) {
+                    Swal.fire({
+                        title: res.message,
+                        icon: "success",
+                        showConfirmButton: false,
+                        timer: 1000
+                    });
+                    passwordModal.hide();
+
+                } else if (res.code === 1) {
+                    inputOriginalPsw.setInvalid();
+                    showErrorAlert(res.message);
+                } else {
+                    showErrorAlert(res.message);
+                }
+            },
+            error: (err) => {
+                showErrorAlert(err.errorText);
+            }
+        });
+    }
+
+    function showErrorAlert(msg) {
+        const alert = $("#modal-password .alert-danger");
+        alert.text(msg);
+        alert.show(400);
+    }
+
+    function checkConfirmPsw() {
+        const newPsw = $("#input-new-password").val();
+        const inputConfirmPsw = $("#input-confirm-password");
+        const confirmPsw = inputConfirmPsw.val();
+        if (newPsw !== confirmPsw) {
+            inputConfirmPsw.addClass("is-invalid");
+        } else {
+            inputConfirmPsw.removeClass("is-invalid");
+        }
+    }
+</script>
+</html>

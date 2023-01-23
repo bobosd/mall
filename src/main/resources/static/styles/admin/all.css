@@ -7,7 +7,7 @@
 }
 
 body {
-    font-family: tahoma, arial, "Microsoft YaHei", "Hiragino Sans GB", u5b8bu4f53, sans-serif;
+    font-family: sans-serif;
 }
 
 .main {
@@ -28,6 +28,12 @@ body {
     color: #3d3d3d;
     padding: 2px 12px;
     border: none;
+    cursor: pointer;
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+    user-select: none; /* Non-prefixed version, currently supported by Chrome and Opera */
 }
 
 .button-blue {
@@ -53,7 +59,7 @@ body {
     color: black;
     border-radius: 5px;
     background-color: rgba(240, 240, 240, 82%);
-    -webkit-backdrop-filter: blur(7px);
+    -webkit-backdrop-filter: blur(10px);
     backdrop-filter: blur(10px);
     box-shadow: 0 0 5px 0 rgba(180, 180, 180, 0.8);
 }
@@ -72,4 +78,72 @@ body {
 .dropdown-option:hover {
     background-color: #0078ff;
     color: white;
+}
+
+a {
+    color: black;
+    font-weight: 400;
+    text-decoration: none;
+    cursor: default;
+}
+
+.main {
+    display: flex;
+    justify-content: center;
+    padding: 15px 20px;
+}
+
+.block {
+    min-width: 670px;
+    padding: 20px 20px;
+    box-shadow: 0 0 5px 0 rgba(180, 180, 180, 0.8);
+    border-radius: 15px;
+}
+
+.block-title {
+    margin-bottom: 15px;
+    display: inline-block;
+    font-weight: lighter;
+    font-size: 24px;
+}
+
+.block-content {
+    font-size: 14px;
+}
+
+.text-centre {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.text-centre-right {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.block-row {
+    padding: 5px 0;
+    margin: 10px 0;
+}
+
+.block-row.hover {
+    border-radius: 10px;
+}
+
+.block-row.hover:hover {
+    background-color: #e8e8e8;
+}
+
+.modal label {
+    font-size: 14px;
+}
+
+.fa-check {
+    color: #5ac659;
+}
+
+.fa-xmark {
+    color: #c64b3b;
 }

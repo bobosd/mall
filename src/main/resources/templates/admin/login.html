@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head th:include="/admin/header::general-libraries-and-styles">
+<base href="/mall">
+<head th:include="admin/header::general-libraries-and-styles">
     <title></title>
     <!-- ??? -->
-
 </head>
 
-<link rel="stylesheet" href="/styles/admin/login.css">
+<link rel="stylesheet" th:href="@{/styles/admin/login.css}">
 <body class="hold-transition login-page">
 <div class="background">
     <div class="login-panel">
@@ -21,23 +21,23 @@
                         </span>
                         </div>
                         <div class="dropdown-content">
-                            <div class="dropdown-option" onclick="location.href='?lang=zh_CN'">
-                                <span><img src="/assets/img/1f1e8-1f1f3.png" alt="chinese" class="user-language-flag"></span>
+                            <div class="dropdown-option" onclick="location.href='mall/admin/login?lang=zh_CN'">
+                                <span><img th:src="@{/assets/img/1f1e8-1f1f3.png}" alt="chinese" class="user-language-flag"></span>
                                 <span>简体中文</span>
                             </div>
-                            <div class="dropdown-option" onclick="location.href='?lang=es_ES'">
-                                <span><img src="/assets/img/1f1ea-1f1f8.png" alt="spanish" class="user-language-flag"></span>
+                            <div class="dropdown-option" onclick="location.href='mall/admin/login?lang=es_ES'">
+                                <span><img th:src="@{/assets/img/1f1ea-1f1f8.png}" alt="spanish" class="user-language-flag" src=""></span>
                                 <span>español</span>
                             </div>
-                            <div class="dropdown-option" onclick="location.href='?lang=en_US'">
-                                <span><img src="/assets/img/1f1fa-1f1f8.png" alt="english" class="user-language-flag"></span>
+                            <div class="dropdown-option" onclick="location.href='mall/admin/login?lang=en_US'">
+                                <span><img th:src="@{/assets/img/1f1fa-1f1f8.png}" alt="english" class="user-language-flag"></span>
                                 <span>english</span>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="text-center">
-                    <img src="/assets/img/poi_128x128.png" alt="mall icon">
+                    <img th:src="@{/assets/img/poi_128x128.png}" alt="mall icon">
                 </div>
             </div>
             <div class="login-panel-body">
@@ -69,7 +69,7 @@
         let btn = $(this);
         btn.addSpinner();
         $.ajax({
-            url: "/admin/login",
+            url: "admin/login",
             method: "POST",
             data: data,
             success: (response) => {
@@ -77,7 +77,7 @@
                 if (response.code === 0) {
                     window.location.href = response.data;
                 } else {
-                    let alert = $(".login-alert")
+                    let alert = $(".login-alert");
                     alert.text(response.message);
                     alert.show();
                 }
