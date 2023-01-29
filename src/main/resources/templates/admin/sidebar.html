@@ -10,7 +10,9 @@
             </div>
             <span class="logo-name">POI商城</span>
         </div>
+
         <div class="sidebar-option-list no-text-select">
+            <div class="sidebar-option-list-tittle">Tittle</div>
             <a th:href="@{/admin/index}">
                 <div class="sidebar-option dashboard">
                     <i class="fa-solid fa-chart-line"></i>
@@ -22,6 +24,16 @@
                 <div class="sidebar-option product-category">
                     <i class="fa-solid fa-tag"></i>
                     <span class="sidebar-option-text" th:text="#{product_categories}"></span>
+                </div>
+            </a>
+        </div>
+
+        <div class="sidebar-option-list no-text-select">
+            <div class="sidebar-option-list-tittle">首页配置</div>
+            <a th:href="@{/admin/carousel}">
+                <div class="sidebar-option carousel-setting">
+                    <i class="fa-solid fa-images"></i>
+                    <span class="sidebar-option-text" th:text="#{carousel}"></span>
                 </div>
             </a>
         </div>
@@ -94,7 +106,6 @@
 
         function sidebarOptionListener() {
             $(".sidebar-option").click(function () {
-                console.log($(this));
                 if ($(this).attr("option-selected") !== "true") {
                     $(".sidebar-option[option-selected=true]").removeAttr("option-selected");
                     $(this).attr("option-selected", true);

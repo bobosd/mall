@@ -37,9 +37,22 @@ body {
 }
 
 .button-blue {
-    background-color: #0078ff;
     color: white;
+    background-color: #0078ff;
 }
+
+.button-blue:hover {
+    background-color: #228bff;
+}
+
+.button-red {
+    color: white;
+    background-color: #e53b1b;
+}
+.button-red:hover {
+    background-color: #f36042;
+}
+
 
 .button-gray {
     background-color: #b4b4b4;
@@ -94,6 +107,7 @@ a {
 }
 
 .block {
+    width: 850px;
     min-width: 670px;
     padding: 20px 20px;
     box-shadow: 0 0 5px 0 rgba(180, 180, 180, 0.8);

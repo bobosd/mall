@@ -32,7 +32,6 @@ public class AdminController {
             return "admin/admin-index";
         }
     }
-
     @ResponseBody
     @PostMapping("/login")
     public Result<?> login(@RequestParam("username") String username,
@@ -70,6 +69,11 @@ public class AdminController {
         request.getSession().removeAttribute("userId");
         request.getSession().removeAttribute("nickname");
         return "admin/login";
+    }
+
+    @GetMapping("/carousel")
+    public String carousel() {
+        return "admin/index_setting/carousel";
     }
 
     @PostMapping("/updatePassword")
