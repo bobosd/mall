@@ -1,5 +1,9 @@
 package com.jiezipoi.mall.utils;
 
+import org.springframework.context.i18n.LocaleContextHolder;
+
+import java.util.Locale;
+
 public class Result<T> {
     String message;
     int code;
@@ -13,6 +17,12 @@ public class Result<T> {
 
     public Result() {
 
+    }
+
+    public Result(CommonResponse response) {
+        Locale locale = LocaleContextHolder.getLocale();
+        this.message = response.getMessage(locale);
+        this.code = 0;
     }
 
     public String getMessage() {

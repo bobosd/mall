@@ -161,3 +161,54 @@ a {
 .fa-xmark {
     color: #c64b3b;
 }
+
+/* DataTable style*/
+table {
+    border-collapse: collapse;
+    border-radius: 5px;
+    box-shadow: 0 0 5px 0 rgba(180, 180, 180, 0.8);
+    overflow: hidden;
+    width: 100%;
+}
+
+table img {
+    border-radius: 8px;
+}
+
+tr {
+    padding: 0 20px;
+}
+
+thead {
+    border-radius: 5px;
+}
+
+th {
+    padding: 10px 0;
+    background-color: #f3f3f3;
+    color: #000000;
+}
+
+th, td {
+    padding: 5px;
+}
+
+td {
+    font-size: 13px;
+}
+
+tr:hover {
+    background-color: #d9d9d9;
+}
+
+.dataTables_length {
+    float: left;
+    font-size: 13px;
+    margin: 5px 0;
+}
+
+.dataTables_filter {
+    float: right;
+    font-size: 13px;
+    margin: 5px 0;
+}

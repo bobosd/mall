@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <base href="/mall">
-<head th:include="admin/header::general-libraries-and-styles">
-    <title></title>
-    <!-- ??? -->
+<head th:replace="admin/header::general-libraries-and-styles(~{::title}, ~{::link}, ~{::script})">
+    <title>Login</title>
+    <link>
 </head>
 
 <link rel="stylesheet" th:href="@{/styles/admin/login.css}">

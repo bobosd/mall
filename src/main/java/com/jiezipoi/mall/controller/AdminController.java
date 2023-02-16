@@ -50,7 +50,7 @@ public class AdminController {
         int id = (int) session.getAttribute("userId");
         AdminUser user = adminUserService.getUser(id);
         map.put("user", user);
-        return "admin/user_setting/main";
+        return "admin/user_setting/user-setting";
     }
 
     @PostMapping("/setNickName")

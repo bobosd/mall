@@ -18,7 +18,7 @@
             create_user, update_time, update_user
     </sql>
 
-    <select id="findCarouselList" parameterType="Map" resultMap="BaseResultMap">
+    <select id="findCarouselList" resultMap="BaseResultMap">
         SELECT <include refid="base_column_list"/>
         FROM carousel
         WHERE is_deleted = 0

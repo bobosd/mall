@@ -1,7 +1,6 @@
 package com.jiezipoi.mall.dao;
 
 import com.jiezipoi.mall.entity.Carousel;
-import com.jiezipoi.mall.utils.PageQueryUtil;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -19,7 +18,7 @@ public interface CarouselDao {
 
     int updateByPrimary(Carousel carousel);
 
-    List<Carousel> findCarouselList(PageQueryUtil pageQueryUtil);
+    List<Carousel> findCarouselList(@Param("start") Integer start, @Param("limit") Integer limit);
 
     int getTotalCarousels();
 

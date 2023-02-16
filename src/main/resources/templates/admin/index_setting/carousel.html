@@ -1,7 +1,11 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="admin/header::general-libraries-and-styles">
+<head th:replace="admin/header::general-libraries-and-styles(~{::title}, ~{::link}, ~{this::head/script})">
     <title id="page-title"></title>
+    <link rel="stylesheet" href="/styles/admin/carousel.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs5/dt-1.13.2/datatables.min.css"/>
+    <script type="text/javascript" src="https://cdn.datatables.net/v/bs5/dt-1.13.2/datatables.min.js"></script>
+
 </head>
 <body>
 <div th:replace="admin/sidebar::sidebar-fragment"></div>
@@ -11,16 +15,143 @@
         <div class="block-content">
             <div class="block-row row">
                 <div class="carousel-option">
-                    <button class="button button-blue" th:text="#{add}"></button>
+                    <button class="button button-blue" th:text="#{add}" onclick="showAddCarouselModal()"></button>
                     <button class="button button-blue" th:text="#{modify}"></button>
                     <button class="button button-red" th:text="#{remove}"></button>
+                </div>
+                <div class="carousel-list-container">
+                    <table>
+                        <thead>
+                        <tr>
+                            <th th:text="#{carousel}"></th>
+                            <th th:text="#{redirect.link}"></th>
+                            <th th:text="#{order}"></th>
+                            <th th:text="#{create.date}"></th>
+                        </tr>
+                        </thead>
+                    </table>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<!-- https://stackoverflow.com/questions/23945494/use-html5-to-resize-an-image-before-upload -->
+
+<div class="modal fade" id="modal-carousel" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" th:text="#{carousel}"></h5>
+                <span class="close-btn-dot" data-bs-dismiss="modal" data-backdrop="false"></span>
+            </div>
+            <div class="modal-body">
+
+                <img alt="preview"/>
+                <div class="image-upload" onclick="setCarouselImage()">
+                    <div><i class="fa-regular fa-image fa-4x"></i></div>
+                </div>
+                <input type="file" accept="image/jpeg,image/jpg,image/png" class="input-image" hidden>
+
+                <label th:text="#{redirect.link}" for="input-redirect-link"></label>
+                <input class="form-control form-control-sm" id="input-redirect-link" type="text">
+
+                <label th:text="#{order}" for="add-carousel-order"></label>
+                <input class="form-control form-control-sm input-order" id="add-carousel-order" type="text">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="button" data-bs-dismiss="modal" th:text="#{close}"></button>
+                <button type="button" class="button button-blue" th:text="#{create}"
+                        id="btn-create-carousel" onclick=""/>
+                <button type="button" class="button button-blue" th:text="#{save}"
+                        id="btn-modify-carousel" onclick=""/>
+            </div>
+        </div>
+    </div>
+</div>
 </body>
+
 <script>
-    sidebarSetSelected($(".carousel-setting"));
+    let addCarouselModal = null;
+
+    $(document).ready(() => {
+        addCarouselModal = new bootstrap.Modal(document.getElementById("modal-carousel"));
+        sidebarSetSelected($(".carousel-setting"));
+        initListener();
+        initDataTable();
+    });
+
+    function initListener() {
+        //preview listener
+        $(".input-image").change((e) => {
+            const [file] = $(".input-image").prop("files");
+            if (file !== null) {
+                $(".modal-body img").attr("src", URL.createObjectURL(file));
+            }
+        });
+    }
+
+    function showAddCarouselModal() {
+        $("#btn-modify-carousel").hide();
+        $("#btn-create-carousel").show();
+        addCarouselModal.show();
+    }
+
+    function showModifyCarouselModal() {
+        $("#btn-modify-carousel").show();
+        $("#btn-create-carousel").hide();
+        addCarouselModal.show();
+    }
+
+    function initDataTable() {
+        $(".carousel-list-container table").DataTable({
+            autoWidth: false,
+            processing: true,
+            serverSide: true,
+            ajax: {
+                url: "/admin/carousels/list",
+                type: "POST",
+                dataFilter: (response) => {
+                    response = JSON.parse(response);
+                    const data = {}
+                    if (response.code === 0) {
+                        data.recordsTotal = response.data.recordsTotal;
+                        data.recordsFiltered = response.data.recordsTotal;
+                        data.data = response.data.list;
+                    }
+                    return JSON.stringify(data);
+                }
+            },
+            columns: [
+                {
+                    data: "carouselUrl",
+                    render: (data) => {
+                        return '<img alt="carousel image" src="' + data + '"/>';
+                    },
+                    width: "30%",
+                },
+                {
+                    data: "redirectUrl",
+                    render: data => {
+                        if (data.length > 30) {
+                            return data.substring(0, 30) + "...";
+                        }
+                        return data;
+                    },
+                    width: "30%"
+                },
+                {
+                    data: "carouselRank",
+                    width: "15%",
+                    className: "text-center"
+                },
+                {data: "createTime", width: "25%"}
+            ]
+        });
+    }
+
+    function setCarouselImage() {
+        $(".input-image").click();
+    }
 </script>
 </html>

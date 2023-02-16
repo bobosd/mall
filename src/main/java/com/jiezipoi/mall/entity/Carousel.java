@@ -2,7 +2,7 @@ package com.jiezipoi.mall.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public class Carousel {
     private Integer carouselId;
@@ -11,10 +11,10 @@ public class Carousel {
     private Integer carouselRank;
     private Byte isDeleted;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDate createTime;
+    private LocalDateTime createTime;
     private Integer createUser;
     @JsonFormat(pattern = "dd-MM-yyyy HH:mm:ss")
-    private LocalDate updateTime;
+    private LocalDateTime updateTime;
     private Integer updateUser;
 
     public Integer getCarouselId() {
@@ -58,11 +58,11 @@ public class Carousel {
         this.isDeleted = isDeleted;
     }
 
-    public LocalDate getCreateTime() {
+    public LocalDateTime getCreateTime() {
         return createTime;
     }
 
-    public void setCreateTime(LocalDate createTime) {
+    public void setCreateTime(LocalDateTime createTime) {
         this.createTime = createTime;
     }
 
@@ -74,11 +74,11 @@ public class Carousel {
         this.createUser = createUser;
     }
 
-    public LocalDate getUpdateTime() {
+    public LocalDateTime getUpdateTime() {
         return updateTime;
     }
 
-    public void setUpdateTime(LocalDate updateTime) {
+    public void setUpdateTime(LocalDateTime updateTime) {
         this.updateTime = updateTime;
     }
 

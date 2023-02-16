@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="admin/header::general-libraries-and-styles">
-    <title id="page-title"></title>
+<head th:replace="admin/header::general-libraries-and-styles(~{::title}, ~{::link}, ~{::script})">
+    <title id="pageTitle">TEST</title>
 </head>
 <link rel="stylesheet" href="/styles/admin/user-setting.css">
 <body>
