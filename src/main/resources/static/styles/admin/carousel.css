@@ -10,7 +10,7 @@
     border: 2px dashed #DDDDDD;
     color: #DDDDDD;
     width: 100%;
-    height: 100px;
+    height: 112px;
     border-radius: 10px;
     cursor: pointer;
     display: flex;
@@ -25,4 +25,29 @@
 .image-upload:hover {
     color: #212529;
     border-color: #0078ff;
+}
+
+.image-preview {
+    height: 112px;
+    border-radius: 10px;
+}
+
+.image-container {
+    display: none;
+}
+
+.image-preview-container {
+    height: 112px;
+    color: #DDDDDD;
+    margin: auto;
+    border-radius: 10px;
+    width: max-content;
+}
+
+.btn-change-image {
+    margin: 10px 0;
+}
+
+.cropper-drag-box, .cropper-container, .cropper-wrap-box, .cropper-canvas {
+    border-radius: 10px;
 }

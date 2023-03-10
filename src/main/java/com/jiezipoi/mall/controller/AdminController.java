@@ -50,7 +50,7 @@ public class AdminController {
         int id = (int) session.getAttribute("userId");
         AdminUser user = adminUserService.getUser(id);
         map.put("user", user);
-        return "admin/user_setting/user-setting";
+        return "admin/user-setting";
     }
 
     @PostMapping("/setNickName")
@@ -73,7 +73,7 @@ public class AdminController {
 
     @GetMapping("/carousel")
     public String carousel() {
-        return "admin/index_setting/carousel";
+        return "admin/carousel";
     }
 
     @PostMapping("/updatePassword")

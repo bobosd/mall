@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<!--suppress JSUnresolvedVariable -->
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="admin/header::general-libraries-and-styles(~{::title}, ~{::link}, ~{this::head/script})">
+    <title id="page-title"></title>
+    <div th:replace="admin/header::datatable"></div>
+    <div th:replace="admin/header::cropper"></div>
+    <link rel="stylesheet" href="/styles/admin/carousel.css">
+</head>
+<body>
+<div th:replace="admin/sidebar::sidebar-fragment"></div>
+<div class="main">
+    <div class="block">
+        <div class="block-title" th:text="#{carousel.setting}"></div>
+        <div class="block-content">
+            <div class="block-row row">
+                <div class="carousel-option">
+                    <button class="button button-blue" th:text="#{add}" onclick="showAddCarouselModal()"></button>
+                </div>
+                <div class="carousel-list-container">
+                    <table>
+                        <thead>
+                        <tr>
+                            <th></th>
+                            <th th:text="#{carousel}"></th>
+                            <th th:text="#{redirect.link}"></th>
+                            <th th:text="#{order}"></th>
+                            <th th:text="#{create.date}"></th>
+                            <th></th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modal-carousel" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" th:text="#{carousel}"></h5>
+                <span class="close-btn-dot" data-bs-dismiss="modal" data-backdrop="false"></span>
+            </div>
+            <div class="modal-body">
+                <div class="image-container">
+                    <div class="image-preview-container">
+                        <img alt="preview" class="image-preview"/>
+                    </div>
+                    <div class="d-flex justify-content-center">
+                        <button class="button button-blue btn-change-image" th:text="#{change.image}"
+                                onclick="setCarouselImage()"/>
+                    </div>
+                </div>
+                <div class="image-upload" onclick="setCarouselImage()">
+                    <div><i class="fa-regular fa-image fa-4x"></i></div>
+                </div>
+                <input type="file" accept="image/jpeg,image/jpg,image/png" class="input-image" hidden>
+                <label th:text="#{redirect.link}" for="input-redirect-link"></label>
+                <input class="form-control form-control-sm" id="input-redirect-link" type="text">
+
+                <label th:text="#{order}" for="input-rank-order"></label>
+                <input class="form-control form-control-sm input-order" id="input-rank-order" type="text">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="button" data-bs-dismiss="modal" th:text="#{close}"></button>
+                <button type="button" class="button button-blue" th:text="#{create}"
+                        id="btn-create-carousel" onclick="createCarousel()"/>
+                <button type="button" class="button button-blue" th:text="#{save}"
+                        id="btn-modify-carousel"/>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+
+<script>
+    const carouselModal = new bootstrap.Modal(document.getElementById("modal-carousel"));
+    let cropper;
+    let datatable;
+
+    $(document).ready(() => {
+        sidebarSetSelected($(".carousel-setting"));
+        initListener();
+        initDataTable();
+    });
+
+    function initListener() {
+        //carousel image preview listener
+        $(".input-image").change(() => {
+            const [file] = $(".input-image").prop("files");
+            if (file !== null) {
+                const url = URL.createObjectURL(file);
+                const img = new Image();
+                img.src = url;
+                img.onload = () => {
+                    const height = img.height;
+                    const width = img.width;
+                    if (isValidImage(width, height)) {
+                        $(".image-preview").prop("src", url);
+                        showPreview(true);
+                        prepareCropper(width, height);
+                    } else {
+                        $(".input-image").val("");
+                    }
+                };
+            } else {
+                showPreview(false);
+            }
+        });
+
+        //carousel modal listener
+        $("#modal-carousel").on("hidden.bs.modal", () => {
+            $(".input-image").val(null);
+            $("#input-redirect-link").val(null);
+            $("#input-rank-order").val(null);
+            if (cropper != null) {
+                cropper.destroy();
+                cropper = null;
+            }
+            showPreview(false);
+        });
+    }
+
+    function prepareCropper() {
+        const container = $(".image-preview");
+        cropper = new Cropper(container.get(0), {
+            aspectRatio: 998 / 447,
+            viewMode: 1,
+            minContainerHeight: 112,
+            minContainerWidth: container.width(),
+            autoCropArea: 1
+        });
+    }
+
+    function isValidImage(width, height) {
+        if (!isValidResolution(width, height)) {
+            const msg = "[[#{invalid.image.resolution}]]";
+            Swal.fire({
+                title: msg,
+                icon: "error"
+            });
+            return false;
+        }
+
+        if (!isValidRatio(width, height)) {
+            const msg = "[[#{invalid.image.ratio}]]";
+            Swal.fire({
+                title: msg,
+                icon: "error"
+            });
+            return false;
+        }
+        return true;
+    }
+
+    function isValidRatio(width, height) {
+        const widthRatio = width / height;
+        return widthRatio < 4.5 && widthRatio > 0.5;
+    }
+
+    function isValidResolution(width, height) {
+        return width > 998 && height > 447;
+    }
+
+    function showPreview(flag) {
+        if (flag === true) {
+            $(".image-upload").hide();
+            $(".image-container").show();
+        } else {
+            $(".image-upload").show();
+            $(".image-container").hide();
+        }
+    }
+
+    function showAddCarouselModal() {
+        $("#btn-modify-carousel").hide();
+        $("#btn-create-carousel").show();
+        carouselModal.show();
+    }
+
+    function showModifyCarouselModal(e) {
+        const btnSave = $("#btn-modify-carousel");
+        btnSave.show();
+        $("#btn-create-carousel").hide();
+
+        //prepare modal content
+        const tr = $(e).closest("tr");
+        const data = datatable.row(tr).data();
+        btnSave.click(() => prepareUpdateData(data.carouselId));
+        $("#input-rank-order").val(data.carouselRank);
+        $("#input-redirect-link").val(data.redirectUrl);
+        $(".image-preview").prop("src", "/admin/carousel/img/" + data.carouselUrl);
+        showPreview(true);
+        carouselModal.show();
+    }
+
+    function prepareUpdateData(id) {
+        if (validateUpdateCarouselForm() === false) {
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append("redirectUrl", $("#input-redirect-link").val());
+        formData.append("order", $("#input-rank-order").val());
+        formData.append("id", id);
+        if (cropper == null) {
+            updateCarousel(formData);
+        } else {
+            cropper.getCroppedCanvas().toBlob((blob) => {
+                formData.append("image", blob);
+                updateCarousel(formData);
+            }, "image/jpeg", 0.7);
+        }
+    }
+
+    function updateCarousel(data) {
+        $.ajax({
+            url: "/admin/carousels/update",
+            method: "POST",
+            data: data,
+            processData: false,
+            contentType: false,
+            success: (res) => {
+                if (res.code === 200) {
+                    showChangeSavedSwal();
+                    datatable.draw();
+                    carouselModal.hide();
+                } else {
+                    Swal.fire({
+                        title: res.mensage,
+                        icon: "error",
+                        showConfirmButton: true
+                    });
+                }
+            },
+            error: () => {
+                showServerErrorSwal();
+            }
+        });
+    }
+
+    function validateUpdateCarouselForm() {
+        let isValid = true;
+        const inputRedirect = $("#input-redirect-link");
+        const inputOrder = $("#input-rank-order");
+
+        const redirectUrl = inputRedirect.val();
+        const order = inputOrder.val();
+
+        if (redirectUrl.length === 0) {
+            inputRedirect.setInvalid();
+            isValid = false;
+        }
+
+        const validator = new Validator(order);
+        if (!validator.isInteger()) {
+            inputOrder.setInvalid();
+            isValid = false;
+        }
+        return isValid;
+    }
+
+    function initDataTable() {
+        // noinspection JSUnusedGlobalSymbols
+        datatable = $(".carousel-list-container table").DataTable({
+            autoWidth: false,
+            processing: true,
+            serverSide: true,
+            order: [3, 'desc'],
+            ajax: {
+                url: "/admin/carousels/list",
+                type: "POST",
+                contentType: "application/json",
+                data: (data) => JSON.stringify(data),
+                dataFilter: (response) => {
+                    response = JSON.parse(response);
+                    const data = {}
+                    if (response.code === 200) {
+                        data.recordsTotal = response.data.recordsTotal;
+                        data.recordsFiltered = response.data.recordsTotal;
+                        data.data = response.data.list;
+                    }
+                    console.log((data.data));
+                    return JSON.stringify(data);
+                }
+            },
+            columns: [
+                {
+                    visible: false,
+                    data: "carouselId",
+                },
+                {
+                    data: "carouselUrl",
+                    render: (url) => {
+                        return '<img alt="carousel image" src="/admin/carousel/img/' + url + '"/>';
+                    },
+                    width: "30%",
+                    orderable: false
+                },
+                {
+                    data: "redirectUrl",
+                    render: data => {
+                        if (data.length > 30) {
+                            return data.substring(0, 30) + "...";
+                        }
+                        return data;
+                    },
+                    width: "30%",
+                    orderable: false
+                },
+                {
+                    data: "carouselRank",
+                    width: "15%",
+                    className: "text-center",
+                    orderable: true
+                },
+                {data: "createTime", width: "25%"},
+                {
+                    data: null,
+                    render: () => {
+                        return '<button class="button button-blue" onclick="showModifyCarouselModal(this)"><i class="fa-solid fa-pen-to-square"></i></button>';
+                    },
+                    orderable: false
+                },
+                {
+                    data: "carouselId",
+                    render: (id) => {
+                        return '<button class="button button-red" onclick="showDeleteConfirmation(' + id + ')"><i class="fa-solid fa-trash-can"></i></button>';
+                    },
+                    orderable: false
+                }
+            ],
+            createdRow: (row, data) => {
+                $(row).attr("carousel-id", data.carouselId);
+            }
+        });
+    }
+
+    function setCarouselImage() {
+        if (cropper != null) {
+            cropper.destroy();
+        }
+        $(".input-image").click();
+    }
+
+    function validateCreateCarouselForm() {
+        let isValid = true;
+        const inputRedirect = $("#input-redirect-link");
+        const inputOrder = $("#input-rank-order");
+
+        const redirectUrl = inputRedirect.val();
+        const order = inputOrder.val();
+
+        if (redirectUrl.length === 0) {
+            inputRedirect.setInvalid();
+            isValid = false;
+        }
+
+        const validator = new Validator(order);
+        if (!validator.isInteger()) {
+            inputOrder.setInvalid();
+            isValid = false;
+        }
+
+        if ($(".input-image").prop("files").length === 0) {
+            $(".image-upload").setInvalid();
+            isValid = false;
+        }
+        return isValid;
+    }
+
+    function createCarousel() {
+        const btnCreate = $("#btn-create-carousel");
+        btnCreate.addSpinner();
+        if (validateCreateCarouselForm() === false) {
+            btnCreate.removeSpinner();
+            return;
+        }
+        cropper.getCroppedCanvas().toBlob((blob) => {
+            const formData = new FormData();
+            formData.append("image", blob);
+            formData.append("redirectUrl", $("#input-redirect-link").val());
+            formData.append("order", $("#input-rank-order").val());
+            $.ajax({
+                url: "/admin/carousels/save",
+                method: "POST",
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: (res) => {
+                    if (res.code === 200) {
+                        Swal.fire({
+                            title: res.message,
+                            icon: "success",
+                            showConfirmButton: false,
+                            timer: 1000,
+                        });
+                        carouselModal.hide();
+                        datatable.draw();
+                    } else {
+                        Swal.fire({
+                            title: res.message,
+                            icon: "error"
+                        });
+                    }
+                },
+                error: (err) => {
+                    Swal.fire({
+                        title: err.message,
+                        icon: "error"
+                    });
+                },
+                complete: () => {
+                    btnCreate.removeSpinner();
+                }
+            });
+        }, "image/jpeg", 0.7);
+    }
+
+    function showDeleteConfirmation(id) {
+        Swal.fire({
+            title: "[[#{confirm.delete}]]",
+            icon: "warning",
+            showConfirmButton: true,
+            showDenyButton: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                deleteCarousel(id)
+            }
+        });
+    }
+
+    function deleteCarousel(id) {
+        $.ajax({
+            url: "/admin/carousels/delete",
+            method: "POST",
+            data: {ids: [id]},
+            success: (res) => {
+                if (res.code === 200) {
+                    Swal.fire({
+                        title: "[[#{delete.success}]]",
+                        icon: "success",
+                        timer: 1000
+                    });
+                    datatable.draw();
+                } else {
+                    Swal.fire({
+                        title: res.message,
+                        icon: "error",
+                        showConfirmButton: true
+                    });
+                }
+            },
+            error: () => {
+                Swal.fire({
+                    title: "[[#{error.server}]]",
+                    icon: "error",
+                    showConfirmButton: true
+                });
+            }
+        });
+    }
+</script>
+</html>

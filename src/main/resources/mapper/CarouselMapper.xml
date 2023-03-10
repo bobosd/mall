@@ -19,10 +19,11 @@
     </sql>
 
     <select id="findCarouselList" resultMap="BaseResultMap">
-        SELECT <include refid="base_column_list"/>
+        SELECT
+        <include refid="base_column_list"/>
         FROM carousel
         WHERE is_deleted = 0
-        ORDER BY carousel_rank DESC
+        ORDER BY ${orderBy}
         <if test="start != null and limit != null">
             LIMIT #{start}, #{limit}
         </if>

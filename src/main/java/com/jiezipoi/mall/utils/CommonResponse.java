@@ -12,11 +12,12 @@ public enum CommonResponse {
     ERROR("save.failed", 404),
     DATA_NOT_EXIST("data.not.exists", 404),
     INVALID_DATA("invalid.data", 400),
+    INTERNAL_SERVER_ERROR("error.server", 500),
     ;
 
     private MessageSource messageSource;
     private final String i18nKey;
-    private int code;
+    private final int code;
 
     CommonResponse(String i18nKey, int code) {
         this.i18nKey = i18nKey;
@@ -29,6 +30,10 @@ public enum CommonResponse {
 
     public String getMessage(Locale locale) {
         return this.messageSource.getMessage(i18nKey, null, locale);
+    }
+
+    public int getCode() {
+        return code;
     }
 
     @Component

@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="admin/header::general-libraries-and-styles(~{::title}, ~{::link}, ~{::script})">
+<head th:replace="admin/header::general-libraries-and-styles(~{::title}, ~{::link}, ~{::head/script})">
     <title id="page-title"></title>
 </head>
 
@@ -12,6 +12,6 @@
 </body>
 
 <script>
-    sidebarSetSelected($(".sidebar-option.product-category"));
+    sidebarSetSelected($(".product-category"));
 </script>
 </html>

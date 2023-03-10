@@ -22,7 +22,7 @@ public class Result<T> {
     public Result(CommonResponse response) {
         Locale locale = LocaleContextHolder.getLocale();
         this.message = response.getMessage(locale);
-        this.code = 0;
+        this.code = response.getCode();
     }
 
     public String getMessage() {

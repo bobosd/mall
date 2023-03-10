@@ -18,7 +18,9 @@ public interface CarouselDao {
 
     int updateByPrimary(Carousel carousel);
 
-    List<Carousel> findCarouselList(@Param("start") Integer start, @Param("limit") Integer limit);
+    List<Carousel> findCarouselList(@Param("start") Integer start,
+                                    @Param("limit") Integer limit,
+                                    @Param("orderBy") String orderBy);
 
     int getTotalCarousels();
 

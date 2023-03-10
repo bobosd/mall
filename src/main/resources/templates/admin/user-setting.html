@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="admin/header::general-libraries-and-styles(~{::title}, ~{::link}, ~{::script})">
+<head th:replace="admin/header::general-libraries-and-styles(~{::title}, ~{::link}, ~{::head/script})">
     <title id="pageTitle">TEST</title>
 </head>
 <link rel="stylesheet" href="/styles/admin/user-setting.css">
@@ -9,7 +9,7 @@
 
 <div class="main">
     <!-- Edit username modal -->
-    <div class="modal" id="modal-username" tabindex="-1">
+    <div class="modal fade" id="modal-username" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -30,7 +30,7 @@
     </div>
 
     <!-- Edit password modal -->
-    <div class="modal" id="modal-password" tabindex="-1">
+    <div class="modal fade" id="modal-password" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -107,7 +107,6 @@
     $(document).ready(function () {
         //reset password edit modal on close
         $("#modal-password").on("hidden.bs.modal", (e) => {
-            console.log(e);
             $("#modal-password input").val("");
             $(".password-validation-container").hide();
         });
@@ -147,8 +146,8 @@
                     });
                 }
             },
-            error: (err) => {
-                console.log(err);
+            error: () => {
+                showServerErrorSwal();
             },
             complete: () => {
                 // noinspection JSUnresolvedFunction
@@ -231,7 +230,6 @@
                 newPassword: newPsw
             },
             success: (res) => {
-                console.log(res)
                 if (res.code === 0) {
                     Swal.fire({
                         title: res.message,

@@ -1,13 +1,17 @@
 package com.jiezipoi.mall.controller;
 
-import com.jiezipoi.mall.entity.Carousel;
 import com.jiezipoi.mall.service.CarouselService;
 import com.jiezipoi.mall.utils.Result;
+import com.jiezipoi.mall.utils.dataTable.DataTableRequest;
+import com.jiezipoi.mall.utils.dataTable.Order;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import java.util.HashMap;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/admin")
@@ -15,25 +19,39 @@ public class CarouselController {
     @Resource
     CarouselService carouselService;
 
-    @GetMapping("/carousels")
-    public String carouselPage(HttpServletRequest request) {
-        return "admin/index_setting/carousel";
-    }
-
     @RequestMapping(value = "/carousels/list", method = RequestMethod.POST)
     @ResponseBody
-    public Result<?> list(@RequestParam("start") Integer start, @RequestParam("length") Integer limit) {
-        return carouselService.getCarouselPage(start, limit);
+    public Result<?> list(@RequestBody DataTableRequest request) {
+        String orderBy = null;
+        if (request.getOrder().size() != 0) {
+            Order order = request.getOrder().get(0);
+            Map<Integer, String> columnMap = new HashMap<>();
+            columnMap.put(3, "carousel_rank");
+            columnMap.put(4, "create_time");
+            orderBy = order.toOrderByString(columnMap);
+        }
+        return carouselService.getCarouselPage(request.getStart(), request.getLength(), orderBy);
     }
 
     @RequestMapping(value = "/carousels/save", method = RequestMethod.POST)
     @ResponseBody
-    public Result<?> save(@RequestBody Carousel carousel) {
-        return carouselService.saveCarousel(carousel);
+    public Result<?> save(@RequestParam("image") MultipartFile image,
+                          @RequestParam("redirectUrl") String redirectUrl,
+                          @RequestParam("order") Integer order,
+                          HttpSession session) {
+        int userId = (int) session.getAttribute("userId");
+        return carouselService.saveCarousel(image, redirectUrl, order, userId);
     }
 
-    public Result<?> update(@RequestBody Carousel carousel) {
-        return carouselService.updateCarousel(carousel);
+    @PostMapping("/carousels/update")
+    @ResponseBody
+    public Result<?> update(@RequestParam(value = "image", required = false) MultipartFile image,
+                            @RequestParam("id") Integer id,
+                            @RequestParam("redirectUrl") String redirectUrl,
+                            @RequestParam("order") Integer order,
+                            HttpSession session) {
+        int userId = (int) session.getAttribute("userId");
+        return carouselService.updateCarousel(id, image, redirectUrl, order, userId);
     }
 
     @GetMapping("/carousels/info/{id}")
@@ -43,7 +61,8 @@ public class CarouselController {
     }
 
     @PostMapping("/carousels/delete")
-    public Result<?> delete(@RequestBody Integer[] ids) {
+    @ResponseBody
+    public Result<?> delete(@RequestParam("ids[]") Integer[] ids) {
         return carouselService.deleteBatch(ids);
     }
 }
