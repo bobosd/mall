@@ -1,0 +1,53 @@
+.carousel-list-container table img {
+    width: 200px;
+}
+
+.carousel-list-container {
+    margin: 20px 0;
+}
+
+.image-upload {
+    border: 2px dashed #DDDDDD;
+    color: #DDDDDD;
+    width: 100%;
+    height: 112px;
+    border-radius: 10px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    align-content: center;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.image-upload:hover {
+    color: #212529;
+    border-color: #0078ff;
+}
+
+.image-preview {
+    height: 112px;
+    border-radius: 10px;
+}
+
+.image-container {
+    display: none;
+}
+
+.image-preview-container {
+    height: 112px;
+    color: #DDDDDD;
+    margin: auto;
+    border-radius: 10px;
+    width: max-content;
+}
+
+.btn-change-image {
+    margin: 10px 0;
+}
+
+.cropper-drag-box, .cropper-container, .cropper-wrap-box, .cropper-canvas {
+    border-radius: 10px;
+}

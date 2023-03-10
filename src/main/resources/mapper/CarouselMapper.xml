@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.jiezipoi.mall.dao.CarouselDao">
+    <resultMap id="BaseResultMap" type="com.jiezipoi.mall.entity.Carousel">
+        <id column="id" jdbcType="INTEGER" property="carouselId"/>
+        <result column="carousel_url" jdbcType="VARCHAR" property="carouselUrl"/>
+        <result column="redirect_url" jdbcType="VARCHAR" property="redirectUrl"/>
+        <result column="carousel_rank" jdbcType="INTEGER" property="carouselRank"/>
+        <result column="is_deleted" jdbcType="TINYINT" property="isDeleted"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="update_user" jdbcType="INTEGER" property="updateUser"/>
+    </resultMap>
+
+    <sql id="base_column_list">
+        id, carousel_url, redirect_url, carousel_rank, is_deleted, create_time,
+            create_user, update_time, update_user
+    </sql>
+
+    <select id="findCarouselList" resultMap="BaseResultMap">
+        SELECT
+        <include refid="base_column_list"/>
+        FROM carousel
+        WHERE is_deleted = 0
+        ORDER BY ${orderBy}
+        <if test="start != null and limit != null">
+            LIMIT #{start}, #{limit}
+        </if>
+    </select>
+
+    <select id="getTotalCarousels" resultType="int">
+        SELECT COUNT(*)
+        FROM carousel
+        WHERE is_deleted = 0;
+    </select>
+
+    <select id="selectByPrimaryKey" parameterType="int" resultMap="BaseResultMap">
+        SELECT
+        <include refid="base_column_list"/>
+        FROM carousel
+        WHERE id = #{carouselId}
+    </select>
+
+    <select id="findCarouselByNum" parameterType="int" resultMap="BaseResultMap">
+        SELECT
+        <include refid="base_column_list">
+        </include>
+        FROM carousel
+        WHERE is_deleted = 0
+        ORDER BY carousel_rank
+        LIMIT #{number};
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="int">
+        DELETE
+        FROM carousel
+        WHERE id = #{carouselId,jdbcType=INTEGER};
+    </delete>
+
+    <insert id="insert" parameterType="com.jiezipoi.mall.entity.Carousel">
+        INSERT INTO carousel(<include refid="base_column_list"/>)
+        VALUES (#{carouselId,jdbcType=INTEGER}, #{carouselUrl,jdbcType=VARCHAR}, #{redirectUrl,jdbcType=VARCHAR},
+        #{carouselRank,jdbcType=INTEGER}, #{isDeleted,jdbcType=TINYINT}, #{createTime,jdbcType=TIMESTAMP},
+        #{createUser,jdbcType=INTEGER}, #{updateTime,jdbcType=TIMESTAMP}, #{updateUser,jdbcType=INTEGER});
+    </insert>
+    
+    <insert id="insertSelective" parameterType="com.jiezipoi.mall.entity.Carousel">
+        INSERT INTO carousel
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="carouselId != null">
+                id,
+            </if>
+            <if test="carouselUrl != null">
+                carousel_url,
+            </if>
+            <if test="redirectUrl != null">
+                redirect_url,
+            </if>
+            <if test="carouselRank != null">
+                carousel_rank,
+            </if>
+            <if test="isDeleted != null">
+                is_deleted,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="createUser != null">
+                create_user,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+            <if test="updateUser != null">
+                update_user,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="carouselId != null">
+                #{carouselId,jdbcType=INTEGER},
+            </if>
+            <if test="carouselUrl != null">
+                #{carouselUrl,jdbcType=VARCHAR},
+            </if>
+            <if test="redirectUrl != null">
+                #{redirectUrl,jdbcType=VARCHAR},
+            </if>
+            <if test="carouselRank != null">
+                #{carouselRank,jdbcType=INTEGER},
+            </if>
+            <if test="isDeleted != null">
+                #{isDeleted,jdbcType=TINYINT},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="createUser != null">
+                #{createUser,jdbcType=INTEGER},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateUser != null">
+                #{updateUser,jdbcType=INTEGER},
+            </if>
+        </trim>
+    </insert>
+
+    <update id="updateByPrimaryKeySelective" parameterType="com.jiezipoi.mall.entity.Carousel">
+        UPDATE carousel
+        <set>
+            <if test="carouselUrl != null">
+                carousel_url = #{carouselUrl,jdbcType=VARCHAR},
+            </if>
+            <if test="redirectUrl != null">
+                redirect_url = #{redirectUrl,jdbcType=VARCHAR},
+            </if>
+            <if test="carouselRank != null">
+                carousel_rank = #{carouselRank,jdbcType=INTEGER},
+            </if>
+            <if test="isDeleted != null">
+                is_deleted = #{isDeleted,jdbcType=TINYINT},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="createUser != null">
+                create_user = #{createUser,jdbcType=INTEGER},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateUser != null">
+                update_user =  #{updateUser,jdbcType=INTEGER},
+            </if>
+        </set>
+        WHERE id = #{carouselId}
+    </update>
+
+    <update id="updateByPrimary" parameterType="com.jiezipoi.mall.entity.Carousel">
+        UPDATE carousel
+        SET
+        carousel_url = #{carouselUrl,jdbcType=VARCHAR},
+        redirect_url = #{redirectUrl,jdbcType=VARCHAR},
+        carousel_rank = #{carouselRank,jdbcType=INTEGER},
+        is_deleted = #{isDeleted,jdbcType=TINYINT},
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+        create_user = #{createUser,jdbcType=INTEGER},
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+        update_user =  #{updateUser,jdbcType=INTEGER}
+        WHERE id = #{carouselId}
+    </update>
+
+    <update id="deleteBatch">
+        UPDATE carousel
+        SET is_deleted = 1, update_time = NOW()
+        WHERE id IN
+        <foreach collection="array" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+</mapper>

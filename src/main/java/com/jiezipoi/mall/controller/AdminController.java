@@ -32,7 +32,6 @@ public class AdminController {
             return "admin/admin-index";
         }
     }
-
     @ResponseBody
     @PostMapping("/login")
     public Result<?> login(@RequestParam("username") String username,
@@ -51,7 +50,7 @@ public class AdminController {
         int id = (int) session.getAttribute("userId");
         AdminUser user = adminUserService.getUser(id);
         map.put("user", user);
-        return "admin/user_setting/main";
+        return "admin/user-setting";
     }
 
     @PostMapping("/setNickName")
@@ -70,6 +69,11 @@ public class AdminController {
         request.getSession().removeAttribute("userId");
         request.getSession().removeAttribute("nickname");
         return "admin/login";
+    }
+
+    @GetMapping("/carousel")
+    public String carousel() {
+        return "admin/carousel";
     }
 
     @PostMapping("/updatePassword")

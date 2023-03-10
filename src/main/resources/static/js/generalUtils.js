@@ -27,4 +27,32 @@ jQuery.fn.setInvalid = function () {
         this.removeClass("is-invalid");
         this.unbind();
     });
+    this.click(() => {
+        this.removeClass("is-invalid");
+        this.unbind();
+    });
 };
+
+class Validator {
+    constructor(string) {
+        this._string = string;
+    }
+
+    get string() {
+        return this._string;
+    }
+
+    set string(value) {
+        this._string = value;
+    }
+
+    isNumeric() {
+        const regEx = new RegExp("([0-9])+(.?[0-9]+)");
+        return regEx.test(this._string);
+    }
+
+    isInteger() {
+        const regEx = new RegExp("[0-9]+");
+        return regEx.test(this._string);
+    }
+}

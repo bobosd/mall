@@ -1,6 +1,21 @@
 .sidebar-option-list {
+    border-bottom: #b4b4b4 2px solid;
     list-style-type: none;
-    padding: 0;
+    margin: 0 13px 10px 13px;
+    padding: 20px 0;
+}
+
+.sidebar-option-list:first-child {
+    padding: 0 0 20px 0;
+}
+
+.sidebar-option-list:last-child {
+    border-bottom: none;
+}
+
+.sidebar-option-list-tittle {
+    color: #7e7e7e;
+    font-weight: bold;
 }
 
 .sidebar-toggle {
@@ -41,11 +56,6 @@
 
 .sidebar-search-container {
     margin: 10px 5px;
-}
-
-.sidebar-option-list {
-    margin-top: 20px;
-    padding: 0 13px;
 }
 
 .sidebar-option {
