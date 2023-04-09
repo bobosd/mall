@@ -1,4 +1,7 @@
-package com.jiezipoi.mall.utils.dataTable;
+package com.jiezipoi.mall.utils.dataTable.request;
+
+import com.jiezipoi.mall.utils.dataTable.Order;
+import com.jiezipoi.mall.utils.dataTable.Search;
 
 import java.util.List;
 

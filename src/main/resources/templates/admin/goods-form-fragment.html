@@ -1,0 +1,231 @@
+<!--suppress HtmlFormInputWithoutLabel -->
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<div th:fragment="goods-form">
+    <div class="block-content">
+        <div class="row">
+            <label th:text="#{product_categories} + ':'"></label>
+            <div class="col-4">
+                <select id="slc-category-level-1"
+                        th:lang="${#locale.toString() == 'zh_CN' ? 'zh-CN' : #locale.getCountry()}">
+                </select>
+            </div>
+            <div class="col-4">
+                <select id="slc-category-level-2"
+                        th:lang="${#locale.toString() == 'zh_CN' ? 'zh-CN' : #locale.getCountry()}"
+                        disabled>
+                </select>
+            </div>
+            <div class="col-4">
+                <select id="slc-category-level-3"
+                        th:lang="${#locale.toString() == 'zh_CN' ? 'zh-CN' : #locale.getCountry()}"
+                        disabled>
+                </select>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-6">
+                <input class="form-control form-control-sm" th:placeholder="#{product.name}">
+            </div>
+            <div class="col-6">
+                <input class="form-control form-control-sm" th:placeholder="#{product.description}">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-4">
+                <input class="form-control form-control-sm" th:placeholder="#{product.cost.price}">
+            </div>
+            <div class="col-4">
+                <input class="form-control form-control-sm" th:placeholder="#{product.sale.price}">
+            </div>
+            <div class="col-4">
+                <input class="form-control form-control-sm" th:placeholder="#{stock}">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <select id="slc-goods-tag" th:placeholder="#{product.tag}" multiple></select>
+            </div>
+        </div>
+        <div class="image-preview-container">
+            <div>
+                <img alt="product image" class="img-product"/>
+            </div>
+            <button class="button button-blue btn-change-image" th:text="#{change.image}"></button>
+        </div>
+        <div class="image-upload-container">
+            <div><i class="fa-solid fa-box fa-4x"></i></div>
+            <span th:text="#{upload.product.image} + '(150*150)'"></span>
+        </div>
+        <input type="file" id="input-product-img" hidden>
+        <div id="editor"></div>
+        <div class="form-check form-switch">
+            <label class="form-check-label" for="flexSwitchCheckDefault" th:text="#{available.sale}"></label>
+            <input class="form-check-input" type="checkbox" id="flexSwitchCheckDefault">
+        </div>
+    </div>
+    <script>
+        let cropper = null;
+
+        $(document).ready(() => {
+            initListener();
+            initSelect2();
+        });
+
+        function initListener() {
+            //on category select option change
+            const slcCategoryL1 = $("#slc-category-level-1");
+            const slcCategoryL2 = $("#slc-category-level-2");
+            const slcCategoryL3 = $("#slc-category-level-3");
+
+            slcCategoryL1.change(() => {
+                slcCategoryL3.val(null).trigger("change"); //reset select2
+                slcCategoryL2.val(null).trigger("change");
+                slcCategoryL3.prop("disabled", true);
+                if (slcCategoryL1.val() == null) {
+                    slcCategoryL2.prop("disabled", true);
+                } else {
+                    slcCategoryL2.prop("disabled", false);
+                }
+            });
+
+            slcCategoryL2.change(() => {
+                if (slcCategoryL2.val() == null) {
+                    slcCategoryL3.prop("disabled", true);
+                } else {
+                    slcCategoryL3.prop("disabled", false);
+                }
+            });
+
+            //on click
+            $(".image-upload-container").click(() => {
+                $("#input-product-img").click();
+            });
+
+            $(".btn-change-image").click(() => {
+                $("#input-product-img").click();
+            });
+
+            //on image set
+            $("#input-product-img").change(() => {
+                if (cropper != null) {
+                    cropper.destroy();
+                }
+                $(".image-upload-container").hide();
+                const [file] = $("#input-product-img").prop("files");
+                if (file !== null) {
+                    const url = URL.createObjectURL(file);
+                    const img = new Image();
+                    img.src = url;
+                    img.onload = () => {
+                        const height = img.height;
+                        const width = img.width;
+                        if (width >= 150 && height >= 150) {
+                            $(".image-preview-container").css({display: "flex"});
+                            $(".img-product").prop("src", url);
+                            prepareCropper(width, height);
+                        } else {
+                            $(".input-image").val("");
+                            Swal.fire({
+                                title: "[[#{invalid.product.image.resolution}]]",
+                                text: " ",
+                                showConfirmButton: true,
+                                icon: "error"
+                            });
+                        }
+                    };
+                }
+            });
+        }
+
+        function prepareCropper() {
+            const container = $(".img-product");
+            console.log(container.width)
+            cropper = new Cropper(container.get(0), {
+                aspectRatio: 150 / 150,
+                viewMode: 1,
+                minContainerHeight: 150,
+                minContainerWidth: container.width(),
+                autoCropArea: 1
+            });
+        }
+
+        const processCategoryResult = (response) => {
+            console.log(response);
+            if (response.code === 200) {
+                const options = response.data.map((c) => ({id: c.id, text: c.categoryName}));
+                return {results: options};
+            } else {
+                return {results: []};
+            }
+        };
+
+        function initSelect2() {
+            $("#slc-category-level-1").select2({
+                language: "es",
+                placeholder: "[[#{product.category.level1}]]",
+                ajax: {
+                    url: "/admin/product-category/listByLevelAndParent",
+                    method: "POST",
+                    dataType: "json",
+                    data: {parentId: 0, level: 1},
+                    processResults: processCategoryResult,
+                }
+            });
+
+            $("#slc-category-level-2").select2({
+                placeholder: "[[#{product.category.level2}]]",
+                ajax: {
+                    url: "/admin/product-category/listByLevelAndParent",
+                    method: "POST",
+                    dataType: "json",
+                    data: () => ({parentId: getLevel2Parent(), level: 2}),
+                    processResults: processCategoryResult,
+                }
+            });
+
+            $("#slc-category-level-3").select2({
+                placeholder: "[[#{product.category.level3}]]",
+                ajax: {
+                    url: "/admin/product-category/listByLevelAndParent",
+                    method: "POST",
+                    dataType: "json",
+                    data: () => ({parentId: getLevel3Parent(), level: 3}),
+                    processResults: processCategoryResult,
+                }
+            });
+
+            $("#slc-goods-tag").select2({
+                tags: true,
+                language: {
+                    noResults: function () {
+                        return "[[#{select2.tag}]]";
+                    },
+                },
+                placeholder: "[[#{product.tag}]]",
+            });
+        }
+
+        sidebarSetSelected($(".create-product"));
+
+        var editor = null
+
+        function customUploadAdapter(editor) {
+            editor.plugins.get("FileRepository").createUploadAdapter = (loader) => new UploadAdapter(loader);
+        }
+
+        ClassicEditor.create(document.querySelector("#editor"), {
+            extraPlugins: [customUploadAdapter]
+        }).then(e => editor = e);
+
+        function getLevel2Parent() {
+            return $("#slc-category-level-1").val();
+        }
+
+        function getLevel3Parent() {
+            return $("#slc-category-level-2").val();
+        }
+    </script>
+</div>
+</html>

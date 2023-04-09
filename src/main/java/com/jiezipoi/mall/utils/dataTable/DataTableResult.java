@@ -1,9 +1,9 @@
-package com.jiezipoi.mall.utils;
+package com.jiezipoi.mall.utils.dataTable;
 
 import java.io.Serializable;
 import java.util.List;
 
-public class DatatableResult implements Serializable {
+public class DataTableResult implements Serializable {
     private int recordsTotal;
     private List<?> list;
 
@@ -13,7 +13,7 @@ public class DatatableResult implements Serializable {
      * @param totalCount    总记录数
      */
 
-    public DatatableResult(List<?> list, int totalCount) {
+    public DataTableResult(List<?> list, int totalCount) {
         this.list = list;
         this.recordsTotal = totalCount;
     }

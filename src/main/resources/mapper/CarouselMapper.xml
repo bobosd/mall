@@ -14,8 +14,7 @@
     </resultMap>
 
     <sql id="base_column_list">
-        id, carousel_url, redirect_url, carousel_rank, is_deleted, create_time,
-            create_user, update_time, update_user
+        id, carousel_url, redirect_url, carousel_rank, is_deleted, create_time, create_user, update_time, update_user
     </sql>
 
     <select id="findCarouselList" resultMap="BaseResultMap">

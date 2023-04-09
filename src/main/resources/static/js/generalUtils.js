@@ -55,4 +55,10 @@ class Validator {
         const regEx = new RegExp("[0-9]+");
         return regEx.test(this._string);
     }
+
+    //allow english letters with accent, chinese characters
+    onlyLetters() {
+        const regEx = new RegExp("[a-zA-ZÀ-ÿ\u4e00-\u9fa5\\s\\d]+");
+        return regEx.test(this._string);
+    }
 }

@@ -2,16 +2,330 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="admin/header::general-libraries-and-styles(~{::title}, ~{::link}, ~{::head/script})">
     <title id="page-title"></title>
+    <link rel="stylesheet" href="/styles/admin/product-category.css">
+    <link th:replace="admin/header::datatable"/>
 </head>
 
 <body>
 <div th:replace="admin/sidebar::sidebar-fragment"></div>
 <div class="main">
-    <h1>Category content</h1>
+    <div class="block">
+        <div class="block-title" th:text="#{product_categories}"></div>
+        <div class="block-content">
+            <div class="category-options">
+                <button class="button button-blue" id="btn-back" disabled><i class="fa-solid fa-chevron-left"></i></button>
+                <button class="button button-blue" id="btn-show-category-modal" th:text="#{create.category}"></button>
+            </div>
+            <table>
+                <thead>
+                <tr>
+                    <th th:text="#{category.name}"></th>
+                    <th th:text="#{rank.order}"></th>
+                    <th th:text="#{create.date}"></th>
+                    <th></th>
+                    <th></th>
+                </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modal-category" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" th:text="#{create.category}"></h5>
+                <span class="close-btn-dot" data-bs-dismiss="modal" data-backdrop="false"></span>
+            </div>
+            <div class="modal-body">
+                <label for="input-category-name" th:text="#{category.name}"></label>
+                <input class="form-control form-control-sm" id="input-category-name" autocomplete="off">
+                <label for="input-rank-order" th:text="#{rank.order}"></label>
+                <input class="form-control form-control-sm" id="input-rank-order" autocomplete="off">
+            </div>
+            <div class="modal-footer">
+                <button class="button button-gray" id="btn-close-modal" th:text="#{cancel}"></button>
+                <button class="button button-blue" id="btn-update-category" th:text="#{save}"></button>
+                <button class="button button-blue" id="btn-create-category" th:text="#{create}"></button>
+            </div>
+        </div>
+    </div>
 </div>
 </body>
 
 <script>
-    sidebarSetSelected($(".product-category"));
+    const categoryModal = new bootstrap.Modal(document.getElementById("modal-category"));
+
+    $(document).ready(() => {
+        initDataTable();
+        initListener();
+        sidebarSetSelected($(".product-category"));
+    });
+
+    let dataTable = null;
+    let categoryLevel = 1;
+    let parentId = 0;
+    let parentStack = [];
+
+    function initDataTable() {
+        dataTable = $("table").DataTable({
+            autoWidth: true,
+            processing: true,
+            serverSide: true,
+            lengthChange: false,
+            paging: false,
+            filter: false,
+            order: [1, 'desc'],
+            language: dataTableLocale,
+            ajax: {
+                url: "/admin/product-category/list",
+                method: "POST",
+                contentType: "application/json",
+                data: (data) => {
+                    data.categoryLevel = categoryLevel;
+                    data.parentId = parentId;
+                    return JSON.stringify(data);
+                },
+                dataFilter: (response) => {
+                    response = JSON.parse(response);
+                    const data = {}
+                    if (response.code === 200) {
+                        data.recordsTotal = response.data.recordsTotal;
+                        data.recordsFiltered = response.data.recordsTotal;
+                        data.data = response.data.list;
+                    }
+                    return JSON.stringify(data);
+                }
+            },
+            columns: [
+                {
+                    data: "categoryName",
+                    orderable: false
+                },
+                {
+                    data: "categoryRank",
+                },
+                {
+                    data: "createTime",
+                    orderable: false
+                },
+                {
+                    data: "id",
+                    render: (id) => {
+                        return '<button class="button button-blue btn-edit-category"><i class="fa-solid fa-edit"></i></button>';
+                    },
+                    orderable: false,
+                    width: 1,
+                    className: "td-function"
+                },
+                {
+                    data: "id",
+                    render: (id) => {
+                        return '<button class="button button-red btn-delete-category"><i class="fa-solid fa-trash-can"></i></button>';
+                    },
+                    orderable: false,
+                    width: 1,
+                    className: "td-function"
+                },
+            ],
+            createdRow: (row, data) => {
+                $(row).click((e) => {
+                    const eventDOM = $(e.target);
+                    if (eventDOM.closest("td").hasClass("td-function") || categoryLevel === 3) {
+                        return;
+                    }
+                    parentStack.push(parentId);
+                    parentId = data.id;
+                    categoryLevel += 1;
+                    renderCategoryTable();
+                });
+
+                $(row).find(".btn-edit-category").click(() => showUpdateCategoryModal(data));
+                $(row).find(".btn-delete-category").click(() => showConfirmDeleteSwal(data.id));
+            }
+        });
+    }
+
+    function initListener() {
+        //buttons listener
+        $("#btn-back").click(() => goBack());
+        $("#btn-close-modal").click(() => categoryModal.hide());
+        $("#btn-show-category-modal").click(() => showCreateCategoryModal());
+        $("#btn-create-category").click(() => createCategory());
+        //modal listener
+        $("#modal-category").on("hidden.bs.modal", () => {
+            $("#input-category-name").val(null);
+            $("#input-rank-order").val(null);
+        });
+
+    }
+
+    function renderCategoryTable() {
+        dataTable.ajax.reload();
+        updateBackButtonState();
+    }
+
+    function updateBackButtonState() {
+        const backButton = $("#btn-back");
+        backButton.attr("category-level", categoryLevel);
+        backButton.attr("parent-id", parentId);
+        backButton.prop("disabled", categoryLevel === 1);
+    }
+
+    function goBack() {
+        parentId = parentStack.pop();
+        categoryLevel -= 1;
+        renderCategoryTable();
+    }
+
+    function showCreateCategoryModal() {
+        $("#btn-create-category").show();
+        $("#btn-update-category").hide();
+        categoryModal.show();
+    }
+
+    /**
+     * @param category
+     * @param category.categoryName category name
+     * @param category.categoryRank category rank order
+     */
+    function showUpdateCategoryModal(category) {
+        $("#btn-create-category").hide();
+        $("#btn-update-category").show().click(() => updateCategory(category));
+        $("#input-category-name").val(category.categoryName);
+        $("#input-rank-order").val(category.categoryRank);
+
+        categoryModal.show();
+    }
+
+    function updateCategory(data) {
+        const btnCreate = $("#btn-update-category");
+        const category = {
+            id: data.id,
+            categoryRank: $("#input-rank-order").val(),
+            categoryName: $("#input-category-name").val(),
+            categoryLevel: data.categoryLevel
+        };
+
+        if (!validateCategoryForm(category)) {
+            return;
+        }
+
+        btnCreate.addSpinner();
+        $.ajax({
+            url: "/admin/product-category/update",
+            method: "POST",
+            data: JSON.stringify(category),
+            contentType: "application/json",
+            success: (res) => {
+                if (res.code === 200) {
+                    categoryModal.hide();
+                    showChangeSavedSwal();
+                    renderCategoryTable();
+                } else {
+                    Swal.fire({
+                        title: res.message,
+                        icon: "error",
+                        showConfirmButton: true
+                    });
+                }
+            },
+            error: () => {
+                showServerErrorSwal();
+            },
+            complete: () => {
+                btnCreate.removeSpinner();
+            }
+        });
+    }
+
+    function createCategory() {
+        const btnCreateCategory = $("#btn-create-category");
+        const category = {
+            categoryName: $("#input-category-name").val(),
+            categoryRank: $("#input-rank-order").val(),
+            categoryLevel: categoryLevel,
+            parentId: parentId
+        }
+
+        if (!validateCategoryForm(category)) {
+            return;
+        }
+
+        btnCreateCategory.addSpinner();
+        $.ajax({
+            url: "/admin/product-category/save",
+            method: "POST",
+            data: JSON.stringify(category),
+            contentType: "application/json",
+            success: (res) => {
+                if (res.code === 200) {
+                    categoryModal.hide();
+                    showCreateSuccessSwal();
+                    renderCategoryTable();
+                } else {
+                    Swal.fire({
+                        title: res.message,
+                        icon: "error",
+                        text: " ",
+                        position: "top",
+                        showConfirmButton: true
+                    });
+                }
+            },
+            error: () => showServerErrorSwal(),
+            complete: () => btnCreateCategory.removeSpinner(),
+        });
+    }
+
+    function validateCategoryForm(category) {
+        let isValid = true;
+        const {categoryRank} = category;
+
+        const validator = new Validator(categoryRank);
+        if (!validator.isInteger()) {
+            isValid = false;
+            $("#input-rank-order").setInvalid();
+        }
+        return isValid;
+    }
+
+    function showConfirmDeleteSwal(id) {
+        Swal.fire({
+            title: "[[#{confirm.delete}]]",
+            icon: "warning",
+            showConfirmButton: true,
+            showDenyButton: true,
+            reverseButtons: true,
+            position: "top",
+        }).then((result) => {
+            if (result.isConfirmed) {
+                deleteCategory(id);
+            }
+        });
+    }
+
+    function deleteCategory(id) {
+        $.ajax({
+            url: "/admin/product-category/delete",
+            method: "POST",
+            data: {ids: [id]},
+            success: (res) => {
+                if (res.code === 200) {
+                    showDeleteSuccessSwal();
+                    renderCategoryTable();
+                } else {
+                    Swal.fire({
+                        title: res.message,
+                        icon: "error",
+                        showConfirmButton: true,
+                        position: "top"
+                    });
+                }
+            },
+            error: () => showServerErrorSwal()
+        });
+    }
 </script>
 </html>

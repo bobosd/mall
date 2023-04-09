@@ -283,7 +283,6 @@
                         data.recordsFiltered = response.data.recordsTotal;
                         data.data = response.data.list;
                     }
-                    console.log((data.data));
                     return JSON.stringify(data);
                 }
             },
@@ -389,7 +388,7 @@
                 method: "POST",
                 data: formData,
                 processData: false,
-                contentType: false,
+                contentType: "multipart/form-data",
                 success: (res) => {
                     if (res.code === 200) {
                         Swal.fire({
@@ -397,19 +396,22 @@
                             icon: "success",
                             showConfirmButton: false,
                             timer: 1000,
+                            position: "top"
                         });
                         carouselModal.hide();
                         datatable.draw();
                     } else {
                         Swal.fire({
                             title: res.message,
-                            icon: "error"
+                            icon: "error",
+                            position: "top"
                         });
                     }
                 },
                 error: (err) => {
                     Swal.fire({
                         title: err.message,
+                        position: "top",
                         icon: "error"
                     });
                 },
@@ -425,7 +427,8 @@
             title: "[[#{confirm.delete}]]",
             icon: "warning",
             showConfirmButton: true,
-            showDenyButton: true
+            showDenyButton: true,
+            position: "top"
         }).then((result) => {
             if (result.isConfirmed) {
                 deleteCarousel(id)
@@ -443,14 +446,16 @@
                     Swal.fire({
                         title: "[[#{delete.success}]]",
                         icon: "success",
-                        timer: 1000
+                        timer: 1000,
+                        position: "top"
                     });
                     datatable.draw();
                 } else {
                     Swal.fire({
                         title: res.message,
                         icon: "error",
-                        showConfirmButton: true
+                        showConfirmButton: true,
+                        position: "top"
                     });
                 }
             },
@@ -458,7 +463,8 @@
                 Swal.fire({
                     title: "[[#{error.server}]]",
                     icon: "error",
-                    showConfirmButton: true
+                    showConfirmButton: true,
+                    position: "top"
                 });
             }
         });

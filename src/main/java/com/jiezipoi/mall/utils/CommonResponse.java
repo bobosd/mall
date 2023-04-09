@@ -8,10 +8,12 @@ import javax.annotation.PostConstruct;
 import java.util.Locale;
 
 public enum CommonResponse {
-    SUCCESS("saved", 200),
+    SUCCESS("success", 200),
+    DELETE_SUCCESS("delete.success", 200),
+    INVALID_DATA("invalid.data", 400),
     ERROR("save.failed", 404),
     DATA_NOT_EXIST("data.not.exists", 404),
-    INVALID_DATA("invalid.data", 400),
+    DATA_ALREADY_EXISTS("data.already.exists", 409),
     INTERNAL_SERVER_ERROR("error.server", 500),
     ;
 

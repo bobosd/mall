@@ -1,0 +1,11 @@
+.category-options {
+    margin-bottom: 10px;
+}
+
+tr {
+    cursor: pointer;
+}
+
+th, td {
+    white-space: nowrap;
+}

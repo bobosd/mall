@@ -1,13 +1,60 @@
 package com.jiezipoi.mall.controller;
 
+import com.jiezipoi.mall.entity.GoodsCategory;
+import com.jiezipoi.mall.service.GoodsCategoryService;
+import com.jiezipoi.mall.utils.CommonResponse;
+import com.jiezipoi.mall.utils.Result;
+import com.jiezipoi.mall.utils.dataTable.request.GoodsCategoryRequest;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.*;
 
-@Controller("/admin/product-category")
+@Controller
+@RequestMapping("/admin")
 public class GoodsCategoryController {
+    private final GoodsCategoryService service;
+
+    public GoodsCategoryController(GoodsCategoryService service) {
+        this.service = service;
+    }
 
     @GetMapping(value = "/product-category")
-    public String categoryPage() {
+    public String productCategory() {
         return "admin/product-category";
+    }
+
+    @PostMapping(value = "/product-category/list")
+    @ResponseBody
+    public Result<?> list(@RequestBody GoodsCategoryRequest request) {
+        return service.getCategoriesPage(request);
+    }
+
+    @PostMapping("/product-category/save")
+    @ResponseBody
+    public Result<?> save(@RequestBody GoodsCategory category) {
+        return service.saveCategory(category);
+    }
+
+    @PostMapping("/product-category/update")
+    @ResponseBody
+    public Result<?> update(@RequestBody GoodsCategory category) {
+        return service.updateGoodsCategory(category);
+    }
+
+    @GetMapping("/product-category/info")
+    @ResponseBody
+    public Result<?> info(Long id) {
+        return service.getGoodsCategoryById(id);
+    }
+
+    @PostMapping("/product-category/delete")
+    @ResponseBody
+    public Result<?> delete(@RequestParam("ids[]") Integer[] ids) {
+        return service.deleteBatch(ids);
+    }
+
+    @PostMapping("/product-category/listByLevelAndParent")
+    @ResponseBody
+    public Result<?> listByLevelAndParent(Integer level, Long parentId) {
+        return service.selectByLevelAndParentIdsAndNumber(parentId, level);
     }
 }

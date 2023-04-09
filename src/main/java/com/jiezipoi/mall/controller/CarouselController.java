@@ -2,7 +2,7 @@ package com.jiezipoi.mall.controller;
 
 import com.jiezipoi.mall.service.CarouselService;
 import com.jiezipoi.mall.utils.Result;
-import com.jiezipoi.mall.utils.dataTable.DataTableRequest;
+import com.jiezipoi.mall.utils.dataTable.request.DataTableRequest;
 import com.jiezipoi.mall.utils.dataTable.Order;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;

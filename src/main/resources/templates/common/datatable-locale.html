@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<script th:fragment="zh_CN">
+    const dataTableLocale = {
+        "search": "搜索:",
+        "paginate": {
+            "first": "首页",
+            "previous": "上页",
+            "next": "下页",
+            "last": "末页"
+        },
+        "autoFill": {
+            "cancel": "取消",
+            "fill": "用 <i>%d<\/i> 填充所有单元格",
+            "fillHorizontal": "水平填充单元格",
+            "fillVertical": "垂直填充单元格"
+        },
+        "buttons": {
+            "colvis": "列可见性",
+            "copy": "复制",
+            "copyTitle": "复制到剪贴板",
+            "csv": "CSV",
+            "excel": "Excel",
+            "pdf": "PDF",
+            "pageLength": {
+                "-1": "显示所有行",
+                "_": "显示 %d 行"
+            },
+            "print": "打印",
+            "collection": "集合 <span class=\"ui-button-icon-primary ui-icon ui-icon-triangle-1-s\"><\/span>",
+            "colvisRestore": "还原可见性",
+            "copyKeys": "按 Ctrl 或 u2318 + C 键将表中数据复制到系统剪贴板。<br \/><br \/>要取消，请单击此消息或按 Escape 键。",
+            "copySuccess": {
+                "1": "已复制 1 行到剪贴板",
+                "_": "已复制 %d 行到剪贴板"
+            },
+            "createState": "创建状态",
+            "removeAllStates": "删除所有状态",
+            "removeState": "删除",
+            "renameState": "重命名",
+            "savedStates": "保存的状态",
+            "stateRestore": "状态 %d",
+            "updateState": "更新"
+        },
+        "searchBuilder": {
+            "button": {
+                "0": "搜索生成器",
+                "_": "搜索生成器 (%d)"
+            },
+            "clearAll": "全部清除",
+            "condition": "条件",
+            "data": "数据",
+            "title": {
+                "0": "搜索生成器",
+                "_": "搜索生成器 (%d)"
+            },
+            "value": "值",
+            "conditions": {
+                "date": {
+                    "equals": "等于",
+                    "after": "早于",
+                    "before": "晚于",
+                    "between": "介于",
+                    "empty": "为空",
+                    "not": "非",
+                    "notBetween": "不介于",
+                    "notEmpty": "非空"
+                },
+                "number": {
+                    "between": "介于",
+                    "empty": "为空",
+                    "equals": "等于",
+                    "gt": "大于",
+                    "gte": "大于等于",
+                    "lt": "小于",
+                    "lte": "小于等于",
+                    "not": "非",
+                    "notBetween": "不介于",
+                    "notEmpty": "非空"
+                },
+                "string": {
+                    "contains": "含有",
+                    "empty": "为空",
+                    "endsWith": "结尾为",
+                    "equals": "等于",
+                    "not": "非",
+                    "notEmpty": "非空",
+                    "startsWith": "开头为",
+                    "notContains": "不含有",
+                    "notStartsWith": "开头不为",
+                    "notEndsWith": "结尾不为"
+                },
+                "array": {
+                    "equals": "等于",
+                    "empty": "为空",
+                    "contains": "含有",
+                    "not": "非",
+                    "notEmpty": "非空",
+                    "without": "无"
+                }
+            },
+            "add": "添加条件",
+            "deleteTitle": "删除筛选规则",
+            "leftTitle": "组合条件",
+            "logicAnd": "与",
+            "logicOr": "或",
+            "rightTitle": "取消组合"
+        },
+        "searchPanes": {
+            "clearMessage": "全部清除",
+            "collapse": {
+                "0": "搜索面板",
+                "_": "搜索面板 (%d)"
+            },
+            "count": "{total}",
+            "countFiltered": "{shown} ({total})",
+            "emptyPanes": "没有搜索面板",
+            "loadMessage": "正在加载搜索面板...",
+            "title": "激活的筛选条件 - %d",
+            "showMessage": "全部显示",
+            "collapseMessage": "全部折叠"
+        },
+        "infoThousands": ",",
+        "thousands": ",",
+        "datetime": {
+            "amPm": [
+                "上午",
+                "下午"
+            ],
+            "minutes": "分",
+            "months": {
+                "0": "1月",
+                "1": "2月",
+                "10": "11月",
+                "11": "12月",
+                "2": "3月",
+                "3": "4月",
+                "4": "5月",
+                "5": "6月",
+                "6": "7月",
+                "7": "8月",
+                "8": "9月",
+                "9": "10月"
+            },
+            "seconds": "秒",
+            "previous": "上月",
+            "next": "下月",
+            "hours": "时",
+            "unknown": "-",
+            "weekdays": [
+                "日",
+                "一",
+                "二",
+                "三",
+                "四",
+                "五",
+                "六"
+            ]
+        },
+        "editor": {
+            "close": "关闭",
+            "create": {
+                "button": "新建",
+                "submit": "创建",
+                "title": "创建新记录"
+            },
+            "edit": {
+                "button": "编辑",
+                "submit": "更新",
+                "title": "编辑记录"
+            },
+            "multi": {
+                "restore": "撤销更改",
+                "title": "多个值",
+                "noMulti": "此字段可以单独编辑，不可以组合编辑。",
+                "info": "选择的多条记录的此字段含有不同的值。要编辑并将所有记录的此字段都设为相同的值，请单击或点按这里，否则它们会保持各自的值不变。"
+            },
+            "remove": {
+                "button": "删除",
+                "submit": "删除",
+                "title": "删除",
+                "confirm": {
+                    "_": "确定要删除 %d 行？",
+                    "1": "确定要删除 1 行？"
+                }
+            },
+            "error": {
+                "system": "出现了系统错误 (<a target=\"\\\" rel=\"\\ nofollow\" href=\"\\\">更多信息&lt;\\\/a&gt;)。<\/a>"
+            }
+        },
+        "loadingRecords": "正在加载...",
+        "processing": "正在处理...",
+        "aria": {
+            "sortAscending": ": 激活以升序排序此列",
+            "sortDescending": ": 激活以降序排序此列"
+        },
+        "decimal": ".",
+        "emptyTable": "表中没有数据",
+        "select": {
+            "cells": {
+                "1": "已选择 1 个单元格",
+                "_": "已选择 %d 个单元格"
+            },
+            "columns": {
+                "1": "已选择 1 列",
+                "_": "已选择 %d 列"
+            },
+            "rows": {
+                "1": "已选择 1 行",
+                "_": "已选择 %d 行"
+            }
+        },
+        "zeroRecords": "没有找到匹配的记录",
+        "stateRestore": {
+            "creationModal": {
+                "button": "创建",
+                "columns": {
+                    "search": "列搜索",
+                    "visible": "列可见性"
+                },
+                "name": "名称:",
+                "order": "排序",
+                "paging": "分页",
+                "search": "搜索",
+                "searchBuilder": "搜索生成器",
+                "select": "选择",
+                "title": "创建新状态",
+                "toggleLabel": "包括:",
+                "scroller": "滚动定位"
+            },
+            "duplicateError": "已存在使用此名称的状态。",
+            "emptyError": "名称不能为空。",
+            "emptyStates": "没有保存的状态",
+            "removeConfirm": "确定要删除 %s？",
+            "removeError": "删除状态失败。",
+            "removeJoiner": "和",
+            "removeSubmit": "删除",
+            "removeTitle": "删除状态",
+            "renameButton": "重命名",
+            "renameLabel": "%s 的新名称:",
+            "renameTitle": "重命名状态"
+        },
+        "info": "正在显示第 _START_ 至 _END_ 条记录，共 _TOTAL_ 条",
+        "infoEmpty": "正在显示第 0 至 0 条记录，共 0 条",
+        "infoFiltered": "(筛选自全部 _MAX_ 条记录)",
+        "lengthMenu": "显示 _MENU_ 条记录"
+    };
+</script>
+
+<script th:fragment="es_ES">
+    const dataTableLocale = {
+        "processing": "Procesando...",
+        "lengthMenu": "Mostrar _MENU_ registros",
+        "zeroRecords": "No se encontraron resultados",
+        "emptyTable": "Ningún dato disponible en esta tabla",
+        "infoEmpty": "Mostrando registros del 0 al 0 de un total de 0 registros",
+        "infoFiltered": "(filtrado de un total de _MAX_ registros)",
+        "search": "Buscar:",
+        "infoThousands": ",",
+        "loadingRecords": "Cargando...",
+        "paginate": {
+            "first": "Primero",
+            "last": "Último",
+            "next": "Siguiente",
+            "previous": "Anterior"
+        },
+        "aria": {
+            "sortAscending": ": Activar para ordenar la columna de manera ascendente",
+            "sortDescending": ": Activar para ordenar la columna de manera descendente"
+        },
+        "buttons": {
+            "copy": "Copiar",
+            "colvis": "Visibilidad",
+            "collection": "Colección",
+            "colvisRestore": "Restaurar visibilidad",
+            "copyKeys": "Presione ctrl o u2318 + C para copiar los datos de la tabla al portapapeles del sistema. <br \/> <br \/> Para cancelar, haga clic en este mensaje o presione escape.",
+            "copySuccess": {
+                "1": "Copiada 1 fila al portapapeles",
+                "_": "Copiadas %ds fila al portapapeles"
+            },
+            "copyTitle": "Copiar al portapapeles",
+            "csv": "CSV",
+            "excel": "Excel",
+            "pageLength": {
+                "-1": "Mostrar todas las filas",
+                "_": "Mostrar %d filas"
+            },
+            "pdf": "PDF",
+            "print": "Imprimir",
+            "renameState": "Cambiar nombre",
+            "updateState": "Actualizar",
+            "createState": "Crear Estado",
+            "removeAllStates": "Remover Estados",
+            "removeState": "Remover",
+            "savedStates": "Estados Guardados",
+            "stateRestore": "Estado %d"
+        },
+        "autoFill": {
+            "cancel": "Cancelar",
+            "fill": "Rellene todas las celdas con <i>%d<\/i>",
+            "fillHorizontal": "Rellenar celdas horizontalmente",
+            "fillVertical": "Rellenar celdas verticalmentemente"
+        },
+        "decimal": ",",
+        "searchBuilder": {
+            "add": "Añadir condición",
+            "button": {
+                "0": "Constructor de búsqueda",
+                "_": "Constructor de búsqueda (%d)"
+            },
+            "clearAll": "Borrar todo",
+            "condition": "Condición",
+            "conditions": {
+                "date": {
+                    "after": "Despues",
+                    "before": "Antes",
+                    "between": "Entre",
+                    "empty": "Vacío",
+                    "equals": "Igual a",
+                    "notBetween": "No entre",
+                    "notEmpty": "No Vacio",
+                    "not": "Diferente de"
+                },
+                "number": {
+                    "between": "Entre",
+                    "empty": "Vacio",
+                    "equals": "Igual a",
+                    "gt": "Mayor a",
+                    "gte": "Mayor o igual a",
+                    "lt": "Menor que",
+                    "lte": "Menor o igual que",
+                    "notBetween": "No entre",
+                    "notEmpty": "No vacío",
+                    "not": "Diferente de"
+                },
+                "string": {
+                    "contains": "Contiene",
+                    "empty": "Vacío",
+                    "endsWith": "Termina en",
+                    "equals": "Igual a",
+                    "notEmpty": "No Vacio",
+                    "startsWith": "Empieza con",
+                    "not": "Diferente de",
+                    "notContains": "No Contiene",
+                    "notStartsWith": "No empieza con",
+                    "notEndsWith": "No termina con"
+                },
+                "array": {
+                    "not": "Diferente de",
+                    "equals": "Igual",
+                    "empty": "Vacío",
+                    "contains": "Contiene",
+                    "notEmpty": "No Vacío",
+                    "without": "Sin"
+                }
+            },
+            "data": "Data",
+            "deleteTitle": "Eliminar regla de filtrado",
+            "leftTitle": "Criterios anulados",
+            "logicAnd": "Y",
+            "logicOr": "O",
+            "rightTitle": "Criterios de sangría",
+            "title": {
+                "0": "Constructor de búsqueda",
+                "_": "Constructor de búsqueda (%d)"
+            },
+            "value": "Valor"
+        },
+        "searchPanes": {
+            "clearMessage": "Borrar todo",
+            "collapse": {
+                "0": "Paneles de búsqueda",
+                "_": "Paneles de búsqueda (%d)"
+            },
+            "count": "{total}",
+            "countFiltered": "{shown} ({total})",
+            "emptyPanes": "Sin paneles de búsqueda",
+            "loadMessage": "Cargando paneles de búsqueda",
+            "title": "Filtros Activos - %d",
+            "showMessage": "Mostrar Todo",
+            "collapseMessage": "Colapsar Todo"
+        },
+        "select": {
+            "cells": {
+                "1": "1 celda seleccionada",
+                "_": "%d celdas seleccionadas"
+            },
+            "columns": {
+                "1": "1 columna seleccionada",
+                "_": "%d columnas seleccionadas"
+            },
+            "rows": {
+                "1": "1 fila seleccionada",
+                "_": "%d filas seleccionadas"
+            }
+        },
+        "thousands": ".",
+        "datetime": {
+            "previous": "Anterior",
+            "next": "Proximo",
+            "hours": "Horas",
+            "minutes": "Minutos",
+            "seconds": "Segundos",
+            "unknown": "-",
+            "amPm": [
+                "AM",
+                "PM"
+            ],
+            "months": {
+                "0": "Enero",
+                "1": "Febrero",
+                "10": "Noviembre",
+                "11": "Diciembre",
+                "2": "Marzo",
+                "3": "Abril",
+                "4": "Mayo",
+                "5": "Junio",
+                "6": "Julio",
+                "7": "Agosto",
+                "8": "Septiembre",
+                "9": "Octubre"
+            },
+            "weekdays": [
+                "Dom",
+                "Lun",
+                "Mar",
+                "Mie",
+                "Jue",
+                "Vie",
+                "Sab"
+            ]
+        },
+        "editor": {
+            "close": "Cerrar",
+            "create": {
+                "button": "Nuevo",
+                "title": "Crear Nuevo Registro",
+                "submit": "Crear"
+            },
+            "edit": {
+                "button": "Editar",
+                "title": "Editar Registro",
+                "submit": "Actualizar"
+            },
+            "remove": {
+                "button": "Eliminar",
+                "title": "Eliminar Registro",
+                "submit": "Eliminar",
+                "confirm": {
+                    "_": "¿Está seguro que desea eliminar %d filas?",
+                    "1": "¿Está seguro que desea eliminar 1 fila?"
+                }
+            },
+            "error": {
+                "system": "Ha ocurrido un error en el sistema (<a target=\"\\\" rel=\"\\ nofollow\" href=\"\\\">Más información&lt;\\\/a&gt;).<\/a>"
+            },
+            "multi": {
+                "title": "Múltiples Valores",
+                "info": "Los elementos seleccionados contienen diferentes valores para este registro. Para editar y establecer todos los elementos de este registro con el mismo valor, hacer click o tap aquí, de lo contrario conservarán sus valores individuales.",
+                "restore": "Deshacer Cambios",
+                "noMulti": "Este registro puede ser editado individualmente, pero no como parte de un grupo."
+            }
+        },
+        "info": "Mostrando _START_ a _END_ de _TOTAL_ registros",
+        "stateRestore": {
+            "creationModal": {
+                "button": "Crear",
+                "name": "Nombre:",
+                "order": "Clasificación",
+                "paging": "Paginación",
+                "search": "Busqueda",
+                "select": "Seleccionar",
+                "columns": {
+                    "search": "Búsqueda de Columna",
+                    "visible": "Visibilidad de Columna"
+                },
+                "title": "Crear Nuevo Estado",
+                "toggleLabel": "Incluir:"
+            },
+            "emptyError": "El nombre no puede estar vacio",
+            "removeConfirm": "¿Seguro que quiere eliminar este %s?",
+            "removeError": "Error al eliminar el registro",
+            "removeJoiner": "y",
+            "removeSubmit": "Eliminar",
+            "renameButton": "Cambiar Nombre",
+            "renameLabel": "Nuevo nombre para %s",
+            "duplicateError": "Ya existe un Estado con este nombre.",
+            "emptyStates": "No hay Estados guardados",
+            "removeTitle": "Remover Estado",
+            "renameTitle": "Cambiar Nombre Estado"
+        }
+    };
+</script>
+
+<script th:fragment="en_US">
+    const dataTableLocale = {
+        "emptyTable": "No data available in table",
+        "info": "Showing _START_ to _END_ of _TOTAL_ entries",
+        "infoEmpty": "Showing 0 to 0 of 0 entries",
+        "infoFiltered": "(filtered from _MAX_ total entries)",
+        "infoThousands": ",",
+        "lengthMenu": "Show _MENU_ entries",
+        "loadingRecords": "Loading...",
+        "processing": "Processing...",
+        "search": "Search:",
+        "zeroRecords": "No matching records found",
+        "thousands": ",",
+        "paginate": {
+            "first": "First",
+            "last": "Last",
+            "next": "Next",
+            "previous": "Previous"
+        },
+        "aria": {
+            "sortAscending": ": activate to sort column ascending",
+            "sortDescending": ": activate to sort column descending"
+        },
+        "autoFill": {
+            "cancel": "Cancel",
+            "fill": "Fill all cells with <i>%d<\/i>",
+            "fillHorizontal": "Fill cells horizontally",
+            "fillVertical": "Fill cells vertically"
+        },
+        "buttons": {
+            "collection": "Collection <span class='ui-button-icon-primary ui-icon ui-icon-triangle-1-s'\/>",
+            "colvis": "Column Visibility",
+            "colvisRestore": "Restore visibility",
+            "copy": "Copy",
+            "copyKeys": "Press ctrl or u2318 + C to copy the table data to your system clipboard.<br><br>To cancel, click this message or press escape.",
+            "copySuccess": {
+                "1": "Copied 1 row to clipboard",
+                "_": "Copied %d rows to clipboard"
+            },
+            "copyTitle": "Copy to Clipboard",
+            "csv": "CSV",
+            "excel": "Excel",
+            "pageLength": {
+                "-1": "Show all rows",
+                "_": "Show %d rows"
+            },
+            "pdf": "PDF",
+            "print": "Print",
+            "updateState": "Update",
+            "stateRestore": "State %d",
+            "savedStates": "Saved States",
+            "renameState": "Rename",
+            "removeState": "Remove",
+            "removeAllStates": "Remove All States",
+            "createState": "Create State"
+        },
+        "searchBuilder": {
+            "add": "Add Condition",
+            "button": {
+                "0": "Search Builder",
+                "_": "Search Builder (%d)"
+            },
+            "clearAll": "Clear All",
+            "condition": "Condition",
+            "conditions": {
+                "date": {
+                    "after": "After",
+                    "before": "Before",
+                    "between": "Between",
+                    "empty": "Empty",
+                    "equals": "Equals",
+                    "not": "Not",
+                    "notBetween": "Not Between",
+                    "notEmpty": "Not Empty"
+                },
+                "number": {
+                    "between": "Between",
+                    "empty": "Empty",
+                    "equals": "Equals",
+                    "gt": "Greater Than",
+                    "gte": "Greater Than Equal To",
+                    "lt": "Less Than",
+                    "lte": "Less Than Equal To",
+                    "not": "Not",
+                    "notBetween": "Not Between",
+                    "notEmpty": "Not Empty"
+                },
+                "string": {
+                    "contains": "Contains",
+                    "empty": "Empty",
+                    "endsWith": "Ends With",
+                    "equals": "Equals",
+                    "not": "Not",
+                    "notEmpty": "Not Empty",
+                    "startsWith": "Starts With",
+                    "notContains": "Does Not Contain",
+                    "notStartsWith": "Does Not Start With",
+                    "notEndsWith": "Does Not End With"
+                },
+                "array": {
+                    "without": "Without",
+                    "notEmpty": "Not Empty",
+                    "not": "Not",
+                    "contains": "Contains",
+                    "empty": "Empty",
+                    "equals": "Equals"
+                }
+            },
+            "data": "Data",
+            "deleteTitle": "Delete filtering rule",
+            "leftTitle": "Outdent Criteria",
+            "logicAnd": "And",
+            "logicOr": "Or",
+            "rightTitle": "Indent Criteria",
+            "title": {
+                "0": "Search Builder",
+                "_": "Search Builder (%d)"
+            },
+            "value": "Value"
+        },
+        "searchPanes": {
+            "clearMessage": "Clear All",
+            "collapse": {
+                "0": "SearchPanes",
+                "_": "SearchPanes (%d)"
+            },
+            "count": "{total}",
+            "countFiltered": "{shown} ({total})",
+            "emptyPanes": "No SearchPanes",
+            "loadMessage": "Loading SearchPanes",
+            "title": "Filters Active - %d",
+            "showMessage": "Show All",
+            "collapseMessage": "Collapse All"
+        },
+        "select": {
+            "cells": {
+                "1": "1 cell selected",
+                "_": "%d cells selected"
+            },
+            "columns": {
+                "1": "1 column selected",
+                "_": "%d columns selected"
+            },
+            "rows": {
+                "1": "1 row selected",
+                "_": "%d rows selected"
+            }
+        },
+        "datetime": {
+            "previous": "Previous",
+            "next": "Next",
+            "hours": "Hour",
+            "minutes": "Minute",
+            "seconds": "Second",
+            "unknown": "-",
+            "amPm": [
+                "am",
+                "pm"
+            ],
+            "weekdays": [
+                "Sun",
+                "Mon",
+                "Tue",
+                "Wed",
+                "Thu",
+                "Fri",
+                "Sat"
+            ],
+            "months": [
+                "January",
+                "February",
+                "March",
+                "April",
+                "May",
+                "June",
+                "July",
+                "August",
+                "September",
+                "October",
+                "November",
+                "December"
+            ]
+        },
+        "editor": {
+            "close": "Close",
+            "create": {
+                "button": "New",
+                "title": "Create new entry",
+                "submit": "Create"
+            },
+            "edit": {
+                "button": "Edit",
+                "title": "Edit Entry",
+                "submit": "Update"
+            },
+            "remove": {
+                "button": "Delete",
+                "title": "Delete",
+                "submit": "Delete",
+                "confirm": {
+                    "_": "Are you sure you wish to delete %d rows?",
+                    "1": "Are you sure you wish to delete 1 row?"
+                }
+            },
+            "error": {
+                "system": "A system error has occurred (<a target=\"\\\" rel=\"nofollow\" href=\"\\\">More information<\/a>)."
+            },
+            "multi": {
+                "title": "Multiple Values",
+                "info": "The selected items contain different values for this input. To edit and set all items for this input to the same value, click or tap here, otherwise they will retain their individual values.",
+                "restore": "Undo Changes",
+                "noMulti": "This input can be edited individually, but not part of a group. "
+            }
+        },
+        "stateRestore": {
+            "renameTitle": "Rename State",
+            "renameLabel": "New Name for %s:",
+            "renameButton": "Rename",
+            "removeTitle": "Remove State",
+            "removeSubmit": "Remove",
+            "removeJoiner": " and ",
+            "removeError": "Failed to remove state.",
+            "removeConfirm": "Are you sure you want to remove %s?",
+            "emptyStates": "No saved states",
+            "emptyError": "Name cannot be empty.",
+            "duplicateError": "A state with this name already exists.",
+            "creationModal": {
+                "toggleLabel": "Includes:",
+                "title": "Create New State",
+                "select": "Select",
+                "searchBuilder": "SearchBuilder",
+                "search": "Search",
+                "scroller": "Scroll Position",
+                "paging": "Paging",
+                "order": "Sorting",
+                "name": "Name:",
+                "columns": {
+                    "visible": "Column Visibility",
+                    "search": "Column Search"
+                },
+                "button": "Create"
+            }
+        }
+    };
+</script>
+</html>

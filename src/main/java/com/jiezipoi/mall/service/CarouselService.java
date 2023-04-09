@@ -5,7 +5,7 @@ import com.jiezipoi.mall.dao.CarouselDao;
 import com.jiezipoi.mall.entity.Carousel;
 import com.jiezipoi.mall.utils.CommonResponse;
 import com.jiezipoi.mall.utils.FileNameGenerator;
-import com.jiezipoi.mall.utils.DatatableResult;
+import com.jiezipoi.mall.utils.dataTable.DataTableResult;
 import com.jiezipoi.mall.utils.Result;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -28,17 +28,17 @@ public class CarouselService {
         this.carouselConfig = carouselConfig;
     }
 
-    public Result<DatatableResult> getCarouselPage(Integer start, Integer limit, String orderBy) {
+    public Result<DataTableResult> getCarouselPage(Integer start, Integer limit, String orderBy) {
         if (start == null || limit == null) {
             return new Result<>(CommonResponse.INVALID_DATA);
         }
-        if (orderBy == null) {
+        if (orderBy == null || orderBy.contains(";")) {
             orderBy = "carousel_rank DESC"; //default order by
         }
         List<Carousel> carousels = carouselDao.findCarouselList(start, limit, orderBy);
         int total = carouselDao.getTotalCarousels();
-        Result<DatatableResult> response = new Result<>(CommonResponse.SUCCESS);
-        response.setData(new DatatableResult(carousels, total));
+        Result<DataTableResult> response = new Result<>(CommonResponse.SUCCESS);
+        response.setData(new DataTableResult(carousels, total));
         return response;
     }
 

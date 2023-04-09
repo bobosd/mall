@@ -1,0 +1,44 @@
+select {
+    width: 100%;
+}
+
+.row {
+    margin: 8px 0;
+}
+
+.image-upload-container {
+    border: 2px dashed #DDDDDD;
+    color: #DDDDDD;
+    width: 100%;
+    height: 112px;
+    border-radius: 10px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    align-content: center;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.image-upload-container:hover {
+    color: #212529;
+    border-color: #0078ff;
+}
+
+.img-product {
+    height: 150px;
+}
+
+.image-preview-container {
+    flex-direction: column;
+    align-items: center;
+    display: none;
+    justify-content: center;
+    margin: 8px 0;
+}
+
+.image-preview-container button {
+    margin: 8px 0;
+}

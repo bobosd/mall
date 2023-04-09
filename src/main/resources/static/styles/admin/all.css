@@ -49,6 +49,11 @@ div.is-invalid {
     background-color: #228bff;
 }
 
+.button-blue[disabled] {
+    background-color: #acc8fc;
+    cursor: default;
+}
+
 .button-red {
     color: white;
     background-color: #e53b1b;
@@ -168,9 +173,8 @@ a {
 
 /* DataTable style*/
 table {
-    border-collapse: collapse;
+    border-spacing: 0 10px;
     border-radius: 5px;
-    box-shadow: 0 0 5px 0 rgba(180, 180, 180, 0.8);
     overflow: hidden;
     width: 100%;
 }
@@ -181,6 +185,21 @@ table img {
 
 tr {
     padding: 0 20px;
+    margin: 5px 0;
+}
+
+tr:hover {
+    background-color: #e1edff !important;
+}
+
+tr:hover td:first-child{
+    border-top-left-radius: 7px;
+    border-bottom-left-radius: 7px;
+}
+
+tr:hover td:last-child{
+    border-top-right-radius: 7px;
+    border-bottom-right-radius: 7px;
 }
 
 thead {
@@ -201,10 +220,6 @@ td {
     font-size: 13px;
 }
 
-tr:hover td{
-
-}
-
 .dataTables_length {
     float: left;
     font-size: 13px;
@@ -217,6 +232,53 @@ tr:hover td{
     margin: 5px 0;
 }
 
-/*
-TODO: Swal CSS
- */
+/* Sweet alert */
+
+.swal2-container {
+    padding: 1.75rem !important;
+    backdrop-filter: blur(2px) !important;
+    background-color: rgba(240, 240, 240, 0.6) !important;
+}
+
+.swal2-modal {
+    -webkit-box-shadow: 0 5px 15px rgba(0, 0, 0, 0);
+    -moz-box-shadow: 0 5px 15px rgba(0, 0, 0, 0);
+    -o-box-shadow: 0 5px 15px rgba(0, 0, 0, 0);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0);
+    border: 1px solid rgba(0,0,0,.2);
+    border-radius: 14px;
+}
+
+.swal2-styled {
+    font-weight: 800;
+    border-radius: 7px !important;
+    font-size: 12px !important;
+    background-color: #c6c6c6;
+    color: #3d3d3d;
+    padding: 2px 12px;
+}
+
+.swal2-actions button {
+    display: block;
+    width: 350px;
+    padding: 5px 0;
+    font-size: 16px !important;
+}
+
+.swal2-styled.swal2-confirm {
+    background-color: #0078ff !important;
+}
+
+.swal2-styled.swal2-confirm:focus {
+    box-shadow: 0 0 0 3px #91bdff;
+}
+
+.swal2-styled.swal2-deny {
+    background-color: #b4b4b4 !important;
+}
+
+.swal2-styled.swal2-deny:focus {
+    box-shadow: 0 0 0 3px rgb(198 198 198 / 50%);
+}
+
+/* select2 */

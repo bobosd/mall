@@ -2,10 +2,12 @@ package com.jiezipoi.mall.controller;
 
 import com.jiezipoi.mall.entity.AdminUser;
 import com.jiezipoi.mall.service.AdminUserService;
+import com.jiezipoi.mall.utils.CommonResponse;
 import com.jiezipoi.mall.utils.Result;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -32,17 +34,13 @@ public class AdminController {
             return "admin/admin-index";
         }
     }
+
     @ResponseBody
     @PostMapping("/login")
     public Result<?> login(@RequestParam("username") String username,
                            @RequestParam("password") String password,
                            HttpSession session) {
         return adminUserService.login(username, password, session);
-    }
-
-    @GetMapping("/product-category")
-    public String productCategory() {
-        return "admin/product-category";
     }
 
     @GetMapping("/user-setting")
@@ -83,5 +81,16 @@ public class AdminController {
                                     HttpSession session) {
         int id = (int) session.getAttribute("userId");
         return adminUserService.updatePassword(id, originalPsw, newPsw);
+    }
+
+    @GetMapping("/ckeditor")
+    public String CKEditor() {
+        return "admin/CKEditor";
+    }
+
+    @PostMapping("/ckeditor/upload")
+    @ResponseBody
+    public Result<?> upload(@RequestParam("file") MultipartFile file) {
+        return new Result<>(CommonResponse.SUCCESS);
     }
 }

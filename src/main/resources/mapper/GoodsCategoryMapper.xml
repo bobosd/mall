@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.jiezipoi.mall.dao.GoodsCategoryDao">
+    <resultMap id="BaseResultMap" type="com.jiezipoi.mall.entity.GoodsCategory">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="category_level" jdbcType="TINYINT" property="categoryLevel"/>
+        <result column="parent_id" jdbcType="INTEGER" property="parentId"/>
+        <result column="category_name" jdbcType="VARCHAR" property="categoryName"/>
+        <result column="category_rank" jdbcType="INTEGER" property="categoryRank"/>
+        <result column="is_deleted" jdbcType="TINYINT" property="isDeleted"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="create_user" jdbcType="INTEGER" property="createUser"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="update_user" jdbcType="INTEGER" property="updateUser"/>
+    </resultMap>
+
+    <sql id="Base_column_list">
+        id, category_level,
+        parent_id,
+        category_name,
+        category_rank,
+        is_deleted,
+        create_time,
+        create_user,
+        update_time,
+        update_user
+    </sql>
+
+    <select id="findGoodsCategoryList" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_column_list"/>
+        FROM goods_category
+        <where>
+            <if test="categoryLevel != null and parentId != null">
+                AND category_level = #{categoryLevel,jdbcType=INTEGER}
+                AND parent_id = #{parentId,jdbcType=BIGINT}
+            </if>
+            AND is_deleted = 0
+        </where>
+        ORDER BY category_rank DESC
+    </select>
+
+    <select id="getTotalGoodsCategories" resultType="int">
+        SELECT COUNT(*)
+        FROM goods_category
+        <where>
+            <if test="parentId != null and categoryLevel != null">
+                AND parent_id = #{parentId,jdbcType=BIGINT}
+                AND category_level = #{categoryLevel,jdbcType=INTEGER}
+            </if>
+            AND is_deleted = 0
+        </where>
+    </select>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        SELECT <include refid="Base_column_list"/>
+        FROM goods_category
+        WHERE id = #{id}
+    </select>
+
+    <select id="selectByLevelAndName" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_column_list"/>
+        FROM goods_category
+        WHERE category_name = #{categoryName,jdbcType=VARCHAR}
+        AND category_level = #{categoryLevel,jdbcType=TINYINT}
+        AND is_deleted = 0 LIMIT 1;
+    </select>
+
+    <select id="selectByLevelAndParentIdsAndNumber" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_column_list"/>
+        FROM goods_category
+        WHERE parent_id = #{parentIds,jdbcType=BIGINT}
+        AND category_level = #{categoryLevel, jdbcType=TINYINT}
+        AND is_deleted = 0
+        ORDER BY category_rank DESC
+        <if test="number > 0">
+            LIMIT #{number}
+        </if>
+    </select>
+    
+    <update id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        update goods_category
+        SET is_deleted = 1
+        WHERE id = #{categoryId,jdbcType=BIGINT}
+    </update>
+
+    <update id="deleteBatch">
+        UPDATE goods_category
+        SET is_deleted = 1
+        WHERE id IN
+        <foreach collection="array" item="id" open="(" separator="," close=")">
+        #{id}
+        </foreach>;
+    </update>
+
+    <insert id="insert" parameterType="com.jiezipoi.mall.entity.GoodsCategory">
+        INSERT INTO goods_category (id, category_level, parent_id, category_name, category_rank, is_deleted,
+                                    create_time, create_user, update_time, update_user)
+        VALUES (#{id,jdbcType=BIGINT}, #{categoryLevel,jdbcType=TINYINT}, #{parentId,jdbcType=BIGINT},
+        #{categoryName,jdbcType=VARCHAR}, #{categoryRank,jdbcType=INTEGER}, #{isDeleted,jdbcType=TINYINT},
+        #{createTime,jdbcType=TIMESTAMP}, #{createUser,jdbcType=INTEGER}, #{updateTime,jdbcType=TIMESTAMP},
+        #{updateUser,jdbcType=INTEGER})
+    </insert>
+
+    <insert id="insertSelective" parameterType="com.jiezipoi.mall.entity.GoodsCategory">
+        INSERT goods_category
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null ">
+                id,
+            </if>
+            <if test="categoryLevel != null ">
+                category_level,
+            </if>
+            <if test="parentId">
+                parent_id,
+            </if>
+            <if test="categoryName">
+                category_name,
+            </if>
+            <if test="categoryRank">
+                category_rank,
+            </if>
+            <if test="isDeleted">
+                is_deleted,
+            </if>
+            <if test="createTime">
+                create_time,
+            </if>
+            <if test="createUser">
+                create_user,
+            </if>
+            <if test="updateTime">
+                update_time,
+            </if>
+            <if test="updateUser">
+                update_user,
+            </if>
+        </trim>
+        <trim prefix="VALUES (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=BIGINT},
+            </if>
+            <if test="categoryLevel != null">
+                #{categoryLevel,jdbcType=TINYINT},
+            </if>
+            <if test="parentId != null">
+                #{parentId,jdbcType=BIGINT},
+            </if>
+            <if test="categoryName != null">
+                #{categoryName,jdbcType=VARCHAR},
+            </if>
+            <if test="categoryRank">
+                #{categoryRank,jdbcType=INTEGER},
+            </if>
+            <if test="isDeleted != null">
+                #{isDeleted,jdbcType=TINYINT},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="createUser">
+                #{createUser,jdbcType=INTEGER},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateUser != null">
+                #{updateUser,jdbcType=INTEGER},
+            </if>
+        </trim>
+    </insert>
+
+    <update id="updateByPrimaryKeySelective" parameterType="com.jiezipoi.mall.entity.GoodsCategory">
+        UPDATE goods_category
+        <set>
+            <if test="categoryLevel != null">
+                category_level = #{categoryLevel,jdbcType=TINYINT},
+            </if>
+            <if test="parentId != null">
+                parent_id = #{parentId,jdbcType=BIGINT},
+            </if>
+            <if test="categoryName != null">
+                category_name = #{categoryName,jdbcType=VARCHAR},
+            </if>
+            <if test="categoryRank != null">
+                category_rank = #{categoryRank,jdbcType=INTEGER},
+            </if>
+            <if test="isDeleted != null">
+                is_deleted = #{isDeleted,jdbcType=TINYINT},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="createUser != null ">
+                create_user = #{createUser,jdbcType=INTEGER},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateUser != null">
+                update_user = #{updateUser,jdbcType=INTEGER}
+            </if>
+        </set>
+        WHERE id = #{id,jdbcType=BIGINT}
+    </update>
+
+    <update id="updateByPrimaryKey" parameterType="com.jiezipoi.mall.entity.GoodsCategory">
+        UPDATE goods_category
+        SET category_level = #{categoryLevel,jdbcType=TINYINT},
+            parent_id = #{parentId,jdbcType=BIGINT},
+            category_name = #{categoryName,jdbcType=VARCHAR},
+            category_rank = #{categoryRank,jdbcType=INTEGER},
+            is_deleted = #{isDeleted,jdbcType=TINYINT},
+            create_time = #{createTime,jdbcType=TIMESTAMP},
+            create_user = #{createUser,jdbcType=INTEGER},
+            update_time = #{updateTime,jdbcType=TIMESTAMP},
+            update_user = #{updateUser,jdbcType=INTEGER}
+        WHERE id = #{id,jdbcType=BIGINT}
+    </update>
+</mapper>
