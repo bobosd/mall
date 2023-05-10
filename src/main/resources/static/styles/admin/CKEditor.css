@@ -1,0 +1,9 @@
+.ck-editor.is-invalid .ck-toolbar {
+    border-color: #dc3545;
+}
+
+.ck-editor.is-invalid .ck-content {
+    border-left-color: #dc3545 !important;
+    border-right-color: #dc3545 !important;
+    border-bottom-color: #dc3545 !important;
+}

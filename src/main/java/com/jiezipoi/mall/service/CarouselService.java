@@ -5,8 +5,8 @@ import com.jiezipoi.mall.dao.CarouselDao;
 import com.jiezipoi.mall.entity.Carousel;
 import com.jiezipoi.mall.utils.CommonResponse;
 import com.jiezipoi.mall.utils.FileNameGenerator;
+import com.jiezipoi.mall.utils.Response;
 import com.jiezipoi.mall.utils.dataTable.DataTableResult;
-import com.jiezipoi.mall.utils.Result;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -28,36 +28,36 @@ public class CarouselService {
         this.carouselConfig = carouselConfig;
     }
 
-    public Result<DataTableResult> getCarouselPage(Integer start, Integer limit, String orderBy) {
+    public Response<DataTableResult> getCarouselPage(Integer start, Integer limit, String orderBy) {
         if (start == null || limit == null) {
-            return new Result<>(CommonResponse.INVALID_DATA);
+            return new Response<>(CommonResponse.INVALID_DATA);
         }
         if (orderBy == null || orderBy.contains(";")) {
             orderBy = "carousel_rank DESC"; //default order by
         }
         List<Carousel> carousels = carouselDao.findCarouselList(start, limit, orderBy);
         int total = carouselDao.getTotalCarousels();
-        Result<DataTableResult> response = new Result<>(CommonResponse.SUCCESS);
+        Response<DataTableResult> response = new Response<>(CommonResponse.SUCCESS);
         response.setData(new DataTableResult(carousels, total));
         return response;
     }
 
-    public Result<?> saveCarousel(MultipartFile file, String redirectUrl, Integer order, int userId) {
+    public Response<?> saveCarousel(MultipartFile file, String redirectUrl, Integer order, int userId) {
         if (!StringUtils.hasLength(redirectUrl) || order == null) {
-            return new Result<>(CommonResponse.INVALID_DATA);
+            return new Response<>(CommonResponse.INVALID_DATA);
         }
         String carouselUrl = saveCarouselImage(file);
         if (carouselUrl == null)
-            return new Result<>(CommonResponse.INTERNAL_SERVER_ERROR);
+            return new Response<>(CommonResponse.INTERNAL_SERVER_ERROR);
         Carousel carousel = new Carousel();
         carousel.setCarouselRank(order);
         carousel.setRedirectUrl(redirectUrl);
         carousel.setCreateUser(userId);
         carousel.setCarouselUrl(carouselUrl);
         if (carouselDao.insertSelective(carousel) > 0) {
-            return new Result<>(CommonResponse.SUCCESS);
+            return new Response<>(CommonResponse.SUCCESS);
         } else {
-            return new Result<>(CommonResponse.ERROR);
+            return new Response<>(CommonResponse.ERROR);
         }
     }
 
@@ -87,14 +87,14 @@ public class CarouselService {
         }
     }
 
-    public Result<?> updateCarousel(Integer id, MultipartFile image, String redirectUrl, Integer order, Integer userId) {
+    public Response<?> updateCarousel(Integer id, MultipartFile image, String redirectUrl, Integer order, Integer userId) {
         if (id == null || redirectUrl == null || order == null) {
-            return new Result<>(CommonResponse.INVALID_DATA);
+            return new Response<>(CommonResponse.INVALID_DATA);
         }
 
         Carousel carousel = carouselDao.selectByPrimaryKey(id);
         if (carousel == null) {
-            return new Result<>(CommonResponse.DATA_NOT_EXIST);
+            return new Response<>(CommonResponse.DATA_NOT_EXIST);
         }
 
         if (image != null) {
@@ -107,31 +107,31 @@ public class CarouselService {
         carousel.setUpdateTime(LocalDateTime.now());
         carousel.setUpdateUser(userId);
         if (carouselDao.updateByPrimaryKeySelective(carousel) > 0) {
-            return new Result<>(CommonResponse.SUCCESS);
+            return new Response<>(CommonResponse.SUCCESS);
         } else {
-            return new Result<>(CommonResponse.ERROR);
+            return new Response<>(CommonResponse.ERROR);
         }
     }
 
-    public Result<?> getCarouselById(Integer id) {
+    public Response<?> getCarouselById(Integer id) {
         if (id == null) {
-            return new Result<>(CommonResponse.INVALID_DATA);
+            return new Response<>(CommonResponse.INVALID_DATA);
         }
         Carousel carousel = carouselDao.selectByPrimaryKey(id);
         if (carousel == null) {
-            return new Result<>(CommonResponse.DATA_NOT_EXIST);
+            return new Response<>(CommonResponse.DATA_NOT_EXIST);
         } else {
-            Result<Carousel> response = new Result<>(CommonResponse.SUCCESS);
+            Response<Carousel> response = new Response<>(CommonResponse.SUCCESS);
             response.setData(carousel);
             return response;
         }
     }
 
-    public Result<?> deleteBatch(Integer[] ids) {
+    public Response<?> deleteBatch(Integer[] ids) {
         if (ids.length < 1) {
-            return new Result<>(CommonResponse.INVALID_DATA);
+            return new Response<>(CommonResponse.INVALID_DATA);
         }
         carouselDao.deleteBatch(ids);
-        return new Result<>(CommonResponse.SUCCESS);
+        return new Response<>(CommonResponse.SUCCESS);
     }
 }

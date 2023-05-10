@@ -5,7 +5,8 @@
     <resultMap id="BaseResultMap" type="com.jiezipoi.mall.entity.GoodsCategory">
         <id column="id" jdbcType="BIGINT" property="id"/>
         <result column="category_level" jdbcType="TINYINT" property="categoryLevel"/>
-        <result column="parent_id" jdbcType="INTEGER" property="parentId"/>
+        <result column="path" jdbcType="VARCHAR" property="path"/>
+        <result column="parent_id" jdbcType="BIGINT" property="parentId"/>
         <result column="category_name" jdbcType="VARCHAR" property="categoryName"/>
         <result column="category_rank" jdbcType="INTEGER" property="categoryRank"/>
         <result column="is_deleted" jdbcType="TINYINT" property="isDeleted"/>
@@ -16,7 +17,9 @@
     </resultMap>
 
     <sql id="Base_column_list">
-        id, category_level,
+        id,
+        category_level,
+        path,
         parent_id,
         category_name,
         category_rank,
@@ -46,7 +49,7 @@
         FROM goods_category
         <where>
             <if test="parentId != null and categoryLevel != null">
-                AND parent_id = #{parentId,jdbcType=BIGINT}
+                AND path = #{parentId,jdbcType=VARCHAR}
                 AND category_level = #{categoryLevel,jdbcType=INTEGER}
             </if>
             AND is_deleted = 0
@@ -97,9 +100,9 @@
     </update>
 
     <insert id="insert" parameterType="com.jiezipoi.mall.entity.GoodsCategory">
-        INSERT INTO goods_category (id, category_level, parent_id, category_name, category_rank, is_deleted,
-                                    create_time, create_user, update_time, update_user)
-        VALUES (#{id,jdbcType=BIGINT}, #{categoryLevel,jdbcType=TINYINT}, #{parentId,jdbcType=BIGINT},
+        INSERT INTO goods_category (id, category_level, path, category_name, category_rank, is_deleted,
+        create_time, create_user, update_time, update_user)
+        VALUES (#{id,jdbcType=BIGINT}, #{categoryLevel,jdbcType=TINYINT}, #{path,jdbcType=VARCHAR},
         #{categoryName,jdbcType=VARCHAR}, #{categoryRank,jdbcType=INTEGER}, #{isDeleted,jdbcType=TINYINT},
         #{createTime,jdbcType=TIMESTAMP}, #{createUser,jdbcType=INTEGER}, #{updateTime,jdbcType=TIMESTAMP},
         #{updateUser,jdbcType=INTEGER})
@@ -114,8 +117,8 @@
             <if test="categoryLevel != null ">
                 category_level,
             </if>
-            <if test="parentId">
-                parent_id,
+            <if test="path">
+                path,
             </if>
             <if test="categoryName">
                 category_name,
@@ -146,8 +149,8 @@
             <if test="categoryLevel != null">
                 #{categoryLevel,jdbcType=TINYINT},
             </if>
-            <if test="parentId != null">
-                #{parentId,jdbcType=BIGINT},
+            <if test="path != null">
+                #{path,jdbcType=VARCHAR},
             </if>
             <if test="categoryName != null">
                 #{categoryName,jdbcType=VARCHAR},
@@ -179,8 +182,8 @@
             <if test="categoryLevel != null">
                 category_level = #{categoryLevel,jdbcType=TINYINT},
             </if>
-            <if test="parentId != null">
-                parent_id = #{parentId,jdbcType=BIGINT},
+            <if test="path != null">
+                path = #{path,jdbcType=VARCHAR},
             </if>
             <if test="categoryName != null">
                 category_name = #{categoryName,jdbcType=VARCHAR},
@@ -210,14 +213,23 @@
     <update id="updateByPrimaryKey" parameterType="com.jiezipoi.mall.entity.GoodsCategory">
         UPDATE goods_category
         SET category_level = #{categoryLevel,jdbcType=TINYINT},
-            parent_id = #{parentId,jdbcType=BIGINT},
-            category_name = #{categoryName,jdbcType=VARCHAR},
-            category_rank = #{categoryRank,jdbcType=INTEGER},
-            is_deleted = #{isDeleted,jdbcType=TINYINT},
-            create_time = #{createTime,jdbcType=TIMESTAMP},
-            create_user = #{createUser,jdbcType=INTEGER},
-            update_time = #{updateTime,jdbcType=TIMESTAMP},
-            update_user = #{updateUser,jdbcType=INTEGER}
+        path = #{path,jdbcType=VARCHAR},
+        category_name = #{categoryName,jdbcType=VARCHAR},
+        category_rank = #{categoryRank,jdbcType=INTEGER},
+        is_deleted = #{isDeleted,jdbcType=TINYINT},
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+        create_user = #{createUser,jdbcType=INTEGER},
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+        update_user = #{updateUser,jdbcType=INTEGER}
         WHERE id = #{id,jdbcType=BIGINT}
     </update>
+
+    <select id="selectByIds" resultMap="BaseResultMap">
+        SELECT <include refid="Base_column_list"/>
+        FROM goods_category
+        WHERE id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
 </mapper>

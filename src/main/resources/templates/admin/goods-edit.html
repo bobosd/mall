@@ -23,10 +23,222 @@
 <script>
     $(document).ready(() => {
         $(".btn-create").click(() => createGoods());
+        $(".btn-upload-image").click(() => uploadCoverImage());
+
+        //sync event
+        $(".select2").change(syncRequest);
+        $(".form-control").change(syncRequest);
+        let imageListener = new MutationObserver((mutations) => {
+            let imageSrc = $(mutations[0].target).attr("src");
+            if (!imageSrc.startsWith("blob")) {
+                syncToServer();
+            }
+        });
+        imageListener.observe($(".img-product").get(0), {attributes: true, attributeFilter: ["src"]});
+        editor.model.document.on("change", syncRequest);
+        $("#switch-on-sale").change(syncRequest);
     });
 
+    function syncToServer() {
+        const goods = collectFormData();
+        $.ajax({
+            url: "/admin/goods/saveTempGoods",
+            method: "POST",
+            dataType: "application/json",
+            data: goods,
+            success: (response) => {
+                console.log(response);
+            },
+            error: (err) => {
+                console.log(err.responseText);
+            }
+        });
+        console.log("synchronizing");
+    }
+
+    const syncRequest = debounce(() => {
+        syncToServer();
+    }, 5000);
+
+    function debounce(func, delay) {
+        let timer;
+        return function (...args) {
+            clearTimeout(timer);
+            timer = setTimeout(() => {
+                func.apply(this, args);
+            }, delay);
+        };
+    }
+
+    function uploadCoverImage() {
+        const btn = $(".btn-create");
+        btn.addSpinner();
+        cropper.getCroppedCanvas().toBlob((blob) => {
+            const data = new FormData();
+            data.append("image", blob);
+            $.ajax({
+                url: "/admin/goods/upload-cover-image",
+                method: "POST",
+                data: data,
+                processData: false,
+                contentType: false,
+                success: (response) => {
+                    if (response.code === 200) {
+                        showChangeSavedSwal();
+                        cropper.destroy();
+                        $(".btn-upload-image").hide();
+                        $(".img-product").attr("src", "/admin/goods/img/"+response.data);
+                    }
+                },
+                error: (e) => {
+                    console.log(e.errorText);
+                    showServerErrorSwal();
+                },
+                complete: () => btn.removeSpinner()
+            });
+        }, "image/jpeg", 0.7);
+    }
+
     function createGoods() {
-        
+        const btn = $(".btn-create");
+        btn.addSpinner();
+        if (!validateForm()) {
+            btn.removeSpinner();
+            return;
+        }
+        const goods = collectFormData();
+        $.ajax({
+            url: "/admin/goods/create",
+            method: "POST",
+            data: JSON.stringify(goods),
+            contentType: "application/json",
+            success: (response) => {
+                if (response.code === 200) {
+                    Swal.fire({
+                        title: response.message,
+                        text: " ",
+                        showConfirmButton: false,
+                        position: "top",
+                        icon: "success"
+                    });
+                } else {
+                    Swal.fire({
+                        title: response.message,
+                        text: " ",
+                        showConfirmButton: true,
+                        position: "top",
+                        icon: "warning"
+                    });
+                }
+            },
+            error: () => showServerErrorSwal(),
+            complete: () => btn.removeSpinner()
+        });
+    }
+
+    function validateForm() {
+        let isValid = true;
+
+        const inputs = [
+            $("#input-goods-name"),
+            $("#input-goods-intro"),
+            $("#input-original-price"),
+            $("#input-selling-price"),
+            $("#input-stock"),
+        ];
+
+        inputs.forEach((node) => {
+            if (node.val() === "") {
+                isValid = false;
+                node.setInvalid();
+            }
+        });
+
+        if (getSelectedCategory() == null) {
+            isValid = false;
+            $("#slc-category-level-1").next().setInvalid();
+        }
+
+        const src = $(".img-product").attr("src");
+        if (src == null || src.startsWith("blob")) {
+            isValid = false;
+            $(".image-upload-container").setInvalid();
+        }
+
+        if (editor.getData().trim().length === 0) {
+            isValid = false;
+            $(".ck-editor").setInvalid();
+        }
+        return isValid;
+    }
+
+    function getSelectedCategory() {
+        const categoryL1 = $("#slc-category-level-1").val();
+        const categoryL2 = $("#slc-category-level-2").val();
+        const categoryL3 = $("#slc-category-level-3").val();
+
+        if (categoryL3 != null) {
+            return categoryL3;
+        }
+        if (categoryL2 != null) {
+            return categoryL2;
+        }
+        if (categoryL1 != null) {
+            return categoryL1;
+        }
+        return null;
+    }
+</script>
+
+<!--Load server saved data-->
+<script th:inline="javascript" th:charset="UTF-8">
+    const goods = [[${goods}]];
+    const category = [[${category}]];
+    $(document).ready(() => loadSavedData());
+
+    function loadSavedData() {
+        if (goods == null)
+            return;
+
+        //load and change select value
+        const categorySelects = [$("#slc-category-level-1"), $("#slc-category-level-2"), $("#slc-category-level-3")];
+
+        if (category != null) {
+            category.reverse(); //the category array is starting by secondary level, but at parent level change will call clear event
+            category.forEach((c) => {
+                const {id, categoryLevel, categoryName} = c;
+                const select = categorySelects[categoryLevel - 1];
+                const option = new Option(categoryName, id, true, true);
+                select.prop("disabled", false);
+                select.append(option).trigger("change");
+            });
+        }
+
+        //input form
+        const {
+            goodsName,
+            goodsIntro,
+            goodsCoverImg,
+            originalPrice,
+            sellingPrice,
+            stockNum,
+            tag,
+            goodsSellStatus,
+            goodsDetailContent
+        } = goods;
+        $("#input-goods-name").val(goodsName);
+        $("#input-goods-intro").val(goodsIntro);
+        $("#input-original-price").val(originalPrice);
+        $("#input-selling-price").val(sellingPrice);
+        $("#input-stock").val(stockNum);
+        $("#switch-on-sale").prop("checked", goodsSellStatus);
+        editor.setData(goodsDetailContent);
+        if (goodsCoverImg != null && goodsCoverImg.length > 0) {
+            $(".image-upload-container").hide();
+            $(".image-preview-container").css({display: "flex"});
+            $(".img-product").attr("src", goodsCoverImg);
+            $(".btn-upload-image").hide();
+        }
     }
 </script>
 </html>

@@ -429,8 +429,8 @@
             showConfirmButton: true,
             showDenyButton: true,
             position: "top"
-        }).then((result) => {
-            if (result.isConfirmed) {
+        }).then((response) => {
+            if (response.isConfirmed) {
                 deleteCarousel(id)
             }
         });

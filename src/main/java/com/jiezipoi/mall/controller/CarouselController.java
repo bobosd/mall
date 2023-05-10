@@ -1,7 +1,7 @@
 package com.jiezipoi.mall.controller;
 
 import com.jiezipoi.mall.service.CarouselService;
-import com.jiezipoi.mall.utils.Result;
+import com.jiezipoi.mall.utils.Response;
 import com.jiezipoi.mall.utils.dataTable.request.DataTableRequest;
 import com.jiezipoi.mall.utils.dataTable.Order;
 import org.springframework.stereotype.Controller;
@@ -21,7 +21,7 @@ public class CarouselController {
 
     @RequestMapping(value = "/carousels/list", method = RequestMethod.POST)
     @ResponseBody
-    public Result<?> list(@RequestBody DataTableRequest request) {
+    public Response<?> list(@RequestBody DataTableRequest request) {
         String orderBy = null;
         if (request.getOrder().size() != 0) {
             Order order = request.getOrder().get(0);
@@ -35,34 +35,34 @@ public class CarouselController {
 
     @RequestMapping(value = "/carousels/save", method = RequestMethod.POST)
     @ResponseBody
-    public Result<?> save(@RequestParam("image") MultipartFile image,
-                          @RequestParam("redirectUrl") String redirectUrl,
-                          @RequestParam("order") Integer order,
-                          HttpSession session) {
+    public Response<?> save(@RequestParam("image") MultipartFile image,
+                            @RequestParam("redirectUrl") String redirectUrl,
+                            @RequestParam("order") Integer order,
+                            HttpSession session) {
         int userId = (int) session.getAttribute("userId");
         return carouselService.saveCarousel(image, redirectUrl, order, userId);
     }
 
     @PostMapping("/carousels/update")
     @ResponseBody
-    public Result<?> update(@RequestParam(value = "image", required = false) MultipartFile image,
-                            @RequestParam("id") Integer id,
-                            @RequestParam("redirectUrl") String redirectUrl,
-                            @RequestParam("order") Integer order,
-                            HttpSession session) {
+    public Response<?> update(@RequestParam(value = "image", required = false) MultipartFile image,
+                              @RequestParam("id") Integer id,
+                              @RequestParam("redirectUrl") String redirectUrl,
+                              @RequestParam("order") Integer order,
+                              HttpSession session) {
         int userId = (int) session.getAttribute("userId");
         return carouselService.updateCarousel(id, image, redirectUrl, order, userId);
     }
 
     @GetMapping("/carousels/info/{id}")
     @ResponseBody
-    public Result<?> info(@PathVariable("id") Integer id) {
+    public Response<?> info(@PathVariable("id") Integer id) {
         return carouselService.getCarouselById(id);
     }
 
     @PostMapping("/carousels/delete")
     @ResponseBody
-    public Result<?> delete(@RequestParam("ids[]") Integer[] ids) {
+    public Response<?> delete(@RequestParam("ids[]") Integer[] ids) {
         return carouselService.deleteBatch(ids);
     }
 }

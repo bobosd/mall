@@ -112,7 +112,7 @@
                 },
                 {
                     data: "id",
-                    render: (id) => {
+                    render: () => {
                         return '<button class="button button-blue btn-edit-category"><i class="fa-solid fa-edit"></i></button>';
                     },
                     orderable: false,
@@ -121,7 +121,7 @@
                 },
                 {
                     data: "id",
-                    render: (id) => {
+                    render: () => {
                         return '<button class="button button-red btn-delete-category"><i class="fa-solid fa-trash-can"></i></button>';
                     },
                     orderable: false,
@@ -299,8 +299,8 @@
             showDenyButton: true,
             reverseButtons: true,
             position: "top",
-        }).then((result) => {
-            if (result.isConfirmed) {
+        }).then((response) => {
+            if (response.isConfirmed) {
                 deleteCategory(id);
             }
         });

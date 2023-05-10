@@ -32,4 +32,6 @@ public interface GoodsCategoryDao {
     List<GoodsCategory> selectByLevelAndParentIdsAndNumber(@Param("parentIds") Long parentIds,
                                                            @Param("categoryLevel") int categoryLevel,
                                                            @Param("number") int number);
+
+    List<GoodsCategory> selectByIds(@Param("ids") long[] ids);
 }

@@ -4,22 +4,22 @@ import org.springframework.context.i18n.LocaleContextHolder;
 
 import java.util.Locale;
 
-public class Result<T> {
+public class Response<T> {
     String message;
     int code;
     T data;
 
-    public Result(String message, int code, T data) {
+    public Response(String message, int code, T data) {
         this.message = message;
         this.code = code;
         this.data = data;
     }
 
-    public Result() {
+    public Response() {
 
     }
 
-    public Result(CommonResponse response) {
+    public Response(CommonResponse response) {
         Locale locale = LocaleContextHolder.getLocale();
         this.message = response.getMessage(locale);
         this.code = response.getCode();
@@ -56,5 +56,11 @@ public class Result<T> {
                 ", code=" + code +
                 ", data=" + data +
                 '}';
+    }
+
+    public void setResponse(CommonResponse response) {
+        Locale locale = LocaleContextHolder.getLocale();
+        this.message = response.getMessage(locale);
+        this.code = response.getCode();
     }
 }

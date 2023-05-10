@@ -11,14 +11,15 @@ class UploadAdapter {
                 const data = new FormData();
                 data.append("file", file);
                 $.ajax({
-                    url: "/admin/ckeditor/upload",
+                    url: "/admin/goods/upload-goods-detail-image",
                     method: "post",
                     processData: false,
                     contentType: false,
                     data: data,
                     success: (res) => {
+                        console.log("uploaded", res);
                         if (res.code === 200) {
-                            resolve({default: res.data.url});
+                            resolve({default: "/admin/goods/img/" + res.data});
                         } else {
                             showErrorAlert("error");
                             reject();
@@ -34,6 +35,6 @@ class UploadAdapter {
     }
 
     abort() {
-
+        console.log("Abort");
     }
 }

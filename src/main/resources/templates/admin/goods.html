@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="admin/header::general-libraries-and-styles(~{::title}, ~{::link}, ~{::head/script})">
+    <meta charset="UTF-8">
+    <title th:text="#{create.product}"></title>
+    <link rel="stylesheet" href="/styles/admin/goods.css">
+    <script th:replace="admin/header::datatable"></script>
+    <script th:replace="admin/header::select2"></script>
+</head>
+<body>
+<div th:replace="admin/sidebar::sidebar-fragment"></div>
+<div class="main">
+    <div class="block">
+        <div class="block-title" th:text="#{product.management}"></div>
+        <div class="block-content">
+            <div class="goods-options">
+                <button class="button button-blue" id="btn-back" th:text="#{create}"></button>
+            </div>
+            <hr/>
+            <div class="goods-options row">
+                <div class="col-4">
+                    <label for="slc-l1"></label>
+                    <select class="form-control form-control-sm select2" id="slc-l1"
+                            th:lang="${#locale.toString() == 'zh_CN' ? 'zh-CN' : #locale.getCountry()}">
+                    </select>
+                </div>
+                <div class="col-4">
+                    <label for="slc-l2"></label>
+                    <select class="form-control form-control-sm select2" id="slc-l2"
+                            th:lang="${#locale.toString() == 'zh_CN' ? 'zh-CN' : #locale.getCountry()}">>
+                    </select>
+                </div>
+                <div class="col-4">
+                    <label for="slc-l3"></label>
+                    <select class="form-control form-control-sm select2" id="slc-l3"
+                            th:lang="${#locale.toString() == 'zh_CN' ? 'zh-CN' : #locale.getCountry()}">>
+                    </select>
+                </div>
+            </div>
+            <table id="table">
+                <thead>
+                <tr>
+                    <th></th>
+                    <th th:text="#{product.name}"></th>
+                    <th th:text="#{create.date}"></th>
+                </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    let table = null;
+    sidebarSetSelected($(".goods-management"));
+    $(document).ready(() => {
+        initSelect2();
+        initDatatable();
+        initListener();
+    });
+
+    function initListener() {
+        //on category filter value change,
+
+        //on goods category select change, reset the children selects
+        const slcCategoryL1 = $("#slc-l1");
+        const slcCategoryL2 = $("#slc-l2");
+        const slcCategoryL3 = $("#slc-l3");
+        slcCategoryL1.change(() => {
+            slcCategoryL2.val(null).trigger("change");
+            slcCategoryL3.val(null).trigger("change");
+        });
+        slcCategoryL2.change(() => slcCategoryL3.val(null).trigger("change"));
+        $(".select2").change(() => table.draw());
+    }
+
+    function initSelect2() {
+        const processCategoryResult = (response) => {
+            if (response.code === 200) {
+                const options = response.data.map((c) => ({id: c.id, text: c.categoryName, path: c.path}));
+                return {results: options};
+            } else {
+                return {results: []};
+            }
+        };
+
+        $("#slc-l1").select2({
+            placeholder: "[[#{product.category.level1}]]",
+            ajax: {
+                url: "/admin/product-category/listByLevelAndParent",
+                method: "POST",
+                dataType: "json",
+                data: {parentId: 0, level: 1},
+                processResults: processCategoryResult,
+            }
+        });
+
+        $("#slc-l2").select2({
+            language: "zh-CN",
+            placeholder: "[[#{product.category.level2}]]",
+            ajax: {
+                url: "/admin/product-category/listByLevelAndParent",
+                method: "POST",
+                dataType: "json",
+                data: () => ({parentId: getLevel2Parent(), level: 2}),
+                processResults: processCategoryResult,
+            }
+        });
+
+        $("#slc-l3").select2({
+            placeholder: "[[#{product.category.level2}]]",
+            ajax: {
+                url: "/admin/product-category/listByLevelAndParent",
+                method: "POST",
+                dataType: "json",
+                data: () => ({parentId: getLevel3Parent(), level: 3}),
+                processResults: processCategoryResult,
+            }
+        });
+    }
+
+    function getLevel2Parent() {
+        return $("#slc-l1").val();
+    }
+
+    function getLevel3Parent() {
+        return $("#slc-l2").val();
+    }
+
+    function initDatatable() {
+        table = $("#table").DataTable({
+            autoWidth: false,
+            processing: true,
+            serverSide: true,
+            language: dataTableLocale,
+            ajax: {
+                url: "/admin/goods/list",
+                method: "POST",
+                contentType: "application/json",
+                data: (data) => {
+                    const category = getSelectedCategory();
+                    data.parentId = category.id;
+                    data.categoryLevel = category.level;
+                    data.path = category.path;
+                    return JSON.stringify(data);
+                },
+                dataFilter: (response) => {
+                    response = JSON.parse(response);
+                    const data = {};
+                    if (response.code === 200) {
+                        data.recordsTotal = response.data.recordsTotal;
+                        data.recordsFiltered = response.data.recordsTotal;
+                        data.data = response.data.list;
+                    }
+                    return JSON.stringify(data);
+                }
+            },
+            columns: [
+                {
+                    data: "id",
+                },
+                {
+                    data: "goodsName"
+                },
+                {
+                    data: "createTime"
+                }
+            ]
+        });
+
+        //mark
+    }
+
+    function getSelectedCategory() {
+        const selects = [ // this array must be ordered in ascending level value
+            $("#slc-l1"),
+            $("#slc-l2"),
+            $("#slc-l3")
+        ];
+
+        for (let i = selects.length - 1; i >= 0; i--) {
+            const selectData = selects[i].select2("data")[0];
+            if (selectData != null) {
+                return {id: selectData.id, level: i + 1, path: selectData.path};
+            }
+        }
+
+        return {id: null, level: null, path: null};
+    }
+</script>
+</body>
+</html>

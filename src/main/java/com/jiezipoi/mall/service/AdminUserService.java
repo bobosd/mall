@@ -2,7 +2,7 @@ package com.jiezipoi.mall.service;
 
 import com.jiezipoi.mall.dao.AdminUserDao;
 import com.jiezipoi.mall.entity.AdminUser;
-import com.jiezipoi.mall.utils.Result;
+import com.jiezipoi.mall.utils.Response;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
@@ -25,28 +25,28 @@ public class AdminUserService {
         this.i18n = i18n;
     }
 
-    public Result<?> login(String username, String password, HttpSession session) {
+    public Response<?> login(String username, String password, HttpSession session) {
         boolean isValid = validateLoginData(username, password);
         Locale userLocale = LocaleContextHolder.getLocale();
         if (!isValid) {
             String message = i18n.getMessage("incorrect.username.or.password", null, userLocale);
-            return new Result<String>(message, 1, null);
+            return new Response<String>(message, 1, null);
         }
         String md5Password = DigestUtils.md5DigestAsHex(password.getBytes(StandardCharsets.UTF_8));
         AdminUser user = adminUserDao.login(username, md5Password);
-        Result<String> result = new Result<>();
+        Response<String> response = new Response<>();
         if (user == null) {
-            result.setCode(1);
+            response.setCode(1);
             String message = i18n.getMessage("incorrect.username.or.password", null, userLocale);
-            result.setMessage(message);
+            response.setMessage(message);
         } else {
-            result.setCode(0);
-            result.setMessage("valid");
-            result.setData("admin/index");
+            response.setCode(0);
+            response.setMessage("valid");
+            response.setData("admin/index");
             session.setAttribute("nickname", user.getNickName());
             session.setAttribute("userId", user.getId());
         }
-        return result;
+        return response;
     }
 
     /**
@@ -63,10 +63,10 @@ public class AdminUserService {
         return adminUserDao.getUserById(id);
     }
 
-    public Result<?> setNickName(String nickName, int id) {
+    public Response<?> setNickName(String nickName, int id) {
         nickName = nickName. trim();
         Locale userLocale = LocaleContextHolder.getLocale();
-        Result<String> response = new Result<>();
+        Response<String> response = new Response<>();
         String pattern = "[A-Za-z0-9\\u4e00-\\u9fa5]+";
         if (nickName.isBlank() || !nickName.matches(pattern)) {
             String message = i18n.getMessage("invalid.nickname", null, userLocale);
@@ -81,10 +81,10 @@ public class AdminUserService {
         return response;
     }
 
-    public Result<?> updatePassword(int id, String originalPsw, String newPsw) {
+    public Response<?> updatePassword(int id, String originalPsw, String newPsw) {
         AdminUser user = adminUserDao.getUserById(id);
         Locale userLocale = LocaleContextHolder.getLocale();
-        Result<?> response = new Result<>();
+        Response<?> response = new Response<>();
         String originalMD5 = DigestUtils.md5DigestAsHex(originalPsw.getBytes(StandardCharsets.UTF_8));
         String newMD5 = DigestUtils.md5DigestAsHex(newPsw.getBytes(StandardCharsets.UTF_8));
         if (!isValidPassword(newPsw)) {

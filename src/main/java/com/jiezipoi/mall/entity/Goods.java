@@ -2,14 +2,15 @@ package com.jiezipoi.mall.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-public class Goods {
+public class Goods implements Serializable {
     private Long id;
     private String goodsName;
     private String goodsIntro;
-    private Long categoryId;
+    private Long goodsCategoryId;
     private String goodsCoverImg;
     private String goodsCarousel;
     private String goodsDetailContent;
@@ -17,10 +18,10 @@ public class Goods {
     private BigDecimal sellingPrice;
     private Integer stockNum;
     private String tag;
-    private Byte goodsSellStatus;
+    private Boolean goodsSellStatus;
     private Integer createUser;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime creteTime;
+    private LocalDateTime createTime;
     private Integer updateUser;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime updateTime;
@@ -49,12 +50,12 @@ public class Goods {
         this.goodsIntro = goodsIntro == null ? null : goodsIntro.trim();
     }
 
-    public Long getCategoryId() {
-        return categoryId;
+    public Long getGoodsCategoryId() {
+        return goodsCategoryId;
     }
 
-    public void setCategoryId(Long categoryId) {
-        this.categoryId = categoryId;
+    public void setGoodsCategoryId(Long goodsCategoryId) {
+        this.goodsCategoryId = goodsCategoryId;
     }
 
     public String getGoodsCoverImg() {
@@ -113,11 +114,11 @@ public class Goods {
         this.tag = tag;
     }
 
-    public Byte getGoodsSellStatus() {
+    public Boolean getGoodsSellStatus() {
         return goodsSellStatus;
     }
 
-    public void setGoodsSellStatus(Byte goodsSellStatus) {
+    public void setGoodsSellStatus(Boolean goodsSellStatus) {
         this.goodsSellStatus = goodsSellStatus;
     }
 
@@ -129,12 +130,12 @@ public class Goods {
         this.createUser = createUser;
     }
 
-    public LocalDateTime getCreteTime() {
-        return creteTime;
+    public LocalDateTime getCreateTime() {
+        return createTime;
     }
 
-    public void setCreteTime(LocalDateTime creteTime) {
-        this.creteTime = creteTime;
+    public void setCreateTime(LocalDateTime createTime) {
+        this.createTime = createTime;
     }
 
     public Integer getUpdateUser() {
@@ -151,5 +152,27 @@ public class Goods {
 
     public void setUpdateTime(LocalDateTime updateTime) {
         this.updateTime = updateTime;
+    }
+
+    @Override
+    public String toString() {
+        return "Goods{" +
+                "id=" + id +
+                ", goodsName='" + goodsName + '\'' +
+                ", goodsIntro='" + goodsIntro + '\'' +
+                ", goodsCategoryId=" + goodsCategoryId +
+                ", goodsCoverImg='" + goodsCoverImg + '\'' +
+                ", goodsCarousel='" + goodsCarousel + '\'' +
+                ", goodsDetailContent='" + goodsDetailContent + '\'' +
+                ", originalPrice=" + originalPrice +
+                ", sellingPrice=" + sellingPrice +
+                ", stockNum=" + stockNum +
+                ", tag='" + tag + '\'' +
+                ", goodsSellStatus=" + goodsSellStatus +
+                ", createUser=" + createUser +
+                ", createTime=" + createTime +
+                ", updateUser=" + updateUser +
+                ", updateTime=" + updateTime +
+                '}';
     }
 }

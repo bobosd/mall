@@ -10,13 +10,15 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class MallWebMvcConfigurer implements WebMvcConfigurer {
     private final CarouselConfig carouselConfig;
+    private final GoodsConfig goodsConfig;
 
     public MallWebMvcConfigurer(LanguageInterceptor languageInterceptor,
                                 AdminLoginInterceptor adminLoginInterceptor,
-                                CarouselConfig carouselConfig) {
+                                CarouselConfig carouselConfig, GoodsConfig goodsConfig) {
         this.languageInterceptor = languageInterceptor;
         this.adminLoginInterceptor = adminLoginInterceptor;
         this.carouselConfig = carouselConfig;
+        this.goodsConfig = goodsConfig;
     }
 
     private final LanguageInterceptor languageInterceptor;
@@ -33,10 +35,16 @@ public class MallWebMvcConfigurer implements WebMvcConfigurer {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         exposeCarouselDirectory(registry);
+        exposeGoodsDirectory(registry);
     }
 
     private void exposeCarouselDirectory(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/admin/carousel/img/**")
                 .addResourceLocations("file:" + carouselConfig.getImageDirectory());
+    }
+
+    private void exposeGoodsDirectory(ResourceHandlerRegistry registry) {
+        registry.addResourceHandler("/admin/goods/img/**")
+                .addResourceLocations("file:" + goodsConfig.getImageDirectory());
     }
 }

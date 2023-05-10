@@ -18,6 +18,8 @@ public class GoodsCategory {
     /**
      * 父分类id
      */
+    private String path;
+
     private Long parentId;
 
     /**
@@ -71,6 +73,14 @@ public class GoodsCategory {
 
     public void setCategoryLevel(Byte categoryLevel) {
         this.categoryLevel = categoryLevel;
+    }
+
+    public String getPath() {
+        return path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
     }
 
     public Long getParentId() {
@@ -135,6 +145,18 @@ public class GoodsCategory {
 
     public void setUpdateUser(Integer updateUser) {
         this.updateUser = updateUser;
+    }
+
+    public long[] getParentIdAsArray() {
+        if (path.isBlank()) {
+            return new long[] {};
+        }
+        String[] ids = path.split("\\.");
+        long[] result = new long[ids.length];
+        for (int i = 0; i < ids.length; i++) {
+            result[i] = Long.parseLong(ids[i]);
+        }
+        return result;
     }
 }
 

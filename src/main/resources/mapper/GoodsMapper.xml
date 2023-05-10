@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.jiezipoi.mall.dao.GoodsDao">
+    <resultMap id="BaseResultMap" type="com.jiezipoi.mall.entity.Goods">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="goods_name" jdbcType="VARCHAR" property="goodsName"/>
+        <result column="goods_intro" jdbcType="VARCHAR" property="goodsIntro"/>
+        <result column="goods_category_id" jdbcType="BIGINT" property="goodsCategoryId"/>
+        <result column="goods_cover_img" jdbcType="VARCHAR" property="goodsCoverImg"/>
+        <result column="goods_carousel" jdbcType="VARCHAR" property="goodsCarousel"/>
+        <result column="goods_detail_content" jdbcType="VARCHAR" property="goodsDetailContent"/>
+        <result column="original_price" jdbcType="DECIMAL" property="originalPrice"/>
+        <result column="selling_price" jdbcType="DECIMAL" property="sellingPrice"/>
+        <result column="stock_num" jdbcType="INTEGER" property="stockNum"/>
+        <result column="tag" jdbcType="VARCHAR" property="tag"/>
+        <result column="goods_sell_status" jdbcType="TINYINT" property="goodsSellStatus"/>
+        <result column="create_user" jdbcType="INTEGER" property="createUser"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_user" jdbcType="INTEGER" property="updateUser"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+    </resultMap>
+
+    <sql id="base_column_list">
+        goods_info.id, goods_info.goods_name, goods_info.goods_intro, goods_info.goods_category_id, goods_info.goods_cover_img,
+        goods_info.goods_carousel, goods_info.goods_detail_content, goods_info.original_price, goods_info.selling_price,
+        goods_info.stock_num, goods_info.tag, goods_info.goods_sell_status, goods_info.create_user, goods_info.create_time,
+        goods_info.update_user, goods_info.update_time
+    </sql>
+
+    <insert id="insertSelective" parameterType="com.jiezipoi.mall.entity.Goods">
+        INSERT INTO goods_info
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="goodsName != null and goodsName != ''">
+                goods_name,
+            </if>
+            <if test="goodsIntro != null and goodsIntro != ''">
+                goods_intro,
+            </if>
+            <if test="goodsCategoryId != null">
+                goods_category_id,
+            </if>
+            <if test="goodsCoverImg != null and goodsCoverImg != ''">
+                goods_cover_img,
+            </if>
+            <if test="goodsCarousel != null and goodsCarousel != ''">
+                goods_carousel,
+            </if>
+            <if test="goodsDetailContent != null and goodsDetailContent != ''">
+                goods_detail_content,
+            </if>
+            <if test="originalPrice != null">
+                original_price,
+            </if>
+            <if test="sellingPrice != null">
+                selling_price,
+            </if>
+            <if test="stockNum != null">
+                stock_num,
+            </if>
+            <if test="tag != null and tag != ''">
+                tag,
+            </if>
+            <if test="goodsSellStatus != null">
+                goods_sell_status,
+            </if>
+            <if test="createUser != null">
+                create_user,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="updateUser != null">
+                update_user,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+        </trim>
+
+        <trim prefix="VALUES (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=BIGINT},
+            </if>
+            <if test="goodsName != null and goodsName != ''">
+                #{goodsName,jdbcType=VARCHAR},
+            </if>
+            <if test="goodsIntro != null and goodsIntro != ''">
+                #{goodsIntro,jdbcType=VARCHAR},
+            </if>
+            <if test="goodsCategoryId != null">
+                #{goodsCategoryId,jdbcType=BIGINT},
+            </if>
+            <if test="goodsCoverImg != null and goodsCoverImg != ''">
+                #{goodsCoverImg,jdbcType=VARCHAR},
+            </if>
+            <if test="goodsCarousel != null and goodsCarousel != ''">
+                #{goodsCarousel,jdbcType=VARCHAR},
+            </if>
+            <if test="goodsDetailContent != null and goodsDetailContent != ''">
+                #{goodsDetailContent,jdbcType=VARCHAR},
+            </if>
+            <if test="originalPrice != null">
+                #{originalPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="sellingPrice != null">
+                #{sellingPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="stockNum != null">
+                #{stockNum,jdbcType=INTEGER},
+            </if>
+            <if test="tag != null and tag != ''">
+                #{tag,jdbcType=VARCHAR},
+            </if>
+            <if test="goodsSellStatus != null">
+                #{goodsSellStatus,jdbcType=TINYINT},
+            </if>
+            <if test="createUser != null">
+                #{createUser,jdbcType=INTEGER},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateUser != null">
+                #{updateUser,jdbcType=INTEGER},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+    </insert>
+
+    <select id="list" resultMap="BaseResultMap">
+        SELECT
+        <include refid="base_column_list"/>
+        FROM goods_info
+        LIMIT #{start}, #{limit}
+    </select>
+
+    <select id="getGoodsCount" resultType="int">
+        SELECT COUNT(*)
+        FROM goods_info;
+    </select>
+
+    <select id="listByCategory" resultMap="BaseResultMap">
+        SELECT <include refid="base_column_list"/>
+        FROM goods_info
+        JOIN goods_category gc on gc.id = goods_info.goods_category_id
+        WHERE gc.path LIKE CONCAT(#{path,jdbcType=VARCHAR}, '.%') OR
+            gc.path = #{path,jdbcType=VARCHAR}
+        LIMIT #{start}, #{limit};
+    </select>
+
+    <select id="getCategoryGoodsCount" resultType="int">
+        SELECT COUNT(*)
+        FROM goods_info
+        JOIN goods_category gc on gc.id = goods_info.goods_category_id
+        WHERE gc.path LIKE CONCAT(#{path,jdbcType=VARCHAR}, '.%') OR
+            gc.path = #{path,jdbcType=VARCHAR};
+    </select>
+</mapper>

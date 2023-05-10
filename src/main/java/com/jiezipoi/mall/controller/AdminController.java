@@ -3,7 +3,7 @@ package com.jiezipoi.mall.controller;
 import com.jiezipoi.mall.entity.AdminUser;
 import com.jiezipoi.mall.service.AdminUserService;
 import com.jiezipoi.mall.utils.CommonResponse;
-import com.jiezipoi.mall.utils.Result;
+import com.jiezipoi.mall.utils.Response;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
@@ -37,9 +37,9 @@ public class AdminController {
 
     @ResponseBody
     @PostMapping("/login")
-    public Result<?> login(@RequestParam("username") String username,
-                           @RequestParam("password") String password,
-                           HttpSession session) {
+    public Response<?> login(@RequestParam("username") String username,
+                             @RequestParam("password") String password,
+                             HttpSession session) {
         return adminUserService.login(username, password, session);
     }
 
@@ -53,10 +53,10 @@ public class AdminController {
 
     @PostMapping("/setNickName")
     @ResponseBody
-    public Result<?> setNickName(@RequestParam("nickname") String nickname,
-                                 HttpSession session) {
+    public Response<?> setNickName(@RequestParam("nickname") String nickname,
+                                   HttpSession session) {
         int id = (int) session.getAttribute("userId");
-        Result<?> response = adminUserService.setNickName(nickname, id);
+        Response<?> response = adminUserService.setNickName(nickname, id);
         if (response.getCode() == 0)
             session.setAttribute("nickname", nickname);
         return response;
@@ -76,9 +76,9 @@ public class AdminController {
 
     @PostMapping("/updatePassword")
     @ResponseBody
-    public Result<?> updatePassword(@RequestParam("originalPassword") String originalPsw,
-                                    @RequestParam("newPassword") String newPsw,
-                                    HttpSession session) {
+    public Response<?> updatePassword(@RequestParam("originalPassword") String originalPsw,
+                                      @RequestParam("newPassword") String newPsw,
+                                      HttpSession session) {
         int id = (int) session.getAttribute("userId");
         return adminUserService.updatePassword(id, originalPsw, newPsw);
     }
@@ -90,7 +90,7 @@ public class AdminController {
 
     @PostMapping("/ckeditor/upload")
     @ResponseBody
-    public Result<?> upload(@RequestParam("file") MultipartFile file) {
-        return new Result<>(CommonResponse.SUCCESS);
+    public Response<?> upload(@RequestParam("file") MultipartFile file) {
+        return new Response<>(CommonResponse.SUCCESS);
     }
 }

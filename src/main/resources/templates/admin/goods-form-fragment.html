@@ -7,17 +7,20 @@
             <label th:text="#{product_categories} + ':'"></label>
             <div class="col-4">
                 <select id="slc-category-level-1"
+                        class="select2"
                         th:lang="${#locale.toString() == 'zh_CN' ? 'zh-CN' : #locale.getCountry()}">
                 </select>
             </div>
             <div class="col-4">
                 <select id="slc-category-level-2"
+                        class="select2"
                         th:lang="${#locale.toString() == 'zh_CN' ? 'zh-CN' : #locale.getCountry()}"
                         disabled>
                 </select>
             </div>
             <div class="col-4">
                 <select id="slc-category-level-3"
+                        class="select2"
                         th:lang="${#locale.toString() == 'zh_CN' ? 'zh-CN' : #locale.getCountry()}"
                         disabled>
                 </select>
@@ -26,21 +29,21 @@
 
         <div class="row">
             <div class="col-6">
-                <input class="form-control form-control-sm" th:placeholder="#{product.name}">
+                <input class="form-control form-control-sm" id="input-goods-name" th:placeholder="#{product.name}">
             </div>
             <div class="col-6">
-                <input class="form-control form-control-sm" th:placeholder="#{product.description}">
+                <input class="form-control form-control-sm" id="input-goods-intro" th:placeholder="#{product.description}">
             </div>
         </div>
         <div class="row">
             <div class="col-4">
-                <input class="form-control form-control-sm" th:placeholder="#{product.cost.price}">
+                <input class="form-control form-control-sm" id="input-original-price" th:placeholder="#{product.cost.price}">
             </div>
             <div class="col-4">
-                <input class="form-control form-control-sm" th:placeholder="#{product.sale.price}">
+                <input class="form-control form-control-sm" id="input-selling-price" th:placeholder="#{product.sale.price}">
             </div>
             <div class="col-4">
-                <input class="form-control form-control-sm" th:placeholder="#{stock}">
+                <input class="form-control form-control-sm" id="input-stock" th:placeholder="#{stock}">
             </div>
         </div>
         <div class="row">
@@ -52,21 +55,25 @@
             <div>
                 <img alt="product image" class="img-product"/>
             </div>
-            <button class="button button-blue btn-change-image" th:text="#{change.image}"></button>
+            <div class="d-inline-block">
+                <button class="button button-blue btn-upload-image" th:text="#{upload}"></button>
+                <button class="button button-blue btn-change-image" th:text="#{change.image}"></button>
+            </div>
         </div>
         <div class="image-upload-container">
             <div><i class="fa-solid fa-box fa-4x"></i></div>
             <span th:text="#{upload.product.image} + '(150*150)'"></span>
         </div>
-        <input type="file" id="input-product-img" hidden>
+        <input type="file" id="input-product-img" accept="image/png, image/gif, image/jpeg" hidden>
         <div id="editor"></div>
         <div class="form-check form-switch">
-            <label class="form-check-label" for="flexSwitchCheckDefault" th:text="#{available.sale}"></label>
-            <input class="form-check-input" type="checkbox" id="flexSwitchCheckDefault">
+            <label class="form-check-label" for="switch-on-sale" th:text="#{available.sale}"></label>
+            <input class="form-check-input" type="checkbox" id="switch-on-sale">
         </div>
     </div>
     <script>
         let cropper = null;
+        let editor = null;
 
         $(document).ready(() => {
             initListener();
@@ -98,7 +105,7 @@
                 }
             });
 
-            //on click
+            //on click for image upload and reset
             $(".image-upload-container").click(() => {
                 $("#input-product-img").click();
             });
@@ -109,12 +116,12 @@
 
             //on image set
             $("#input-product-img").change(() => {
-                if (cropper != null) {
-                    cropper.destroy();
-                }
                 $(".image-upload-container").hide();
                 const [file] = $("#input-product-img").prop("files");
-                if (file !== null) {
+                if (file != null) {
+                    if (cropper != null) {
+                        cropper.destroy();
+                    }
                     const url = URL.createObjectURL(file);
                     const img = new Image();
                     img.src = url;
@@ -141,7 +148,7 @@
 
         function prepareCropper() {
             const container = $(".img-product");
-            console.log(container.width)
+            $(".btn-upload-image").show();
             cropper = new Cropper(container.get(0), {
                 aspectRatio: 150 / 150,
                 viewMode: 1,
@@ -207,10 +214,6 @@
             });
         }
 
-        sidebarSetSelected($(".create-product"));
-
-        var editor = null
-
         function customUploadAdapter(editor) {
             editor.plugins.get("FileRepository").createUploadAdapter = (loader) => new UploadAdapter(loader);
         }
@@ -225,6 +228,118 @@
 
         function getLevel3Parent() {
             return $("#slc-category-level-2").val();
+        }
+
+        function collectFormData() {
+            return {
+                //id
+                goodsName: $("#input-goods-name").val(),
+                goodsIntro: $("#input-goods-intro").val(),
+                goodsCategoryId: getSelectedCategoryId(),
+                goodsCoverImg: getCoverImgSrc(),
+                //goodsCarousel
+                goodsDetailContent: editor.getData(),
+                originalPrice: getOriginalPrice(),
+                sellingPrice: getSellingPrice(),
+                stockNum: getStockNum(),
+                tag: null, //$("#slc-goods-tag").val(),
+                goodsSellStatus: $("#switch-on-sale").prop("checked"),
+            };
+        }
+
+        function getCoverImgSrc() {
+            const imageSrc = $(".img-product").attr("src");
+            if (imageSrc == null || imageSrc.startsWith("blob")) {
+                return null;
+            } else {
+                return imageSrc;
+            }
+        }
+
+        function getStockNum() {
+            let stock = $("#input-stock").val();
+            const validator = new Validator(stock);
+            if (validator.isInteger()) {
+                return parseInt(stock);
+            } else {
+                return null;
+            }
+        }
+
+        function getSellingPrice() {
+            let price = $("#input-selling-price").val();
+            const validator = new Validator(price);
+            if (!validator.isNumeric()) {
+                return null;
+            } else {
+                return parseFloat(price);
+            }
+        }
+
+        function getOriginalPrice() {
+            let price = $("#input-original-price").val();
+            const validator = new Validator(price);
+            if (!validator.isNumeric()) {
+                return null;
+            } else {
+                return parseFloat(price);
+            }
+        }
+
+        function getSelectedCategoryId() {
+            const selectL3 = $("#slc-category-level-3").val();
+            if (selectL3 != null)
+                return selectL3;
+
+            const selectL2 = $("#slc-category-level-2").val();
+            if (selectL2 != null)
+                return selectL2;
+
+            const selectL1 = $("#slc-category-level-1").val();
+            if (selectL1 != null)
+                return selectL1;
+        }
+
+        <!-- image upload adapter -->
+        class UploadAdapter {
+            constructor(loader) {
+                //CKEditor 5 instance
+                this.loader = loader;
+                console.log(loader);
+            }
+
+            upload() {
+                return this.loader.file.then(file => {
+                    return new Promise((resolve, reject) => {
+                        const data = new FormData();
+                        data.append("file", file);
+                        $.ajax({
+                            url: "/admin/goods/upload-goods-detail-image",
+                            method: "post",
+                            processData: false,
+                            contentType: false,
+                            data: data,
+                            success: (res) => {
+                                console.log("uploaded", res);
+                                if (res.code === 200) {
+                                    resolve({default: "/admin/goods/img/" + res.data});
+                                } else {
+                                    showErrorAlert("error");
+                                    reject();
+                                }
+                            },
+                            error: () => {
+                                showServerErrorSwal();
+                                reject();
+                            },
+                        });
+                    });
+                })
+            }
+
+            abort() {
+                console.log("Abort");
+            }
         }
     </script>
 </div>

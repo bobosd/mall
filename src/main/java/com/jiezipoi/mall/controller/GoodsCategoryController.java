@@ -2,8 +2,7 @@ package com.jiezipoi.mall.controller;
 
 import com.jiezipoi.mall.entity.GoodsCategory;
 import com.jiezipoi.mall.service.GoodsCategoryService;
-import com.jiezipoi.mall.utils.CommonResponse;
-import com.jiezipoi.mall.utils.Result;
+import com.jiezipoi.mall.utils.Response;
 import com.jiezipoi.mall.utils.dataTable.request.GoodsCategoryRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -24,37 +23,37 @@ public class GoodsCategoryController {
 
     @PostMapping(value = "/product-category/list")
     @ResponseBody
-    public Result<?> list(@RequestBody GoodsCategoryRequest request) {
+    public Response<?> list(@RequestBody GoodsCategoryRequest request) {
         return service.getCategoriesPage(request);
     }
 
     @PostMapping("/product-category/save")
     @ResponseBody
-    public Result<?> save(@RequestBody GoodsCategory category) {
+    public Response<?> save(@RequestBody GoodsCategory category) {
         return service.saveCategory(category);
     }
 
     @PostMapping("/product-category/update")
     @ResponseBody
-    public Result<?> update(@RequestBody GoodsCategory category) {
+    public Response<?> update(@RequestBody GoodsCategory category) {
         return service.updateGoodsCategory(category);
     }
 
     @GetMapping("/product-category/info")
     @ResponseBody
-    public Result<?> info(Long id) {
+    public Response<?> info(Long id) {
         return service.getGoodsCategoryById(id);
     }
 
     @PostMapping("/product-category/delete")
     @ResponseBody
-    public Result<?> delete(@RequestParam("ids[]") Integer[] ids) {
+    public Response<?> delete(@RequestParam("ids[]") Integer[] ids) {
         return service.deleteBatch(ids);
     }
 
     @PostMapping("/product-category/listByLevelAndParent")
     @ResponseBody
-    public Result<?> listByLevelAndParent(Integer level, Long parentId) {
+    public Response<?> listByLevelAndParent(Integer level, Long parentId) {
         return service.selectByLevelAndParentIdsAndNumber(parentId, level);
     }
 }
