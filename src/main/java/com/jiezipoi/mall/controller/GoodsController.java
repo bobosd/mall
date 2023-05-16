@@ -1,9 +1,12 @@
 package com.jiezipoi.mall.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jiezipoi.mall.entity.Goods;
 import com.jiezipoi.mall.entity.GoodsCategory;
 import com.jiezipoi.mall.service.GoodsCategoryService;
 import com.jiezipoi.mall.service.GoodsService;
+import com.jiezipoi.mall.utils.CommonResponse;
 import com.jiezipoi.mall.utils.Response;
 import com.jiezipoi.mall.utils.dataTable.request.GoodsCategoryRequest;
 import org.springframework.stereotype.Controller;
@@ -25,11 +28,11 @@ public class GoodsController {
 
     @GetMapping("/goods")
     public String goodsPage() {
-        return "/admin/goods";
+        return "/admin/goods-list";
     }
 
-    @GetMapping("/create-product")
-    public String edit(ModelMap modelMap, HttpSession session) {
+    @GetMapping("/goods/form")
+    public String createGoodsPage(ModelMap modelMap, HttpSession session) {
         int userId = (int) session.getAttribute("userId");
         Goods goods = goodsService.getUserTempGoods(userId);
         modelMap.addAttribute("goods", goods);
@@ -38,7 +41,34 @@ public class GoodsController {
             List<GoodsCategory> categories = categoryService.getGoodsCategoryAndParent(categoryId);
             modelMap.addAttribute("category", categories);
         }
-        return "/admin/goods-edit";
+        return "/admin/goods-create";
+    }
+
+    @GetMapping("/goods/edit/{id}")
+    public String goodsEditPage(ModelMap modelMap, @PathVariable Long id) {
+        Response<?> response = goodsService.getGoodsById(id);
+        if (response.getCode() == 200) {
+            Goods goods = (Goods) response.getData();
+            Long categoryId = goods.getGoodsCategoryId();
+            List<GoodsCategory> categories = categoryService.getGoodsCategoryAndParent(categoryId);
+            modelMap.addAttribute("goods", goods);
+            modelMap.addAttribute("category", categories);
+            return "/admin/goods-edit";
+        } else {
+            return "/admin/fallback";
+        }
+    }
+
+    @PostMapping("/goods/update")
+    @ResponseBody
+    public Response<?> updateGoods(@RequestParam("goods") String goodsJsonString,
+                                   @RequestParam(value = "image", required = false) MultipartFile file) {
+        try {
+            Goods goods = new ObjectMapper().readValue(goodsJsonString, Goods.class);
+            return goodsService.updateGoods(goods, file);
+        } catch (JsonProcessingException e) {
+            return new Response<>(CommonResponse.INVALID_DATA);
+        }
     }
 
     @PostMapping("/goods/create")

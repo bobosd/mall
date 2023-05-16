@@ -1,0 +1,177 @@
+<!--suppress HtmlFormInputWithoutLabel -->
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="admin/header::general-libraries-and-styles(~{::title}, ~{::link}, ~{::head/script})">
+    <meta charset="UTF-8">
+    <title th:text="#{create.product}"></title>
+    <script th:replace="admin/header::select2"></script>
+    <script th:replace="admin/header::cropper"></script>
+    <script th:replace="admin/header::CKEditor"></script>
+    <link rel="stylesheet" href="/styles/admin/goods-create.css">
+</head>
+<body>
+<div th:replace="admin/sidebar::sidebar-fragment"></div>
+<div class="main">
+    <div class="block">
+        <div class="block-title" th:text="#{product.info}"></div>
+        <div th:replace="admin/goods-form-fragment::goods-form"></div>
+        <button class="button button-blue btn-create float-end" th:text="#{create}"></button>
+    </div>
+</div>
+</body>
+
+<script>
+    $(document).ready(() => {
+        $(".btn-create").click(() => createGoods());
+        $(".btn-upload-image").click(() => uploadCoverImage());
+
+        //sync event
+        $(".select2").change(syncRequest);
+        $(".form-control").change(syncRequest);
+        let imageListener = new MutationObserver((mutations) => {
+            let imageSrc = $(mutations[0].target).attr("src");
+            if (!imageSrc.startsWith("blob")) {
+                syncToServer();
+            }
+        });
+        imageListener.observe($(".img-product").get(0), {attributes: true, attributeFilter: ["src"]});
+        editor.model.document.on("change", syncRequest);
+        $("#switch-on-sale").change(syncRequest);
+
+        //on image set
+        $("#input-product-img").change(() => {
+            $(".image-upload-container").hide();
+            const [file] = $("#input-product-img").prop("files");
+            if (file != null) {
+                if (cropper != null) {
+                    cropper.destroy();
+                }
+                const url = URL.createObjectURL(file);
+                const img = new Image();
+                img.src = url;
+                img.onload = () => {
+                    const height = img.height;
+                    const width = img.width;
+                    if (width >= 150 && height >= 150) {
+                        $(".image-preview-container").css({display: "flex"});
+                        $(".img-product").prop("src", url);
+                        prepareCropper(width, height);
+                        $(".btn-upload-image").show();
+                    } else {
+                        $(".input-image").val("");
+                        Swal.fire({
+                            title: "[[#{invalid.product.image.resolution}]]",
+                            text: " ",
+                            showConfirmButton: true,
+                            icon: "error"
+                        });
+                    }
+                };
+            }
+        });
+    });
+
+    function syncToServer() {
+        const goods = collectFormData();
+        $.ajax({
+            url: "/admin/goods/saveTempGoods",
+            method: "POST",
+            dataType: "application/json",
+            data: goods,
+            success: (response) => {
+                console.log(response);
+            },
+            error: (err) => {
+                console.log(err.responseText);
+            }
+        });
+        console.log("synchronizing");
+    }
+
+    const syncRequest = debounce(() => {
+        syncToServer();
+    }, 5000);
+
+    function debounce(func, delay) {
+        let timer;
+        return function (...args) {
+            clearTimeout(timer);
+            timer = setTimeout(() => {
+                func.apply(this, args);
+            }, delay);
+        };
+    }
+
+    function uploadCoverImage() {
+        const btn = $(".btn-create");
+        btn.addSpinner();
+        cropper.getCroppedCanvas().toBlob((blob) => {
+            const data = new FormData();
+            data.append("image", blob);
+            $.ajax({
+                url: "/admin/goods/upload-cover-image",
+                method: "POST",
+                data: data,
+                processData: false,
+                contentType: false,
+                success: (response) => {
+                    if (response.code === 200) {
+                        showChangeSavedSwal();
+                        cropper.destroy();
+                        $(".btn-upload-image").hide();
+                        $(".img-product").attr("src", "/admin/goods/img/"+response.data);
+                    }
+                },
+                error: (e) => {
+                    console.log(e.errorText);
+                    showServerErrorSwal();
+                },
+                complete: () => btn.removeSpinner()
+            });
+        }, "image/jpeg", 0.7);
+    }
+
+    function createGoods() {
+        const btn = $(".btn-create");
+        btn.addSpinner();
+        if (!validateForm()) {
+            btn.removeSpinner();
+            return;
+        }
+        const goods = collectFormData();
+        $.ajax({
+            url: "/admin/goods/create",
+            method: "POST",
+            data: JSON.stringify(goods),
+            contentType: "application/json",
+            success: (response) => {
+                if (response.code === 200) {
+                    Swal.fire({
+                        title: response.message,
+                        text: " ",
+                        showConfirmButton: false,
+                        position: "top",
+                        icon: "success"
+                    });
+                    window.location.href = "/admin/goods";
+                } else {
+                    Swal.fire({
+                        title: response.message,
+                        text: " ",
+                        showConfirmButton: true,
+                        position: "top",
+                        icon: "warning"
+                    });
+                }
+            },
+            error: () => showServerErrorSwal(),
+            complete: () => btn.removeSpinner()
+        });
+    }
+
+
+</script>
+
+<!--Load server saved data-->
+
+</html>

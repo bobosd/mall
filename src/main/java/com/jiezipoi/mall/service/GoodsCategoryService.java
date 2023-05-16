@@ -97,9 +97,7 @@ public class GoodsCategoryService {
     public List<GoodsCategory> getGoodsCategoryAndParent(Long categoryId) {
         List<GoodsCategory> result = new ArrayList<>();
         GoodsCategory category = goodsCategoryDao.selectByPrimaryKey(categoryId);
-        if (category.getPath() != null) {
-            result.add(category);
-        } else {
+        if (category != null) {
             long[] ids = category.getParentIdAsArray();
             result = goodsCategoryDao.selectByIds(ids);
         }

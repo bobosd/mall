@@ -78,6 +78,7 @@
         $(document).ready(() => {
             initListener();
             initSelect2();
+            $("input").attr("autocomplete", "off");
         });
 
         function initListener() {
@@ -113,42 +114,10 @@
             $(".btn-change-image").click(() => {
                 $("#input-product-img").click();
             });
-
-            //on image set
-            $("#input-product-img").change(() => {
-                $(".image-upload-container").hide();
-                const [file] = $("#input-product-img").prop("files");
-                if (file != null) {
-                    if (cropper != null) {
-                        cropper.destroy();
-                    }
-                    const url = URL.createObjectURL(file);
-                    const img = new Image();
-                    img.src = url;
-                    img.onload = () => {
-                        const height = img.height;
-                        const width = img.width;
-                        if (width >= 150 && height >= 150) {
-                            $(".image-preview-container").css({display: "flex"});
-                            $(".img-product").prop("src", url);
-                            prepareCropper(width, height);
-                        } else {
-                            $(".input-image").val("");
-                            Swal.fire({
-                                title: "[[#{invalid.product.image.resolution}]]",
-                                text: " ",
-                                showConfirmButton: true,
-                                icon: "error"
-                            });
-                        }
-                    };
-                }
-            });
         }
 
         function prepareCropper() {
             const container = $(".img-product");
-            $(".btn-upload-image").show();
             cropper = new Cropper(container.get(0), {
                 aspectRatio: 150 / 150,
                 viewMode: 1,
@@ -230,9 +199,18 @@
             return $("#slc-category-level-2").val();
         }
 
+        function getGoodsId() {
+            const url = window.location.href;
+            if (url.includes("edit")) {
+                const arr = url.split("/");
+                return parseInt(arr[arr.length - 1]);
+            }
+            return null;
+        }
+
         function collectFormData() {
             return {
-                //id
+                id: getGoodsId(),
                 goodsName: $("#input-goods-name").val(),
                 goodsIntro: $("#input-goods-intro").val(),
                 goodsCategoryId: getSelectedCategoryId(),
@@ -339,6 +317,110 @@
 
             abort() {
                 console.log("Abort");
+            }
+        }
+
+        function validateForm() {
+            let isValid = true;
+
+            const inputs = [
+                $("#input-goods-name"),
+                $("#input-goods-intro"),
+                $("#input-original-price"),
+                $("#input-selling-price"),
+                $("#input-stock"),
+            ];
+
+            inputs.forEach((node) => {
+                if (node.val() === "") {
+                    isValid = false;
+                    node.setInvalid();
+                }
+            });
+
+            if (getSelectedCategory() == null) {
+                isValid = false;
+                $("#slc-category-level-1").next().setInvalid();
+            }
+
+            const src = $(".img-product").attr("src");
+            if (src == null || src.startsWith("blob")) {
+                isValid = false;
+                $(".image-upload-container").setInvalid();
+            }
+
+            if (editor.getData().trim().length === 0) {
+                isValid = false;
+                $(".ck-editor").setInvalid();
+            }
+            return isValid;
+        }
+
+        function getSelectedCategory() {
+            const categoryL1 = $("#slc-category-level-1").val();
+            const categoryL2 = $("#slc-category-level-2").val();
+            const categoryL3 = $("#slc-category-level-3").val();
+
+            if (categoryL3 != null) {
+                return categoryL3;
+            }
+            if (categoryL2 != null) {
+                return categoryL2;
+            }
+            if (categoryL1 != null) {
+                return categoryL1;
+            }
+            return null;
+        }
+    </script>
+
+    <script th:inline="javascript" th:charset="UTF-8">
+        const goods = [[${goods}]];
+        const category = [[${category}]];
+        $(document).ready(() => loadSavedData());
+
+        function loadSavedData() {
+            if (goods == null)
+                return;
+
+            //load and change select value
+            const categorySelects = [$("#slc-category-level-1"), $("#slc-category-level-2"), $("#slc-category-level-3")];
+
+            if (category != null) {
+                category.reverse(); //the category array is starting by secondary level, but at parent level change will call clear event
+                category.forEach((c) => {
+                    const {id, categoryLevel, categoryName} = c;
+                    const select = categorySelects[categoryLevel - 1];
+                    const option = new Option(categoryName, id, true, true);
+                    select.prop("disabled", false);
+                    select.append(option).trigger("change");
+                });
+            }
+
+            //input form
+            const {
+                goodsName,
+                goodsIntro,
+                goodsCoverImg,
+                originalPrice,
+                sellingPrice,
+                stockNum,
+                tag,
+                goodsSellStatus,
+                goodsDetailContent
+            } = goods;
+            $("#input-goods-name").val(goodsName);
+            $("#input-goods-intro").val(goodsIntro);
+            $("#input-original-price").val(originalPrice);
+            $("#input-selling-price").val(sellingPrice);
+            $("#input-stock").val(stockNum);
+            $("#switch-on-sale").prop("checked", goodsSellStatus);
+            editor.setData(goodsDetailContent);
+            if (goodsCoverImg != null && goodsCoverImg.length > 0) {
+                $(".image-upload-container").hide();
+                $(".image-preview-container").css({display: "flex"});
+                $(".img-product").attr("src", goodsCoverImg);
+                $(".btn-upload-image").hide();
             }
         }
     </script>

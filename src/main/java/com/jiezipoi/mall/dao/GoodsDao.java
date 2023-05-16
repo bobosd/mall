@@ -24,4 +24,8 @@ public interface GoodsDao {
     int getGoodsCount();
 
     int getCategoryGoodsCount(@Param("path") String categoryPath);
+
+    Goods selectGoodsById(@Param("goodsId") long goodsId);
+
+    int updateByPrimaryKeySelective(Goods goods);
 }

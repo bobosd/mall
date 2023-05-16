@@ -4,12 +4,15 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 @Configuration
 @ConfigurationProperties(prefix = "goods")
 @PropertySource("classpath:/config/goods-config.properties")
 public class GoodsConfig {
     private final MallConfig mallConfig;
-    private String imageDirectory;
+    private String fileStorePath;
     private String userTempFilePrefix;
     private String coverImageFilename;
     private String userTempDataFilename;
@@ -26,12 +29,12 @@ public class GoodsConfig {
         this.userTempDataFilename = userTempDataFilename;
     }
 
-    public String getImageDirectory() {
-        return mallConfig.getUploadDirectory() + imageDirectory;
+    public Path getFileStorePath() {
+        return Paths.get(mallConfig.getUploadDirectory() + fileStorePath);
     }
 
-    public void setImageDirectory(String imageDirectory) {
-        this.imageDirectory = imageDirectory;
+    public void setFileStorePath(String fileStorePath) {
+        this.fileStorePath = fileStorePath;
     }
 
     public String getUserTempFilePrefix() {

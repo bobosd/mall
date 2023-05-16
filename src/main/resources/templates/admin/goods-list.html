@@ -14,7 +14,7 @@
         <div class="block-title" th:text="#{product.management}"></div>
         <div class="block-content">
             <div class="goods-options">
-                <button class="button button-blue" id="btn-back" th:text="#{create}"></button>
+                <button class="button button-blue" id="btn-create-goods" th:text="#{create}"></button>
             </div>
             <hr/>
             <div class="goods-options row">
@@ -72,6 +72,9 @@
         });
         slcCategoryL2.change(() => slcCategoryL3.val(null).trigger("change"));
         $(".select2").change(() => table.draw());
+
+        //create new goods
+        $("#btn-create-goods").click(() => window.location.href = "/admin/goods/form");
     }
 
     function initSelect2() {
@@ -165,10 +168,15 @@
                 {
                     data: "createTime"
                 }
-            ]
+            ],
+            createdRow: (row, goods) => {
+                $(row).click(() => openGoodsEditPage(goods.id));
+            }
         });
+    }
 
-        //mark
+    function openGoodsEditPage(id) {
+        window.location.href = "/admin/goods/edit/" + id;
     }
 
     function getSelectedCategory() {

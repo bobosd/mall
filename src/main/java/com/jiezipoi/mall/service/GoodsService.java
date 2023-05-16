@@ -58,14 +58,18 @@ public class GoodsService {
     }
 
     private boolean isValidGoods(Goods goods) {
-        return !goods.getGoodsName().isBlank() &&
+        return goods.getGoodsName() != null &&
+                !goods.getGoodsName().isBlank() &&
+                goods.getGoodsIntro() != null &&
                 !goods.getGoodsIntro().isBlank() &&
                 goods.getOriginalPrice() != null &&
                 goods.getGoodsCategoryId() != null &&
                 goods.getSellingPrice() != null &&
                 goods.getStockNum() != null &&
                 goods.getGoodsSellStatus() != null &&
+                goods.getGoodsCoverImg() != null &&
                 !goods.getGoodsCoverImg().isBlank() &&
+                goods.getGoodsDetailContent() != null &&
                 !goods.getGoodsDetailContent().isBlank();
     }
 
@@ -87,6 +91,12 @@ public class GoodsService {
         }
     }
 
+    /**
+     * 上传的临时的商品封面，该图
+     * @param file 用户上传的图片
+     * @param userId 用户id
+     * @return 图片在服务器的地址
+     */
     public Response<?> uploadCoverImage(MultipartFile file, int userId) {
         Response<String> response = new Response<>();
         Path uploadDir = getUserTempDir(userId);
@@ -107,7 +117,7 @@ public class GoodsService {
     }
 
     private Path getUserTempDir(int userId) {
-        String uploadDirString = goodsConfig.getImageDirectory();
+        Path uploadDirString = goodsConfig.getFileStorePath();
         return Paths.get(uploadDirString + goodsConfig.getUserTempFileName(userId));//return: {config_path}/temp_{userid}
     }
 
@@ -172,5 +182,40 @@ public class GoodsService {
         Response<DataTableResult> response = new Response<>(CommonResponse.SUCCESS);
         response.setData(dataTableResult);
         return response;
+    }
+
+    public Response<?> getGoodsById(Long id) {
+        if (id == null) {
+            return new Response<>(CommonResponse.INVALID_DATA);
+        }
+        Goods goods = goodsDao.selectGoodsById(id);
+        if (goods == null) {
+            return new Response<>(CommonResponse.INVALID_DATA);
+        }
+        Response<Goods> response = new Response<>(CommonResponse.SUCCESS);
+        response.setData(goods);
+        return response;
+    }
+
+    public Response<?> updateGoods(Goods goods, MultipartFile file) {
+        if (!isValidGoods(goods)) {
+            return new Response<>(CommonResponse.INVALID_DATA);
+        }
+
+        if (file != null) {
+            String coverImagePath = saveCoverImage(file, goods.getId());
+        }
+
+        if (goodsDao.updateByPrimaryKeySelective(goods) > 0) {
+            return new Response<>(CommonResponse.SUCCESS);
+        } else {
+            return new Response<>(CommonResponse.DATA_NOT_EXIST);
+        }
+    }
+
+    private String saveCoverImage(MultipartFile image, Long goodsId) {
+        Path storePath = goodsConfig.getFileStorePath();
+
+        return null;
     }
 }

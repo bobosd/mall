@@ -147,6 +147,10 @@ public class GoodsCategory {
         this.updateUser = updateUser;
     }
 
+    /**
+     *
+     * @return array of parents id and itself
+     */
     public long[] getParentIdAsArray() {
         if (path.isBlank()) {
             return new long[] {};
