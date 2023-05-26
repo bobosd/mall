@@ -103,23 +103,25 @@
     }
 
     function uploadCoverImage() {
+        console.log("1");
         const btn = $(".btn-create");
         btn.addSpinner();
         cropper.getCroppedCanvas().toBlob((blob) => {
             const data = new FormData();
             data.append("image", blob);
             $.ajax({
-                url: "/admin/goods/upload-cover-image",
+                url: "/admin/goods/temp/upload/cover-image",
                 method: "POST",
                 data: data,
                 processData: false,
                 contentType: false,
                 success: (response) => {
+                    console.log(response);
                     if (response.code === 200) {
                         showChangeSavedSwal();
                         cropper.destroy();
                         $(".btn-upload-image").hide();
-                        $(".img-product").attr("src", "/admin/goods/img/"+response.data);
+                        $(".img-product").attr("src", response.data);
                     }
                 },
                 error: (e) => {
@@ -149,11 +151,11 @@
                     Swal.fire({
                         title: response.message,
                         text: " ",
+                        timer: 1500,
                         showConfirmButton: false,
                         position: "top",
-                        icon: "success"
-                    });
-                    window.location.href = "/admin/goods";
+                        icon: "success",
+                    }).then(() => window.location.href = "/admin/goods");
                 } else {
                     Swal.fire({
                         title: response.message,
@@ -168,8 +170,6 @@
             complete: () => btn.removeSpinner()
         });
     }
-
-
 </script>
 
 <!--Load server saved data-->

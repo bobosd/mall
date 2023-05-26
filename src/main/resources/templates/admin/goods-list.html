@@ -11,7 +11,7 @@
 <div th:replace="admin/sidebar::sidebar-fragment"></div>
 <div class="main">
     <div class="block">
-        <div class="block-title" th:text="#{product.management}"></div>
+        <div class="block-title" th:text="#{product}"></div>
         <div class="block-content">
             <div class="goods-options">
                 <button class="button button-blue" id="btn-create-goods" th:text="#{create}"></button>
@@ -43,6 +43,7 @@
                     <th></th>
                     <th th:text="#{product.name}"></th>
                     <th th:text="#{create.date}"></th>
+                    <th th:text="#{available}"></th>
                 </tr>
                 </thead>
             </table>
@@ -167,6 +168,13 @@
                 },
                 {
                     data: "createTime"
+                },
+                {
+                    data: "goodsSellStatus",
+                    render: (status) => {
+                        return '<span class="dot" activated="' + status + '"></span>';
+                    },
+                    width: "10%"
                 }
             ],
             createdRow: (row, goods) => {

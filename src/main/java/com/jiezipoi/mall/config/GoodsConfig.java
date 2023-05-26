@@ -14,8 +14,33 @@ public class GoodsConfig {
     private final MallConfig mallConfig;
     private String fileStorePath;
     private String userTempFilePrefix;
-    private String coverImageFilename;
     private String userTempDataFilename;
+    private String imageSuffix;
+
+    public String getExposeUrl(Path filePath) {
+        Path basePath = getFileStorePath();
+        Path relativizePath = basePath.relativize(filePath);
+        String normalizePath = relativizePath.toString().replaceAll("\\\\", "/");//替换 '\' 为 '/'
+        return this.exposeUrl + normalizePath;
+    }
+
+    public void setExposeUrl(String exposeUrl) {
+        this.exposeUrl = exposeUrl;
+    }
+
+    private String exposeUrl;
+
+    public MallConfig getMallConfig() {
+        return mallConfig;
+    }
+
+    public String getImageSuffix() {
+        return imageSuffix;
+    }
+
+    public void setImageSuffix(String imageSuffix) {
+        this.imageSuffix = imageSuffix;
+    }
 
     public GoodsConfig(MallConfig mallConfig) {
         this.mallConfig = mallConfig;
@@ -46,14 +71,6 @@ public class GoodsConfig {
     }
 
     public String getUserTempFileName(int userName) {
-        return getUserTempFilePrefix() + userName;
-    }
-
-    public String getCoverImageFilename() {
-        return coverImageFilename;
-    }
-
-    public void setCoverImageFilename(String coverImageFilename) {
-        this.coverImageFilename = coverImageFilename;
+        return getUserTempFilePrefix() + userName + "/";
     }
 }

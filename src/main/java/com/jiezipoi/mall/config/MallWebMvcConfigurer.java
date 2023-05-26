@@ -7,6 +7,8 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import java.io.File;
+
 @Configuration
 public class MallWebMvcConfigurer implements WebMvcConfigurer {
     private final CarouselConfig carouselConfig;
@@ -44,7 +46,8 @@ public class MallWebMvcConfigurer implements WebMvcConfigurer {
     }
 
     private void exposeGoodsDirectory(ResourceHandlerRegistry registry) {
+        System.out.println("file:" + goodsConfig.getFileStorePath());
         registry.addResourceHandler("/admin/goods/img/**")
-                .addResourceLocations("file:" + goodsConfig.getFileStorePath());
+                .addResourceLocations("file:" + goodsConfig.getFileStorePath() + File.separator);
     }
 }

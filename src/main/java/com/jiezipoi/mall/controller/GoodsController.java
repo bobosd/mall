@@ -85,11 +85,11 @@ public class GoodsController {
         return goodsService.saveTempGoods(goods, userId);
     }
 
-    @PostMapping("/goods/upload-cover-image")
+    @PostMapping("/goods/temp/upload/cover-image")
     @ResponseBody
     public Response<?> uploadCoverImage(@RequestParam("image") MultipartFile image, HttpSession session) {
         int userId = (int) session.getAttribute("userId");
-        return goodsService.uploadCoverImage(image, userId);
+        return goodsService.saveTempCoverImage(image, userId);
     }
 
     @PostMapping("/goods/upload-goods-detail-image")

@@ -14,6 +14,8 @@ import java.io.*;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 public class GoodsService {
@@ -25,30 +27,67 @@ public class GoodsService {
         this.goodsConfig = goodsConfig;
     }
 
+    /**
+     * 创建商品，把储存的临时数据和图片都转移到goods文件夹中
+     * @param goods 商品
+     * @param userId 用户ID
+     * @return 服务器响应
+     */
     public Response<?> createGoods(Goods goods, int userId) {
         if (!isValidGoods(goods)) {
             return new Response<>(CommonResponse.INVALID_DATA);
         }
+
+        String tempCoverImgUrl = goods.getGoodsCoverImg();
+        goods.setGoodsCoverImg(replaceTempUrl(tempCoverImgUrl));
+        String tempDetail = goods.getGoodsDetailContent();
+        goods.setGoodsDetailContent(replaceTempUrl(tempDetail));
+
+        try {
+            walkTempFile(userId);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return new Response<>(CommonResponse.INTERNAL_SERVER_ERROR);
+        }
+
         if (goodsDao.insertSelective(goods) > 0) {
-            try {
-                deleteTempFile(userId);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
             return new Response<>(CommonResponse.SUCCESS);
         } else {
             return new Response<>(CommonResponse.ERROR);
         }
     }
 
-    private void deleteTempFile(int userId) throws IOException {
+    private String replaceTempUrl(String text) {
+        String tempUrlRegex =
+                "/admin/goods/img/(" + goodsConfig.getUserTempFilePrefix() + "\\w+/)?\\w+" + goodsConfig.getImageSuffix();
+        Pattern pattern = Pattern.compile(tempUrlRegex);
+        Matcher matcher = pattern.matcher(text);
+        StringBuilder stringBuilder = new StringBuilder();
+        while (matcher.find()) {
+            String url = matcher.group(0);
+            String tempDir = matcher.group(1);
+            String replacement = url.replaceAll(tempDir, "");
+            matcher.appendReplacement(stringBuilder, replacement);
+        }
+        matcher.appendTail(stringBuilder);
+        return stringBuilder.toString();
+    }
+
+    private void walkTempFile(int userId) throws IOException {
         Path tempDir = getUserTempDir(userId);
         Files.walkFileTree(tempDir, new SimpleFileVisitor<>() {
             @Override
             public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                Files.delete(file);
+                String imageSuffix = goodsConfig.getImageSuffix();
+                if (file.toString().endsWith(imageSuffix)) {
+                    Path fileName = file.getFileName();
+                    Files.move(file, goodsConfig.getFileStorePath().resolve(fileName));
+                } else {
+                    Files.delete(file);
+                }
                 return FileVisitResult.CONTINUE;
             }
+
             @Override
             public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
                 Files.delete(dir);
@@ -75,11 +114,10 @@ public class GoodsService {
 
     public Response<?> saveTempGoods(Goods goods, int userId) {
         Path uploadDir = getUserTempDir(userId);
-        String fileDir = uploadDir + "/" + goodsConfig.getUserTempDataFilename();
-
+        String fileDir = uploadDir + File.separator + goodsConfig.getUserTempDataFilename();
         try {
             if (!Files.exists(uploadDir)) {
-                Files.createFile(uploadDir);
+                Files.createDirectories(uploadDir);
             }
             ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(fileDir));
             outputStream.writeObject(goods);
@@ -92,23 +130,21 @@ public class GoodsService {
     }
 
     /**
-     * 上传的临时的商品封面，该图
-     * @param file 用户上传的图片
+     * 上传的临时的商品封面，
+     *
+     * @param file   用户上传的图片
      * @param userId 用户id
      * @return 图片在服务器的地址
      */
-    public Response<?> uploadCoverImage(MultipartFile file, int userId) {
+    public Response<?> saveTempCoverImage(MultipartFile file, int userId) {
         Response<String> response = new Response<>();
         Path uploadDir = getUserTempDir(userId);
-        String filename = goodsConfig.getCoverImageFilename();
-        Path imagePath = Paths.get(uploadDir + "/" + filename);
+        String filename = FileNameGenerator.generateFileName() + ".jpg";
         try {
-            if (!Files.exists(uploadDir)) {
-                Files.createDirectories(uploadDir);
-            }
-            Files.write(imagePath, file.getBytes());
+            Path savedLocation = saveImage(uploadDir, filename, file);
+            String url = goodsConfig.getExposeUrl(savedLocation);
             response.setResponse(CommonResponse.SUCCESS);
-            response.setData(goodsConfig.getUserTempFileName(userId) + "/" + filename);
+            response.setData(url);
         } catch (IOException e) {
             e.printStackTrace();
             response.setResponse(CommonResponse.INTERNAL_SERVER_ERROR);
@@ -118,7 +154,8 @@ public class GoodsService {
 
     private Path getUserTempDir(int userId) {
         Path uploadDirString = goodsConfig.getFileStorePath();
-        return Paths.get(uploadDirString + goodsConfig.getUserTempFileName(userId));//return: {config_path}/temp_{userid}
+        return Paths.get(uploadDirString + "/" + goodsConfig.getUserTempFileName(userId));
+        //return: {config_path}/temp_{userid}
     }
 
     public Goods getUserTempGoods(int userId) {
@@ -138,7 +175,7 @@ public class GoodsService {
     public Response<?> uploadGoodsDetailImage(MultipartFile image, Integer goodsId, int userId) {
         Path uploadDir;
         if (goodsId != null && goodsId != 0) {
-            uploadDir = getGoodsDir(goodsId);
+            uploadDir = getGoodsStoragePath();
         } else {
             uploadDir = getUserTempDir(userId);
         }
@@ -151,7 +188,7 @@ public class GoodsService {
             Files.write(imagePath, image.getBytes());
             Response<String> response = new Response<>();
             response.setResponse(CommonResponse.SUCCESS);
-            response.setData(goodsConfig.getUserTempFileName(userId) + "/" + fileName);
+            response.setData(goodsConfig.getUserTempFileName(userId) + fileName);
             return response;
         } catch (IOException e) {
             e.printStackTrace();
@@ -159,8 +196,8 @@ public class GoodsService {
         }
     }
 
-    private Path getGoodsDir(Integer goodsId) {
-        return Paths.get(goodsId.toString());
+    private Path getGoodsStoragePath() {
+        return goodsConfig.getFileStorePath();
     }
 
     public Response<?> list(Integer start, Integer limit, String categoryPath, Integer level) {
@@ -203,7 +240,13 @@ public class GoodsService {
         }
 
         if (file != null) {
-            String coverImagePath = saveCoverImage(file, goods.getId());
+            try {
+                Path uploadDir = goodsConfig.getFileStorePath();
+                String filename = getFileNameByUrl(goods.getGoodsCoverImg());
+                saveImage(uploadDir, filename, file);
+            } catch (IOException e) {
+                return new Response<>(CommonResponse.INTERNAL_SERVER_ERROR);
+            }
         }
 
         if (goodsDao.updateByPrimaryKeySelective(goods) > 0) {
@@ -213,9 +256,28 @@ public class GoodsService {
         }
     }
 
-    private String saveCoverImage(MultipartFile image, Long goodsId) {
-        Path storePath = goodsConfig.getFileStorePath();
-
-        return null;
+    private String getFileNameByUrl(String url) {
+        String[] temp = url.split("/");
+        return temp[temp.length - 1];
     }
+
+    private Path saveImage(Path directory, String fileName, MultipartFile file) throws IOException{
+        if (!Files.exists(directory)) {
+            Files.createDirectories(directory);
+        }
+        Path filePath = Paths.get(directory + File.separator + fileName);
+        Files.write(filePath, file.getBytes());
+        return filePath;
+    }
+
+    /*
+    TODO:
+    - 储存图片的方法需要改善，应该只有一个方法：saveImage(Path, FileName) ✔
+
+    - 图片的命名应当只有一种：使用FileNameGenerator
+
+    - 在创建Temp的时候，该Object的coverImage应当保存临时的cover图片地址
+
+    - 当tempObject转换为正式的商品时，应该修改他的coverImage值和detail中的src值
+     */
 }
