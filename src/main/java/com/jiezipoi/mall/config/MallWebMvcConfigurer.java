@@ -46,7 +46,6 @@ public class MallWebMvcConfigurer implements WebMvcConfigurer {
     }
 
     private void exposeGoodsDirectory(ResourceHandlerRegistry registry) {
-        System.out.println("file:" + goodsConfig.getFileStorePath());
         registry.addResourceHandler("/admin/goods/img/**")
                 .addResourceLocations("file:" + goodsConfig.getFileStorePath() + File.separator);
     }
