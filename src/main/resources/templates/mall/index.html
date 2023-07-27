@@ -1,25 +1,145 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head>
+<head th:replace="mall/header::general-libraries-and-styles(~{::title}, ~{::link}, ~{this::head/script})">
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Mall</title>
+    <link th:include="mall/header::swiper"/>
     <link rel="stylesheet" href="/styles/mall/all.css"/>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/js/all.min.js" integrity="sha512-rpLlll167T5LJHwp0waJCh3ZRf7pO6IT1+LZOhAyP6phAirwchClbTZV3iqL3BMrVxIYRbzGTpli4rfxsCK6Vw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css" integrity="sha512-MV7K8+y+gLIBoVD59lQIYicR65iaqukzvf/nwasF0nqhPay5w/9lJmVM2hMDcnK1OnMGCdVK+iQrJ7lzPJQd1w==" crossorigin="anonymous" referrerpolicy="no-referrer" />    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
-
-    <style>
-        .floor {
-            max-width: 1300px;
-            margin: auto;
-        }
-    </style>
+    <link rel="stylesheet" href="/styles/mall/index.css"/>
 </head>
 <body>
 <nav th:replace="mall/navbar::navbar"></nav>
 <main>
     <div class="floor">
-        <h1>Content</h1>
+        <div class="first-screen">
+            <div class="category-menu">
+                <th:block th:each="l1category : ${categories}">
+                    <div class="category-level1" th:data-id="${l1category.getCategoryId()}">
+                        <span th:text="${l1category.getCategoryName()}"></span>
+                    </div>
+                </th:block>
+                <div class="category-sub-menu-container">
+                    <div class="category-sub-menu">
+                        <!-- rendering in javascript -->
+                    </div>
+                </div>
+            </div>
+            <div class="swiper">
+                <div class="swiper-wrapper">
+                    <th:block th:each="carousel : ${carousels}">
+                        <div class="swiper-slide">
+                            <img th:src="${baseUrl} + ${carousel.getCarouselUrl()}" alt="carousel image">
+                        </div>
+                    </th:block>
+                </div>
+                <!-- Pagination -->
+                <div class="swiper-pagination"></div>
+                <!-- navigation buttons -->
+                <div class="swiper-button-prev"></div>
+                <div class="swiper-button-next"></div>
+                <!-- scrollbar -->
+                <div class="swiper-scrollbar"></div>
+            </div>
+        </div>
     </div>
 </main>
+<script th:inline="javascript">
+    const categories = getCategoriesMap();
+    const swiper = new Swiper(".swiper", {
+        direction: "horizontal",
+        loop: true,
+        pagination: {el: ".swiper-pagination"},
+        navigation: {
+            nextEl: '.swiper-button-next',
+            prevEl: '.swiper-button-prev',
+        },
+        scrollbar: {el: ".swiper-scrollbar"},
+    });
+
+    let mouseInCategoryOption = false;
+    let mouseInSubMenu = false;
+
+    $(document).ready(() => {
+        bindCategoryOptionsEvent();
+        bindSubMenuEvent();
+    });
+
+    function bindCategoryOptionsEvent() {
+        const options = $(".category-level1");
+        options.mouseenter((event) => {
+            const id = parseInt($(event.target).attr("data-id"));
+            const category = categories.get(id);
+            if (category == null)
+                return;
+            prepareSubMenu(category);
+        });
+
+        options.mouseleave(() => {
+            mouseInCategoryOption = false;
+        });
+    }
+
+    function bindSubMenuEvent() {
+        const subMenu = $(".category-sub-menu");
+        subMenu.mouseenter(() => {
+            mouseInSubMenu = true;
+        });
+
+        subMenu.mouseleave(() => {
+            mouseInSubMenu = false;
+        });
+    }
+
+    function prepareSubMenu(l1category) {
+        const subMenu = $(".category-sub-menu");
+        const l2categories = l1category.children === null ? [] : l1category.children;
+        subMenu.empty();
+        subMenu.attr("parent-id", l1category.categoryId);
+        calcSubMenuPosition();
+        calcSubMenuSize();
+        for (let i = 0; i < l2categories.length; i++) {
+            const l2category = l2categories[i];
+            const l2DOM = jQuery.parseHTML(
+                '<div class="category-level2"><div class="category-level2-name">' + l2category.categoryName + '</div></div>');
+            const l3categories = l2category.children === null ? [] : l2category.children;
+            for (let j = 0; j < l3categories.length; j++) {
+                const l3category = l3categories[j];
+                const l3DOM = jQuery.parseHTML('<div class="category-level3">' + l3category.categoryName + '</div>');
+                $(l2DOM).append(l3DOM);
+            }
+            subMenu.append(l2DOM);
+        }
+    }
+
+    function calcSubMenuSize() {
+        const categoryMenu = $(".category-menu");
+        const menuHeight = categoryMenu.height();
+        $(".category-sub-menu").height(menuHeight - 10); //10 = padding
+    }
+
+    function calcSubMenuPosition() {
+        const category = $(".category-level1");
+        const width = category.outerWidth();
+        const {left} = category.position();
+        const {top} = $(".swiper").position();
+        $(".category-sub-menu-container").css({top: top, left: left + width - 10});
+    }
+
+    function getCategoriesMap() {
+        const categories = [[${categories}]];
+        const result = new Map();
+        for (let i = 0; i < categories.length; i++) {
+            const category = categories[i];
+            result.set(category.categoryId, category);
+        }
+        return result;
+    }
+
+    function toggleSubMenuDisplay() {
+        if (!mouseInSubMenu && !mouseInCategoryOption) {
+            $(".category-sub-menu").hide();
+        }
+    }
+</script>
 </body>
 </html>

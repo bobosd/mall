@@ -10,6 +10,7 @@ import org.springframework.context.annotation.PropertySource;
 public class CarouselConfig {
     private final MallConfig mallConfig;
     private String imageDirectory;
+    private String exposeUrl;
 
     public CarouselConfig(MallConfig mallConfig) {
         this.mallConfig = mallConfig;
@@ -21,5 +22,13 @@ public class CarouselConfig {
 
     public void setImageDirectory(String imageDirectory) {
         this.imageDirectory = imageDirectory;
+    }
+
+    public String getExposeUrl() {
+        return exposeUrl;
+    }
+
+    public void setExposeUrl(String exposeUrl) {
+        this.exposeUrl = exposeUrl;
     }
 }

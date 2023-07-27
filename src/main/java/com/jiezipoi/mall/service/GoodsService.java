@@ -1,6 +1,7 @@
 package com.jiezipoi.mall.service;
 
 import com.jiezipoi.mall.config.GoodsConfig;
+import com.jiezipoi.mall.dao.GoodsCategoryDao;
 import com.jiezipoi.mall.dao.GoodsDao;
 import com.jiezipoi.mall.entity.Goods;
 import com.jiezipoi.mall.utils.CommonResponse;
@@ -20,9 +21,11 @@ import java.util.regex.Pattern;
 @Service
 public class GoodsService {
     final GoodsDao goodsDao;
+    final GoodsCategoryDao goodsCategoryDao;
     final GoodsConfig goodsConfig;
 
-    public GoodsService(GoodsDao goodsDao, GoodsConfig goodsConfig) {
+    public GoodsService(GoodsDao goodsDao, GoodsConfig goodsConfig, GoodsCategoryDao goodsCategoryDao) {
+        this.goodsCategoryDao = goodsCategoryDao;
         this.goodsDao = goodsDao;
         this.goodsConfig = goodsConfig;
     }
@@ -164,7 +167,8 @@ public class GoodsService {
         if (!Files.exists(Paths.get(serializedGoodsDir))) {
             return null;
         }
-        try (ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(serializedGoodsDir))) {
+        try (FileInputStream fileInputStream = new FileInputStream(serializedGoodsDir);
+             ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream)) {
             return (Goods) objectInputStream.readObject();
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
@@ -269,15 +273,4 @@ public class GoodsService {
         Files.write(filePath, file.getBytes());
         return filePath;
     }
-
-    /*
-    TODO:
-    - 储存图片的方法需要改善，应该只有一个方法：saveImage(Path, FileName) ✔
-
-    - 图片的命名应当只有一种：使用FileNameGenerator
-
-    - 在创建Temp的时候，该Object的coverImage应当保存临时的cover图片地址
-
-    - 当tempObject转换为正式的商品时，应该修改他的coverImage值和detail中的src值
-     */
 }

@@ -3,6 +3,7 @@ package com.jiezipoi.mall.entity;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 
 public class GoodsCategory {
     /**
@@ -58,6 +59,8 @@ public class GoodsCategory {
      * 修改者id
      */
     private Integer updateUser;
+
+    private final HashSet<GoodsCategory> children = new HashSet<>();
 
     public Long getId() {
         return id;
@@ -148,12 +151,11 @@ public class GoodsCategory {
     }
 
     /**
-     *
      * @return array of parents id and itself
      */
     public long[] getParentIdAsArray() {
         if (path.isBlank()) {
-            return new long[] {};
+            return new long[]{};
         }
         String[] ids = path.split("\\.");
         long[] result = new long[ids.length];

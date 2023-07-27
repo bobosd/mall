@@ -83,7 +83,7 @@ public class CarouselService {
         try {
             Files.delete(imagePath);
         } catch (IOException ignored) {
-
+            
         }
     }
 

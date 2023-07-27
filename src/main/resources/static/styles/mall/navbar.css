@@ -6,7 +6,7 @@ nav {
 .navbar {
     height: 80px;
     margin: 0 auto;
-    max-width: 1300px;
+    max-width: 1278px;
     overflow: hidden;
     display: flex;
     justify-content: space-between;
@@ -20,6 +20,7 @@ nav a {
     cursor: pointer;
     border-radius: 5px;
     transition-duration: 0.3s;
+    text-decoration: none;
 }
 
 nav a:hover {
@@ -31,11 +32,21 @@ nav a:hover {
     flex-grow: 1;
 }
 
+nav .shopping-cart {
+    background-color: #fc830a;
+    color: #FFFFFF;
+}
+
+nav .shopping-cart:hover {
+    background-color: #fc830a;
+}
+
 .search-box {
     display: flex;
     height: 40px;
     border-radius: 30px;
     border: 1px solid #DDDDDD;
+    align-items: center;
 }
 
 .search-box:hover {
@@ -50,8 +61,14 @@ nav a:hover {
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 70px;
+    width: 50px;
     cursor: pointer;
+    height: max-content;
+    margin: 0 10px;
+    padding: 5px 0;
+    background-color: #fc830a;
+    border-radius: 15px;
+    color: #FFFFFF;
 }
 
 input[type="search"] {

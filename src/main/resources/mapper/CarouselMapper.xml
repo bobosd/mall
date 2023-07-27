@@ -179,4 +179,11 @@
             #{id}
         </foreach>
     </update>
+
+    <select id="findAllCarousel" resultMap="BaseResultMap">
+        SELECT
+        <include refid="base_column_list"/>
+        FROM carousel
+        WHERE is_deleted = 0
+    </select>
 </mapper>

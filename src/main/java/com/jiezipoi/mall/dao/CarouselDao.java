@@ -27,4 +27,6 @@ public interface CarouselDao {
     int deleteBatch(Integer[] ids);
 
     List<Carousel> findCarouselByNum(@Param("number") int number);
+
+    List<Carousel> findAllCarousel();
 }

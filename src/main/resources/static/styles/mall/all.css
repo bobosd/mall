@@ -1,3 +1,9 @@
 body {
     margin: 0;
 }
+
+.floor {
+    max-width: 1278px;
+    margin: auto;
+    padding: 20px 10px 0 10px;
+}

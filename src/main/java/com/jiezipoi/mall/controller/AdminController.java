@@ -93,4 +93,10 @@ public class AdminController {
     public Response<?> upload(@RequestParam("file") MultipartFile file) {
         return new Response<>(CommonResponse.SUCCESS);
     }
+
+    @GetMapping("/index-config")
+    public String newArrivalsPage(@RequestParam("configType") int configType) {
+        
+        return "admin/new-arrivals";
+    }
 }

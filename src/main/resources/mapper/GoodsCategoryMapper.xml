@@ -234,4 +234,12 @@
         </foreach>
         ORDER BY category_level DESC;
     </select>
+
+    <select id="selectByCategoryLevel" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_column_list"/>
+        FROM goods_category
+        WHERE category_level = #{level} AND
+        is_deleted = 0;
+    </select>
 </mapper>

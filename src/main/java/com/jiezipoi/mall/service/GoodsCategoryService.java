@@ -1,5 +1,8 @@
 package com.jiezipoi.mall.service;
 
+import com.jiezipoi.mall.controller.vo.IndexLevel1CategoryVO;
+import com.jiezipoi.mall.controller.vo.IndexLevel2CategoryVO;
+import com.jiezipoi.mall.controller.vo.IndexLevel3CategoryVO;
 import com.jiezipoi.mall.dao.GoodsCategoryDao;
 import com.jiezipoi.mall.entity.GoodsCategory;
 import com.jiezipoi.mall.utils.CommonResponse;
@@ -12,6 +15,8 @@ import javax.servlet.http.HttpSession;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class GoodsCategoryService {
@@ -117,5 +122,45 @@ public class GoodsCategoryService {
         Response<List<GoodsCategory>> response = new Response<>(CommonResponse.SUCCESS);
         response.setData(categories);
         return response;
+    }
+
+    public List<IndexLevel1CategoryVO> getIndexCategory() {
+        List<IndexLevel1CategoryVO> level1Categories = goodsCategoryDao.selectByCategoryLevel((byte) 1).stream()
+                .map(IndexLevel1CategoryVO::new)
+                .toList();
+        List<IndexLevel2CategoryVO> level2Categories = goodsCategoryDao.selectByCategoryLevel((byte) 2)
+                .stream()
+                .map(IndexLevel2CategoryVO::new)
+                .toList();
+        List<IndexLevel3CategoryVO> level3Categories = goodsCategoryDao.selectByCategoryLevel((byte) 3)
+                .stream()
+                .map(IndexLevel3CategoryVO::new)
+                .toList();
+
+        //处理二级和三级的层级关系
+        Map<Long, List<IndexLevel3CategoryVO>> l3CategoriesMap = level3Categories.stream()
+                .collect(Collectors.groupingBy(IndexLevel3CategoryVO::getParentId));
+
+        level2Categories.forEach(category -> {
+            Long id = category.getCategoryId();
+            if (l3CategoriesMap.containsKey(id)) {
+                List<IndexLevel3CategoryVO> children = l3CategoriesMap.get(id);
+                category.setChildren(children);
+            }
+        });
+
+        //处理二级和三级的层级关系
+        Map<Long, List<IndexLevel2CategoryVO>> l2CategoriesMap = level2Categories.stream()
+                .collect(Collectors.groupingBy(IndexLevel2CategoryVO::getParentId));
+
+        level1Categories.forEach(category -> {
+            Long id = category.getCategoryId();
+            if (l2CategoriesMap.containsKey(id)) {
+                List<IndexLevel2CategoryVO> children = l2CategoriesMap.get(id);
+                category.setChildren(children);
+            }
+        });
+
+        return level1Categories;
     }
 }
