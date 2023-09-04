@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="admin/header::general-libraries-and-styles(~{::title}, ~{::link}, ~{::head/script})">
+    <title th:text="#{new.arrivals}"></title>
+    <link rel="stylesheet" href="/styles/admin/index-config.css">
+    <link th:include="admin/header::datatable">
+</head>
+<body>
+<div th:replace="admin/sidebar::sidebar-fragment"></div>
+<div class="main">
+    <div class="block">
+        <div class="block-title" th:text="#{index.config}"></div>
+        <div class="block-content">
+            <div class="block-row">
+                <div class="carousel-option">
+                    <button class="button button-blue btn-show-create-index-config-modal" th:text="#{create}"></button>
+                </div>
+            </div>
+
+            <div class="block-row">
+                <table>
+                    <thead>
+                    <tr>
+                        <th></th>
+                        <th th:text="#{config.name}"></th>
+                        <th th:text="#{redirect.link}"></th>
+                        <th th:text="#{rank.order}"></th>
+                        <th th:text="#{goods.id}"></th>
+                        <th th:text="#{create.date}"></th>
+                        <th></th>
+                    </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modal-index-config" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" th:text="#{index.config}"></h5>
+                <span class="close-btn-dot" data-bs-dismiss="modal" data-backdrop="false"></span>
+            </div>
+            <div class="modal-body">
+                <div class="image-container">
+                    <label th:text="#{config.name}"></label>
+                    <input class="form-control form-control-sm input-index-config-name" autocomplete="off">
+                    <label th:text="#{redirect.link}"></label>
+                    <input class="form-control form-control-sm input-redirect-link">
+                    <div class="row">
+                        <div class="col-6">
+                            <label th:text="#{goods.id}"></label>
+                            <input class="form-control form-control-sm input-goods-id">
+                        </div>
+                        <div class="col-6">
+                            <label th:text="#{rank.order}"></label>
+                            <input class="form-control form-control-sm input-order" type="number">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="button" data-bs-dismiss="modal" th:text="#{close}"></button>
+                <button type="button" class="button button-blue btn-create-index-config" th:text="#{create}"/>
+                <button type="button" class="button button-blue btn-update-index-config" th:text="#{save}"/>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    sidebarSetSelected($(".sidebar-option.new-arrivals"));
+
+    const indexConfigModal = new bootstrap.Modal(document.getElementById("modal-index-config"));
+
+    $(document).ready(() => {
+        initDataTable();
+        initListener();
+    });
+
+    function initListener() {
+        //menu buttons
+        $(".btn-show-create-index-config-modal").click(() => showCreateIndexConfigModal());
+        //modal buttons
+        $(".btn-create-index-config").click(() => createIndexConfig());
+        $(".btn-update-index-config").click(() => updateIndexConfig());
+        //modal
+        $("#modal-index-config").on("hidden.bs.modal", () => {
+            $("#modal-index-config").removeAttr("index-config-id");
+            $("#modal-index-config input").val(null);
+        });
+    }
+
+    function updateIndexConfig() {
+        const data = collectFormData();
+        data.id = $("#modal-index-config").attr("index-config-id");
+        data.configType = getConfigType();
+        if (!isValidIndexConfig(data)) {
+            return;
+        }
+
+        $.ajax({
+            url: "/admin/index-config/update",
+            method: "POST",
+            contentType: "application/json",
+            data: JSON.stringify(data),
+            success: (res) => {
+                console.log(res);
+                if (res.code === 200) {
+                    showChangeSavedSwal();
+                    indexConfigModal.hide();
+                    table.draw();
+                } else {
+                    Swal.fire({
+                        title: res.message,
+                        icon: "error",
+                        showConfirmButton: true
+                    });
+                }
+            },
+            error: () => {
+                showServerErrorSwal();
+            }
+        });
+    }
+
+    function isValidIndexConfig(data) {
+        let isValid = true;
+
+        if (data.configName.length === 0) {
+            isValid = false;
+            $(".input-index-config-name").setInvalid();
+        }
+
+        if (data.redirectUrl.length === 0) {
+            isValid = false;
+            $(".input-redirect-link").setInvalid();
+        }
+
+        const idValidator = new Validator(data.goodsId);
+        if (data.goodsId.length === 0 || !idValidator.isInteger()) {
+            isValid = false;
+            $(".input-goods-id").setInvalid();
+        }
+
+        const rankValidator = new Validator(data.configRank);
+        if (data.configRank.length === 0 || !rankValidator.isInteger()) {
+            isValid = false;
+            $(".input-order").setInvalid();
+        }
+
+        return isValid;
+    }
+
+    function createIndexConfig() {
+        const data = collectFormData();
+        data.configType = getConfigType();
+        if (!isValidIndexConfig(data)) {
+            return;
+        }
+
+        $.ajax({
+            url: "/admin/index-config/save",
+            method: "POST",
+            contentType: "application/json",
+            data: JSON.stringify(data),
+            success: (res) => {
+                if (res.code === 200) {
+                    showCreateSuccessSwal();
+                    indexConfigModal.hide();
+                    table.draw();
+                } else {
+                    Swal.fire({
+                        title: res.message,
+                        icon: "error",
+                        showConfirmButton: true,
+                    });
+                }
+            },
+            error: () => showServerErrorSwal()
+        });
+    }
+
+    function collectFormData() {
+        const data = {};
+        data.configName = $(".input-index-config-name").val();
+        data.redirectUrl = $(".input-redirect-link").val();
+        data.goodsId = parseInt($(".input-goods-id").val());
+        data.configRank = parseInt($(".input-order").val());
+        return data;
+    }
+
+    function initDataTable() {
+        table = $("table").DataTable({
+            autoWidth: false,
+            processing: true,
+            serverSide: true,
+            searching: false,
+            language: dataTableLocale,
+            ajax: {
+                url: "/admin/index-config/list",
+                type: "POST",
+                contentType: "application/json",
+                data: (requestData) => {
+                    requestData.configType = getConfigType();
+                    return JSON.stringify(requestData);
+                },
+                dataFilter: (response) => {
+                    response = JSON.parse(response);
+                    const data = {}
+                    if (response.code === 200) {
+                        data.recordsTotal = response.data.recordsTotal;
+                        data.recordsFiltered = response.data.recordsTotal;
+                        data.data = response.data.list;
+                    }
+                    return JSON.stringify(data);
+                }
+            },
+            columns: [
+                {
+                    visible: false,
+                    data: "id",
+                    orderable: false
+                },
+                {
+                    data: "configName",
+                    orderable: false
+                },
+                {
+                    data: "redirectUrl",
+                    orderable: false
+                },
+                {
+                    data: "configRank",
+                    orderable: false
+                },
+                {
+                    data: "goodsId",
+                    orderable: false
+                },
+                {
+                    data: "createTime",
+                    orderable: false,
+                },
+                {
+                    data: "id",
+                    render: () => {
+                        return '<button class="button button-red btn-delete-index-config"><i class="fa-solid fa-trash-can"></i></button>';
+                    },
+                    orderable: false,
+                    width: 1,
+                    className: "td-function"
+                }
+            ],
+            createdRow: (row, indexConfig) => {
+                $(row).click((e) => {
+                    const target = $(e.target);
+                    if (!target.closest("td").hasClass("td-function")) {
+                        showUpdateIndexConfigModal(indexConfig);
+                    }
+                });
+
+                $(row).find(".btn-delete-index-config").click(() => {
+                    showConfirmDeleteSwal(indexConfig.id);
+                });
+            }
+        });
+    }
+
+    function getConfigType() {
+        const urlParams = new URLSearchParams(window.location.search);
+        return parseInt(urlParams.get("configType"));
+    }
+
+    function showUpdateIndexConfigModal(indexConfig) {
+        console.log(indexConfig);
+        $(".input-index-config-name").val(indexConfig.configName);
+        $(".input-redirect-link").val(indexConfig.redirectUrl);
+        $(".input-goods-id").val(indexConfig.goodsId);
+        $(".input-order").val(indexConfig.configRank);
+        $("#modal-index-config").attr("index-config-id", indexConfig.id);
+        $(".btn-create-index-config").hide();
+        $(".btn-update-index-config").show();
+        indexConfigModal.show();
+    }
+
+    function showCreateIndexConfigModal() {
+        $(".btn-create-index-config").show();
+        $(".btn-update-index-config").hide();
+        indexConfigModal.show();
+    }
+
+    function showConfirmDeleteSwal(id) {
+        Swal.fire({
+            title: "[[#{confirm.delete}]]",
+            icon: "warning",
+            showConfirmButton: true,
+            showDenyButton: true,
+            reverseButtons: true,
+            position: "top",
+        }).then((response) => {
+            if (response.isConfirmed) {
+                deleteIndexConfig(id);
+            }
+        });
+    }
+
+    function deleteIndexConfig(id) {
+        $.ajax({
+            url: "/admin/index-config/delete",
+            method: "POST",
+            data: JSON.stringify([id]),
+            contentType: "application/json",
+            success: (res) => {
+                if (res.code === 200) {
+                    showDeleteSuccessSwal();
+                    table.draw();
+                } else {
+                    Swal.fire({
+                        title: res.message,
+                        icon: "error",
+                        showConfirmButton: true,
+                        showDenyButton: false,
+                        position: "top"
+                    });
+                }
+            },
+            error: () => showServerErrorSwal()
+        });
+    }
+</script>
+</body>
+</html>

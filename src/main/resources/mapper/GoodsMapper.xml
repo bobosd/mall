@@ -219,4 +219,13 @@
         </set>
         WHERE id = #{id,jdbcType=BIGINT}
     </update>
+
+    <select id="selectGoodsByIds" resultMap="BaseResultMap">
+        SELECT <include refid="base_column_list"/>
+        FROM goods_info
+        WHERE id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
 </mapper>

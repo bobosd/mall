@@ -3,8 +3,8 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="admin/header::general-libraries-and-styles(~{::title}, ~{::link}, ~{this::head/script})">
     <title id="page-title"></title>
-    <div th:replace="admin/header::datatable"></div>
-    <div th:replace="admin/header::cropper"></div>
+    <link th:include="admin/header::datatable">
+    <link th:include="admin/header::cropper">
     <link rel="stylesheet" href="/styles/admin/carousel.css">
 </head>
 <body>
@@ -13,7 +13,7 @@
     <div class="block">
         <div class="block-title" th:text="#{carousel.setting}"></div>
         <div class="block-content">
-            <div class="block-row row">
+            <div class="block-row">
                 <div class="carousel-option">
                     <button class="button button-blue" th:text="#{add}" onclick="showAddCarouselModal()"></button>
                 </div>
@@ -192,7 +192,7 @@
         btnSave.click(() => prepareUpdateData(data.carouselId));
         $("#input-rank-order").val(data.carouselRank);
         $("#input-redirect-link").val(data.redirectUrl);
-        $(".image-preview").prop("src", "/admin/carousel/img/" + data.carouselUrl);
+        $(".image-preview").prop("src", "/carousel/img/" + data.carouselUrl);
         showPreview(true);
         carouselModal.show();
     }

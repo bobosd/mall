@@ -22,7 +22,8 @@
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs5/dt-1.13.2/datatables.min.css"/>
     <script type="text/javascript" src="https://cdn.datatables.net/v/bs5/dt-1.13.2/datatables.min.js"></script>
     <th:block th:switch="__${#locale.toString()}__">
-        <th:block th:case="zh_CN"><script th:replace="common/datatable-locale::zh_CN"></script>
+        <th:block th:case="zh_CN">
+            <script th:replace="common/datatable-locale::zh_CN"></script>
         </th:block>
         <th:block th:case="es_ES">
             <script th:replace="common/datatable-locale::es_ES"></script>

@@ -1,5 +1,6 @@
 package com.jiezipoi.mall.controller;
 
+import com.jiezipoi.mall.commons.IndexConfigEnum;
 import com.jiezipoi.mall.entity.AdminUser;
 import com.jiezipoi.mall.service.AdminUserService;
 import com.jiezipoi.mall.utils.CommonResponse;
@@ -95,8 +96,13 @@ public class AdminController {
     }
 
     @GetMapping("/index-config")
-    public String newArrivalsPage(@RequestParam("configType") int configType) {
-        
-        return "admin/new-arrivals";
+    public String newArrivalsPage(HttpServletRequest request, @RequestParam("configType") int configType) {
+        IndexConfigEnum indexConfigEnum = IndexConfigEnum.getIndexConfigEnumByType(configType);
+        if (indexConfigEnum.equals(IndexConfigEnum.DEFAULT)) {
+            return "admin/fallback";
+        }
+        request.setAttribute("path", indexConfigEnum.getName());
+        request.setAttribute("configType", configType);
+        return "admin/index-config";
     }
 }

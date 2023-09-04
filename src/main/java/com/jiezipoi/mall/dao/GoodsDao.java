@@ -27,5 +27,7 @@ public interface GoodsDao {
 
     Goods selectGoodsById(@Param("goodsId") long goodsId);
 
+    List<Goods> selectGoodsByIds(@Param("ids") long[] goodsId);
+
     int updateByPrimaryKeySelective(Goods goods);
 }
