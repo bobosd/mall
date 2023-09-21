@@ -62,7 +62,7 @@ public class GoodsController {
     @PostMapping("/goods/update")
     @ResponseBody
     public Response<?> updateGoods(@RequestParam("goods") String goodsJsonString,
-                                   @RequestParam(value = "image", required = false) MultipartFile file) {
+                                   @RequestParam(value = "coverImage", required = false) MultipartFile file) {
         try {
             Goods goods = new ObjectMapper().readValue(goodsJsonString, Goods.class);
             return goodsService.updateGoods(goods, file);

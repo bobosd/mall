@@ -47,9 +47,8 @@ public class GoodsService {
         goods.setGoodsDetailContent(replaceTempUrl(tempDetail));
 
         try {
-            walkTempFile(userId);
+            walkUserTempFile(userId);
         } catch (IOException e) {
-            e.printStackTrace();
             return new Response<>(CommonResponse.INTERNAL_SERVER_ERROR);
         }
 
@@ -60,9 +59,15 @@ public class GoodsService {
         }
     }
 
+    /**
+     * 临时商品的图片是保存在Temp文件里的，当正式创建的时候需要把该含有临时文件地址转为正确的地址
+     * @param text 含有Temp地址的字符串
+     * @return 将字符串中所有的Temp地址替换为正式地址
+     */
     private String replaceTempUrl(String text) {
+        System.out.println(text);
         String tempUrlRegex =
-                "/admin/goods/img/(" + goodsConfig.getUserTempFilePrefix() + "\\w+/)?\\w+" + goodsConfig.getImageSuffix();
+                "/goods/img/(" + goodsConfig.getUserTempFilePrefix() + "\\w+/)?\\w+" + goodsConfig.getImageSuffix();
         Pattern pattern = Pattern.compile(tempUrlRegex);
         Matcher matcher = pattern.matcher(text);
         StringBuilder stringBuilder = new StringBuilder();
@@ -73,10 +78,11 @@ public class GoodsService {
             matcher.appendReplacement(stringBuilder, replacement);
         }
         matcher.appendTail(stringBuilder);
+        System.out.println(stringBuilder);
         return stringBuilder.toString();
     }
 
-    private void walkTempFile(int userId) throws IOException {
+    private void walkUserTempFile(int userId) throws IOException {
         Path tempDir = getUserTempDir(userId);
         Files.walkFileTree(tempDir, new SimpleFileVisitor<>() {
             @Override
@@ -115,6 +121,20 @@ public class GoodsService {
                 !goods.getGoodsDetailContent().isBlank();
     }
 
+    private boolean isValidForUpdate(Goods goods) {
+        return goods.getGoodsName() != null &&
+                !goods.getGoodsName().isBlank() &&
+                goods.getGoodsIntro() != null &&
+                !goods.getGoodsIntro().isBlank() &&
+                goods.getOriginalPrice() != null &&
+                goods.getGoodsCategoryId() != null &&
+                goods.getSellingPrice() != null &&
+                goods.getStockNum() != null &&
+                goods.getGoodsSellStatus() != null &&
+                goods.getGoodsDetailContent() != null &&
+                !goods.getGoodsDetailContent().isBlank();
+    }
+
     public Response<?> saveTempGoods(Goods goods, int userId) {
         Path uploadDir = getUserTempDir(userId);
         String fileDir = uploadDir + File.separator + goodsConfig.getUserTempDataFilename();
@@ -127,7 +147,6 @@ public class GoodsService {
             outputStream.close();
             return new Response<>(CommonResponse.SUCCESS);
         } catch (IOException e) {
-            e.printStackTrace();
             return new Response<>(CommonResponse.ERROR);
         }
     }
@@ -149,7 +168,6 @@ public class GoodsService {
             response.setResponse(CommonResponse.SUCCESS);
             response.setData(url);
         } catch (IOException e) {
-            e.printStackTrace();
             response.setResponse(CommonResponse.INTERNAL_SERVER_ERROR);
         }
         return response;
@@ -171,7 +189,6 @@ public class GoodsService {
              ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream)) {
             return (Goods) objectInputStream.readObject();
         } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
             return null;
         }
     }
@@ -195,7 +212,6 @@ public class GoodsService {
             response.setData(goodsConfig.getUserTempFileName(userId) + fileName);
             return response;
         } catch (IOException e) {
-            e.printStackTrace();
             return new Response<>(CommonResponse.INTERNAL_SERVER_ERROR);
         }
     }
@@ -239,20 +255,25 @@ public class GoodsService {
     }
 
     public Response<?> updateGoods(Goods goods, MultipartFile file) {
-        if (!isValidGoods(goods)) {
+        if (!isValidForUpdate(goods)) {
             return new Response<>(CommonResponse.INVALID_DATA);
         }
-
         if (file != null) {
+            //删除旧图片，保存新图片并且修改Goods对象值
             try {
                 Path uploadDir = goodsConfig.getFileStorePath();
-                String filename = getFileNameByUrl(goods.getGoodsCoverImg());
-                saveImage(uploadDir, filename, file);
+                Goods queryGoods = goodsDao.selectGoodsById(goods.getId());
+                String oldImageUrl = queryGoods.getGoodsCoverImg();
+                String oldFileName = getFileNameByUrl(oldImageUrl);
+                deleteGoodsImage(oldFileName);
+                String fileName = FileNameGenerator.generateFileName();
+                Path imagePath = saveImage(uploadDir, fileName, file);
+                String goodsImageUrl = goodsConfig.getExposeUrl(imagePath);
+                goods.setGoodsCoverImg(goodsImageUrl);
             } catch (IOException e) {
                 return new Response<>(CommonResponse.INTERNAL_SERVER_ERROR);
             }
         }
-
         if (goodsDao.updateByPrimaryKeySelective(goods) > 0) {
             return new Response<>(CommonResponse.SUCCESS);
         } else {
@@ -272,5 +293,10 @@ public class GoodsService {
         Path filePath = Paths.get(directory + File.separator + fileName);
         Files.write(filePath, file.getBytes());
         return filePath;
+    }
+
+    private void deleteGoodsImage(String fileName) throws IOException {
+        Path storePath = goodsConfig.getFileStorePath();
+        Files.delete(Path.of(storePath + File.separator + fileName));
     }
 }

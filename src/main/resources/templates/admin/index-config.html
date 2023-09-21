@@ -71,7 +71,24 @@
 </div>
 
 <script>
-    sidebarSetSelected($(".sidebar-option.new-arrivals"));
+    function detectSidebarOption() {
+        const configType = getConfigType();
+        let optionDiv;
+        switch (configType) {
+            case 3:
+                optionDiv = $(".sidebar-option.best-selling");
+                break;
+            case 4:
+                optionDiv = $(".sidebar-option.new-arrivals");
+                break;
+            case 5:
+                optionDiv = $(".sidebar-option.recommend");
+                break;
+        }
+        sidebarSetSelected(optionDiv);
+    }
+
+    detectSidebarOption();
 
     const indexConfigModal = new bootstrap.Modal(document.getElementById("modal-index-config"));
 

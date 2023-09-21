@@ -62,6 +62,7 @@ public class IndexConfigService {
     }
 
     public Response<?> updateIndexConfig(IndexConfig indexConfig) {
+        System.out.println(indexConfig);
         if (indexConfig.getConfigType() == null ||
                 indexConfig.getId() == null ||
                 indexConfig.getConfigName().isBlank() ||
@@ -82,12 +83,8 @@ public class IndexConfigService {
             return response;
         }
 
-        int updated = indexConfigDao.updateByPrimaryKeySelective(indexConfig);
-        if (updated > 0) {
-            return new Response<>(CommonResponse.SUCCESS);
-        } else {
-            return new Response<>(CommonResponse.ERROR);
-        }
+        indexConfigDao.updateByPrimaryKeySelective(indexConfig);
+        return new Response<>(CommonResponse.SUCCESS);
     }
 
     private boolean hasValidGoodsId(IndexConfig indexConfig) {
@@ -102,7 +99,7 @@ public class IndexConfigService {
         }
 
         List<Long> goodsIds = indexConfigs.stream()
-                .map(IndexConfig::getId)
+                .map(IndexConfig::getGoodsId)
                 .toList();
         long[] idsArray = new long[goodsIds.size()];
         for (int i = 0; i < goodsIds.size(); i++) {

@@ -103,6 +103,7 @@ public class AdminController {
         }
         request.setAttribute("path", indexConfigEnum.getName());
         request.setAttribute("configType", configType);
+
         return "admin/index-config";
     }
 }

@@ -80,3 +80,52 @@
 .category-sub-menu-container:hover {
     display: block;
 }
+
+/* product preview style */
+.product-container {
+    width: 200px;
+}
+
+.product-container img {
+    width: 100%;
+}
+
+/* Best Selling divs */
+.best-selling-container {
+    display: flex;
+    justify-content: center;
+    padding: 10px 0;
+}
+
+.product-container {
+    background-color: #FFFFFF;
+    margin: 0 10px;
+    border-radius: 10px;
+    padding: 22px;
+    width: 330px;
+    cursor: pointer;
+}
+
+.product-image-container {
+    display: flex;
+    justify-content: center;
+}
+
+.product-container img {
+    width: 180px;
+}
+
+.product-name {
+    font-size: 14px;
+    height: 63px;
+}
+
+.product-name:hover {
+    color: #fc830a;
+}
+
+.product-price {
+    font-size: 18px;
+    font-weight: bold;
+    color: #7e7e7e;
+}

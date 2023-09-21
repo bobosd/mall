@@ -322,7 +322,7 @@
 
         function validateForm() {
             let isValid = true;
-
+            const isEditing = window.location.href.includes("edit"); //编辑的保存图片方法不一样，可以跳过验证
             const inputs = [
                 $("#input-goods-name"),
                 $("#input-goods-intro"),
@@ -344,7 +344,7 @@
             }
 
             const src = $(".img-product").attr("src");
-            if (src == null || src.startsWith("blob")) {
+            if ((src == null || src.startsWith("blob")) && !isEditing) {
                 isValid = false;
                 $(".image-upload-container").setInvalid();
             }

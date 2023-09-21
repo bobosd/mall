@@ -3,7 +3,18 @@ body {
 }
 
 .floor {
+    padding: 50px 20px;
+}
+
+.floor:first-child {
+    padding: 10px 20px 50px 20px;
+}
+
+.floor > div {
     max-width: 1278px;
     margin: auto;
-    padding: 20px 10px 0 10px;
+}
+
+.floor-dark {
+    background-color: #DDDDDD;
 }
