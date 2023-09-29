@@ -18,3 +18,19 @@ body {
 .floor-dark {
     background-color: #DDDDDD;
 }
+
+.floor-left-title {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-content: center;
+    height: 100%;
+    font-weight: bold;
+    font-size: 48px;
+}
+
+.floor-top-title {
+    height: 100%;
+    font-weight: bold;
+    font-size: 32px;
+}

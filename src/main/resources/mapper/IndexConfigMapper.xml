@@ -52,7 +52,6 @@
         FROM index_config
         WHERE config_type = #{configType} AND is_deleted = 0
         ORDER BY config_rank DESC
-        LIMIT #{number}
     </select>
 
     <select id="selectByPrimaryKey" parameterType="long" resultMap="BaseResultMap">

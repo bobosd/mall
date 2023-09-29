@@ -39,11 +39,11 @@ public class MallController {
         modelMap.put("categories", categories);
 
         List<IndexConfigGoodsVO> bestSelling =
-                indexConfigService.getConfigGoodsForIndex(IndexConfigEnum.INDEX_GOODS_HOT.getType(), 5);
+                indexConfigService.getConfigGoodsForIndex(IndexConfigEnum.INDEX_GOODS_HOT.getType());
         List<IndexConfigGoodsVO> newArrivals =
-                indexConfigService.getConfigGoodsForIndex(IndexConfigEnum.INDEX_GOODS_NEW.getType(), 5);
+                indexConfigService.getConfigGoodsForIndex(IndexConfigEnum.INDEX_GOODS_NEW.getType());
         List<IndexConfigGoodsVO> recommend =
-                indexConfigService.getConfigGoodsForIndex(IndexConfigEnum.INDEX_GOODS_RECOMMEND.getType(), 5);
+                indexConfigService.getConfigGoodsForIndex(IndexConfigEnum.INDEX_GOODS_RECOMMEND.getType());
         modelMap.put("bestSelling", bestSelling);
         modelMap.put("newArrivals", newArrivals);
         modelMap.put("recommend", recommend);
@@ -53,5 +53,10 @@ public class MallController {
     @GetMapping("/test")
     public String testPage() {
         return "mall/test";
+    }
+
+    @GetMapping("/login")
+    public String loginPage() {
+        return "mall/login";
     }
 }

@@ -47,7 +47,7 @@ class Validator {
     }
 
     isNumeric() {
-        const regEx = new RegExp("([0-9])+(.?[0-9]+)");
+        const regEx = new RegExp("([0-9])+(.?[0-9]?)");
         return regEx.test(this._string);
     }
 

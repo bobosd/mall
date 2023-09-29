@@ -23,7 +23,7 @@ public class CarouselController {
     @ResponseBody
     public Response<?> list(@RequestBody DataTableRequest request) {
         String orderBy = null;
-        if (request.getOrder().size() != 0) {
+        if (!request.getOrder().isEmpty()) {
             Order order = request.getOrder().get(0);
             Map<Integer, String> columnMap = new HashMap<>();
             columnMap.put(3, "carousel_rank");

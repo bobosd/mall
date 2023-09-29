@@ -26,5 +26,5 @@ public interface IndexConfigDao {
 
     int deleteBatch(long[] ids);
 
-    List<IndexConfig> findIndexConfigByTypeAndNum(@Param("configType") int configType, @Param("number") int number);
+    List<IndexConfig> findIndexConfigByTypeAndNum(@Param("configType") int configType);
 }

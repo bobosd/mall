@@ -80,6 +80,9 @@
             success: (response) => {
                 if (response.code === 200) {
                     showChangeSavedSwal();
+                    cropper.destroy();
+                    const goods = response.data;
+                    $(".img-product").attr("src", goods.goodsCoverImg);
                 } else {
                     Swal.fire({
                         title: response.message,

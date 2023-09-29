@@ -227,5 +227,8 @@
         <foreach collection="ids" item="id" open="(" separator="," close=")">
             #{id}
         </foreach>
+        ORDER BY FIELD(id, <foreach collection="ids" item="goods_id" separator=",">
+        #{goods_id}
+    </foreach>)
     </select>
 </mapper>

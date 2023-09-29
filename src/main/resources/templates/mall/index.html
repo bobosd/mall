@@ -45,28 +45,35 @@
 
     <!-- best-selling -->
     <div class="floor floor-dark">
-        <div class="best-selling-container">
-            <div class="swiper swiper-best-selling">
-                <div class="swiper-wrapper">
-                    <th:block th:unless="${#lists.isEmpty(bestSelling)}">
-                        <th:block th:each="product : ${bestSelling}">
-                            <div class="swiper-slide">
-                                <div class="product-container">
-                                    <div class="product-image-container">
-                                        <img th:src="${product.getGoodsCoverImg()}" alt="product image">
-                                    </div>
-                                    <div class="product-name" th:text="${product.getGoodsName()}"></div>
-                                    <div class="product-price" th:text="${product.getSellingPrice()}"></div>
-                                </div>
-                            </div>
-                        </th:block>
-                    </th:block>
+        <div class="row">
+            <div class="col-2">
+                <div class="floor-left-title">
+                    Top Deal
                 </div>
-                <!-- navigation buttons -->
-                <div class="swiper-button-prev best-selling-prev"></div>
-                <div class="swiper-button-next best-selling-next"></div>
-                <!-- scrollbar -->
-                <div class="swiper-scrollbar best-selling-scrollbar"></div>
+            </div>
+            <div class="col-10">
+                <div class="best-selling-container">
+                    <div class="swiper swiper-best-selling">
+                        <div class="swiper-wrapper">
+                            <th:block th:unless="${#lists.isEmpty(bestSelling)}">
+                                <th:block th:each="product : ${bestSelling}">
+                                    <div class="swiper-slide">
+                                        <div class="product-container">
+                                            <div class="product-image-container">
+                                                <img th:src="${product.getGoodsCoverImg()}" alt="product image">
+                                            </div>
+                                            <div class="product-name" th:text="${product.getGoodsName()}"></div>
+                                            <div class="product-price" th:text="${product.getSellingPrice() + '￥'}"></div>
+                                        </div>
+                                    </div>
+                                </th:block>
+                            </th:block>
+                        </div>
+                        <!-- navigation buttons -->
+                        <div class="swiper-button-prev best-selling-prev"></div>
+                        <div class="swiper-button-next best-selling-next"></div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -74,6 +81,7 @@
     <!-- new arrival -->
     <div class="floor">
         <div class="new-arrival-container">
+            <div class="floor-top-title">New Arrival</div>
             <div class="swiper swiper-new-arrival">
                 <div class="swiper-wrapper">
                     <th:block th:unless="${#lists.isEmpty(newArrivals)}">
@@ -93,18 +101,48 @@
                 <!-- navigation buttons -->
                 <div class="swiper-button-prev new-arrival-prev"></div>
                 <div class="swiper-button-next new-arrival-next"></div>
-                <!-- scrollbar -->
-                <div class="swiper-scrollbar new-arrival-scrollbar"></div>
             </div>
         </div>
     </div>
 
     <!-- recommend for you -->
-
+    <div class="floor floor-dark">
+        <div class="row">
+            <div class="col-2">
+                <div class="floor-left-title">
+                    Last Viewed
+                </div>
+            </div>
+            <div class="col-10">
+                <div class="best-selling-container">
+                    <div class="swiper swiper-best-selling">
+                        <div class="swiper-wrapper">
+                            <th:block th:unless="${#lists.isEmpty(recommend)}">
+                                <th:block th:each="product : ${recommend}">
+                                    <div class="swiper-slide">
+                                        <div class="product-container">
+                                            <div class="product-image-container">
+                                                <img th:src="${product.getGoodsCoverImg()}" alt="product image">
+                                            </div>
+                                            <div class="product-name" th:text="${product.getGoodsName()}"></div>
+                                            <div class="product-price" th:text="${product.getSellingPrice() + '￥'}"></div>
+                                        </div>
+                                    </div>
+                                </th:block>
+                            </th:block>
+                        </div>
+                        <!-- navigation buttons -->
+                        <div class="swiper-button-prev best-selling-prev"></div>
+                        <div class="swiper-button-next best-selling-next"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </main>
 <script th:inline="javascript">
     const categories = getCategoriesMap();
-    const newArrival = [[${newArrivals}]];
+    const bestSelling = [[${bestSelling}]];
     const swiper = new Swiper(".carousel", {
         direction: "horizontal",
         loop: true,
@@ -124,18 +162,18 @@
             nextEl: '.best-selling-next',
             prevEl: '.best-selling-prev',
         },
-        scrollbar: {el: ".best-selling-scrollbar"}
+        spaceBetween: 35,
     });
 
     const swiperNewArrival = new Swiper(".swiper-new-arrival", {
         direction: "horizontal",
-        slidesPerView: 4,
+        slidesPerView: 5,
         loop: true,
         navigation: {
             nextEl: '.new-arrival-next',
             prevEl: '.new-arrival-prev',
         },
-        scrollbar: {el: ".new-arrival-scrollbar"}
+        spaceBetween: 30
     });
 
     let mouseInCategoryOption = false;

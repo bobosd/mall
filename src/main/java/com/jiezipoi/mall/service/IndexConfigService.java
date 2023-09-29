@@ -92,8 +92,8 @@ public class IndexConfigService {
         return !(goods == null);
     }
 
-    public List<IndexConfigGoodsVO> getConfigGoodsForIndex(int configType, int number) {
-        List<IndexConfig> indexConfigs = indexConfigDao.findIndexConfigByTypeAndNum(configType, number);
+    public List<IndexConfigGoodsVO> getConfigGoodsForIndex(int configType) {
+        List<IndexConfig> indexConfigs = indexConfigDao.findIndexConfigByTypeAndNum(configType);
         if (indexConfigs.isEmpty()) {
             return new ArrayList<>();
         }

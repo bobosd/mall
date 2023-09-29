@@ -275,7 +275,9 @@ public class GoodsService {
             }
         }
         if (goodsDao.updateByPrimaryKeySelective(goods) > 0) {
-            return new Response<>(CommonResponse.SUCCESS);
+            Response<Goods> response = new Response<>(CommonResponse.SUCCESS);
+            response.setData(goods);
+            return response;
         } else {
             return new Response<>(CommonResponse.DATA_NOT_EXIST);
         }
