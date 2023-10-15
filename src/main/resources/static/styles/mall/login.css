@@ -1,0 +1,117 @@
+.login-body {
+    display: flex;
+    justify-content: center;
+    margin-top: 50px;
+}
+
+.logo {
+    display: flex;
+    justify-content: center;
+}
+
+.logo img {
+    width: 150px;
+}
+
+section {
+    width: 400px;
+    padding: 25px;
+}
+
+section:first-child {
+    border-right: 1px #d2d2d2 solid;
+    padding-right: 50px;
+}
+
+section:last-child {
+    padding-left: 50px;
+}
+
+article {
+    margin: 20px 0;
+    display: flex;
+}
+
+section article:first-child {
+    margin-top: 0;
+}
+
+section article:last-child {
+    margin-bottom: 0;
+}
+
+.message-content {
+    padding: 8px 0;
+}
+
+.message-logo {
+    width: 65px;
+    height: 65px;
+    border-radius: 20px;
+    background-color: #d7d7d7;
+    margin-right: 20px;
+}
+
+.message-title {
+    height: 12px;
+    width: 100px;
+    border-radius: 6px;
+    background-color: #a9a9a9;
+}
+
+.message-title {
+    height: 16px;
+    width: 100px;
+    border-radius: 6px;
+    background-color: #a9a9a9;
+}
+
+.message-text {
+    margin-top: 10px;
+}
+
+.message-text div {
+    height: 12px;
+    background-color: #d7d7d7;
+    border-radius: 6px;
+    margin: 4px 0;
+}
+
+.large-text {
+    width: 235px;
+}
+
+.sort-text {
+    width: 70px;
+}
+
+form > *:not(:first-child) {
+    margin-top: 20px;
+}
+
+.form-check label {
+    font-size: 13px;
+}
+
+.hyperlink {
+    color: #0078ff;
+    cursor: pointer;
+}
+
+.hyperlink:hover {
+    text-underline: #0078ff;
+}
+
+.button-sign-up {
+    display: flex;
+    justify-content: center;
+    padding: 7px 0;
+    background-color: #FC830AFF;
+    font-size: 16px;
+    font-weight: bold;
+    color: #FFFFFF;
+    border-radius: 7px;
+    cursor: pointer;
+    border: none;
+    width: 100%;
+}

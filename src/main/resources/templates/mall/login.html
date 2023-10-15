@@ -1,10 +1,236 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="mall/header::general-libraries-and-styles(~{::title}, ~{::link}, ~{this::head/script})">
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Mall</title>
+    <link rel="stylesheet" href="/styles/mall/all.css"/>
+    <link rel="stylesheet" href="/styles/mall/login.css"/>
 </head>
 <body>
+    <div class="logo">
+        <img src="/assets/img/poi.png" alt="mall icon">
+    </div>
+    <div class="login-body">
+        <section>
+            <article>
+                <div class="message-logo"></div>
+                <div class="message-content">
+                    <div class="message-title"></div>
+                    <div class="message-text">
+                        <div class="large-text"></div>
+                        <div class="large-text"></div>
+                    </div>
+                </div>
+            </article>
+            <article>
+                <div class="message-logo"></div>
+                <div class="message-content">
+                    <div class="message-title"></div>
+                    <div class="message-text">
+                        <div class="large-text"></div>
+                        <div class="sort-text"></div>
+                    </div>
+                </div>
+            </article>
+            <article>
+                <div class="message-logo"></div>
+                <div class="message-content">
+                    <div class="message-title"></div>
+                    <div class="message-text">
+                        <div class="large-text"></div>
+                    </div>
+                </div>
+            </article>
+            <article>
+                <div class="message-logo"></div>
+                <div class="message-content">
+                    <div class="message-title"></div>
+                    <div class="message-text">
+                        <div class="sort-text"></div>
+                    </div>
+                </div>
+            </article>
+        </section>
+        <section>
+            <h2>Login</h2>
+            <form class="needs-validation" novalidate>
+                <div>
+                    <input class="form-control" placeholder="Name" id="input-username" required>
+                    <div class="invalid-feedback"></div>
+                </div>
+                <div>
+                    <input class="form-control input-email" placeholder="E-mail" id="input-email">
+                    <div class="invalid-feedback"></div>
+                </div>
+                <div>
+                    <input class="form-control input-password" placeholder="Password" type="password"
+                           autocomplete="password" id="input-password">
+                    <div class="invalid-feedback"></div>
+                </div>
+                <div>
+                    <input class="form-control input-repeat-password" placeholder="Repeat password" type="password"
+                           autocomplete="password" id="input-repeat-password">
+                    <div class="invalid-feedback"></div>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="check-privacy-policy">
+                    <label class="form-check-label" for="check-user-term">
+                        I accept the privacy policy
+                    </label>
+                    <div class="invalid-feedback"></div>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="check-user-term">
+                    <label class="form-check-label" for="check-privacy-policy">
+                        <span>I have read and agree to the</span>
+                        <span class="hyperlink">Terms of Service</span>
+                    </label>
+                    <div class="invalid-feedback"></div>
+                </div>
+                <button class="button-sign-up" type="submit">Sign up</button>
+            </form>
+        </section>
+    </div>
+<script>
+    $(document).ready(() => {
+        addEventListener();
+    });
 
+    function addEventListener() {
+        //disable submit
+        $("form").submit(function (e) {
+            e.preventDefault();
+            checkFormValidity();
+        });
+
+        $("#input-username").on("input", () => checkUsernameValidity());
+        $("#input-email").on("input", () => checkEmailValidity());
+        $("#input-password").on("input", () => checkPasswordValidity());
+        $("#input-repeat-password").on("input", () => checkRepeatPasswordValidity());
+        $("#check-user-term").on("change", () => checkUserTerm());
+        $("#check-privacy-policy").on("change", () => checkPrivacyPolicy());
+    }
+
+    function checkFormValidity() {
+        let isValid = true;
+
+        if (checkUsernameValidity() === false)
+            isValid = false;
+
+        if (checkEmailValidity() === false)
+            isValid = false;
+
+        if (checkPasswordValidity() === false)
+            isValid = false;
+
+        if (checkRepeatPasswordValidity() === false)
+            isValid = false;
+
+        if (checkUserTerm() === false)
+            isValid = false;
+
+        if (checkPrivacyPolicy() === false)
+            isValid = false;
+
+        return isValid;
+    }
+
+    function checkPrivacyPolicy() {
+        const checkbox = $("#check-privacy-policy");
+        if (!checkbox.prop("checked")) {
+            checkbox.setInvalidWithFeedBack("To register, you need to consent our private policy");
+            return false;
+        }
+        return true;
+    }
+
+    function checkUserTerm() {
+        const checkbox = $("#check-user-term");
+        if (!checkbox.prop("checked")) {
+            checkbox.setInvalidWithFeedBack("To register, you need to agree the User Agreement");
+            return false;
+        }
+        checkbox.setValid();
+        return true;
+    }
+
+    function checkRepeatPasswordValidity() {
+        const input = $("#input-repeat-password");
+        const confirmedPassword = input.val();
+        const originalPassword = $("#input-password").val();
+
+        if (originalPassword !== confirmedPassword || confirmedPassword.length === 0) {
+            input.setInvalidWithFeedBack("Passwords do not match");
+            return false;
+        }
+
+        input.setValid();
+        return true;
+    }
+
+    function checkPasswordValidity() {
+        const input = $("#input-password");
+        const password = input.val();
+
+        if (password.length < 8) {
+            input.setInvalidWithFeedBack("The password must be at least 8 characters");
+            return false;
+        }
+
+        const regEx = new RegExp("^(?=.*[A-Za-z])(?=.*\\d)(?=.*[~!@#$%^&*()_+=\\-\\[\\]{};:/.,<>?]).*$");
+        if (!regEx.test(password)) {
+            input.setInvalidWithFeedBack("The password must contain numbers, letters and special characters");
+            return false;
+        }
+
+        input.setValid();
+        return true;
+    }
+
+    function checkEmailValidity() {
+        const input = $("#input-email");
+        const email = input.val();
+
+        const regEx = new RegExp("^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4}$");
+        if (!regEx.test(email)) {
+            input.setInvalidWithFeedBack("Invalid email format");
+            return false;
+        }
+
+        input.setValid();
+        return true;
+    }
+
+    function checkUsernameValidity() {
+        const input = $("#input-username");
+        const username = input.val();
+
+        if (username.length < 3) {
+            input.setInvalidWithFeedBack("The name must have at least 3 characters and numbers");
+            return false;
+        }
+
+        const regEx = new RegExp("[a-zA-Z\\d]+(\\s[a-zA-Z]+\\d+)*");
+        if (!regEx.test(username)) {
+            input.setInvalidWithFeedBack("The name can't have special characters");
+            return false;
+        }
+
+        input.setValid();
+        return true;
+    }
+
+    function createUser() {
+        const user = {
+            nickname: $("#input-username"),
+            email: $("#input-email"),
+            password: $("#input-password")
+        };
+
+        $.ajax({
+            
+        });
+    }
+</script>
 </body>
 </html>

@@ -22,6 +22,7 @@ jQuery.fn.removeSpinner = function () {
 };
 
 jQuery.fn.setInvalid = function () {
+    this.removeClass("is-valid");
     this.addClass("is-invalid");
     this.focusin(() => {
         this.removeClass("is-invalid");
@@ -31,6 +32,23 @@ jQuery.fn.setInvalid = function () {
         this.removeClass("is-invalid");
         this.unbind();
     });
+};
+
+jQuery.fn.setInvalidWithFeedBack = function (invalidMessage) {
+    let nextDOM = this.next();
+    for (let i = 0; i < 2; i++) {
+        if (nextDOM.is("div") && nextDOM.hasClass("invalid-feedback")) {
+            nextDOM.text(invalidMessage);
+        }
+        nextDOM = nextDOM.next();
+    }
+    this.removeClass("is-valid");
+    this.addClass("is-invalid");
+};
+
+jQuery.fn.setValid = function () {
+    this.removeClass("is-invalid");
+    this.addClass("is-valid");
 };
 
 class Validator {
