@@ -8,6 +8,7 @@ import com.jiezipoi.mall.dao.CarouselDao;
 import com.jiezipoi.mall.entity.Carousel;
 import com.jiezipoi.mall.service.GoodsCategoryService;
 import com.jiezipoi.mall.service.IndexConfigService;
+import com.jiezipoi.mall.utils.Response;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -50,13 +51,8 @@ public class MallController {
         return "mall/index";
     }
 
-    @GetMapping("/test")
-    public String testPage() {
-        return "mall/test";
-    }
-
-    @GetMapping("/login")
-    public String loginPage() {
-        return "mall/login";
+    @GetMapping("/signup")
+    public String signupPage() {
+        return "/mall/signup";
     }
 }

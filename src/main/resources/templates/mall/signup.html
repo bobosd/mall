@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <title>Mall</title>
     <link rel="stylesheet" href="/styles/mall/all.css"/>
-    <link rel="stylesheet" href="/styles/mall/login.css"/>
+    <link rel="stylesheet" href="/styles/mall/signup.css"/>
+    <link th:include="mall/header::swiper"/>
 </head>
 <body>
     <div class="logo">
@@ -52,7 +53,7 @@
             </article>
         </section>
         <section>
-            <h2>Login</h2>
+            <h2>Sign up</h2>
             <form class="needs-validation" novalidate>
                 <div>
                     <input class="form-control" placeholder="Name" id="input-username" required>
@@ -74,14 +75,14 @@
                 </div>
                 <div class="form-check">
                     <input class="form-check-input" type="checkbox" id="check-privacy-policy">
-                    <label class="form-check-label" for="check-user-term">
+                    <label class="form-check-label" for="check-privacy-policy">
                         I accept the privacy policy
                     </label>
                     <div class="invalid-feedback"></div>
                 </div>
                 <div class="form-check">
                     <input class="form-check-input" type="checkbox" id="check-user-term">
-                    <label class="form-check-label" for="check-privacy-policy">
+                    <label class="form-check-label" for="check-user-term">
                         <span>I have read and agree to the</span>
                         <span class="hyperlink">Terms of Service</span>
                     </label>
@@ -100,9 +101,11 @@
         //disable submit
         $("form").submit(function (e) {
             e.preventDefault();
-            checkFormValidity();
+            if (checkFormValidity())
+                createUser();
         });
 
+        //validation event
         $("#input-username").on("input", () => checkUsernameValidity());
         $("#input-email").on("input", () => checkEmailValidity());
         $("#input-password").on("input", () => checkPasswordValidity());
@@ -141,6 +144,7 @@
             checkbox.setInvalidWithFeedBack("To register, you need to consent our private policy");
             return false;
         }
+        checkbox.setValid();
         return true;
     }
 
@@ -222,13 +226,50 @@
 
     function createUser() {
         const user = {
-            nickname: $("#input-username"),
-            email: $("#input-email"),
-            password: $("#input-password")
+            nickname: $("#input-username").val(),
+            email: $("#input-email").val(),
+            password: $("#input-password").val()
         };
 
         $.ajax({
-            
+            url: "/user/signup",
+            method: "POST",
+            data: user,
+            success: (response) => {
+                console.log(response);
+                switch (response.code) {
+                    case 409:
+                        Swal.fire({
+                            title: "Email already exists",
+                            text: "This email is already associated with an account, please try to login or " +
+                                "choose \"Forgot password\".",
+                            icon: "error",
+                            showConfirmButton: true,
+                            showDenyButton: false,
+                        });
+                        break;
+                    case 200:
+                        Swal.fire({
+                            title: "Success",
+                            text: "To complete the registration, please check your email and click the activation link." +
+                                "If you don't see the email, please check your spam folder or verify your email address.",
+                            icon: "success",
+                            showConfirmButton: true,
+                            showDenyButton: false,
+                        });
+                        break;
+                    case 400:
+                        Swal.fire({
+                            title: "Error",
+                            text: "Invalid data",
+                            icon: "error",
+                            showConfirmButton: true,
+                            showDenyButton: false
+                        });
+                        break;
+                }
+            },
+            error: () => showServerErrorSwal()
         });
     }
 </script>

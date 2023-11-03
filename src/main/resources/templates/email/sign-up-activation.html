@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <title th:remove="all">Template for HTML email with inline image</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<body style="margin: 0">
+<table style="background-color: #ffffff; max-width: 750px; padding: 20px">
+    <tr>
+        <td><img src="https://jiezicloud.com/assets/img/poi_128x128.png" alt="mall icon" width="76"></td>
+    </tr>
+    <tr>
+        <td style="background-color: #FFFFFF; padding: 0 20px;
+        font-family: Helvetica, Serif, sans-serif; font-size: 15px">
+            <p>Hi <span th:text="${nickName}"></span>,</p>
+            <p>Thank you for creating an account in our Mall. To complete your registration, please click on the
+                activation link</p>
+            <a href="https://jiezicloud.com/testing_link">https://jiezicloud.com/testing_link</a>
+            <p>You must activate your account within 3 days from signing up, or you will need to repeat account
+                creation process.</p>
+            <p>If you did not create this account or believe this email was sent to you in error, please disregard
+                this message. Your account will not be activated unless you click the activation link.</p>
+        </td>
+    </tr>
+    <tr>
+        <td style="height: 20px"></td>
+    </tr>
+    <tr>
+        <td style=" border-top: #3d3d3d 1px solid; font-size: 12px">
+            this email message was auto-generated, please do not respond. If you have any question please contact to
+            customer service.
+        </td>
+    </tr>
+</table>
+</body>
+</html>
