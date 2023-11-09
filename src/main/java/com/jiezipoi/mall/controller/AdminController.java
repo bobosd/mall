@@ -1,17 +1,18 @@
 package com.jiezipoi.mall.controller;
 
-import com.jiezipoi.mall.commons.IndexConfigEnum;
+import com.jiezipoi.mall.enums.IndexConfigEnum;
 import com.jiezipoi.mall.entity.AdminUser;
 import com.jiezipoi.mall.service.AdminUserService;
 import com.jiezipoi.mall.utils.CommonResponse;
 import com.jiezipoi.mall.utils.Response;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
+
 
 @Controller
 @RequestMapping("/admin")

@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="mall/header::general-libraries-and-styles(~{::title}, ~{::link}, ~{this::head/script})">
+<head th:replace="~{mall/header::general-libraries-and-styles(~{::title}, ~{::link}, ~{this::head/script})}">
     <meta charset="UTF-8">
     <title>Mall</title>
     <link rel="stylesheet" href="/styles/mall/all.css"/>
     <link rel="stylesheet" href="/styles/mall/signup.css"/>
-    <link th:include="mall/header::swiper"/>
+    <link th:replace="~{common/libraries::swiper-css}"/>
+    <script th:replace="~{common/libraries::swiper-js}"></script>
 </head>
 <body>
     <div class="logo">
@@ -225,18 +226,18 @@
     }
 
     function createUser() {
+        const buttonSignUp = $(".button-sign-up");
+        buttonSignUp.addSpinner();
         const user = {
             nickname: $("#input-username").val(),
             email: $("#input-email").val(),
             password: $("#input-password").val()
         };
-
         $.ajax({
             url: "/user/signup",
             method: "POST",
             data: user,
             success: (response) => {
-                console.log(response);
                 switch (response.code) {
                     case 409:
                         Swal.fire({
@@ -252,7 +253,7 @@
                         Swal.fire({
                             title: "Success",
                             text: "To complete the registration, please check your email and click the activation link." +
-                                "If you don't see the email, please check your spam folder or verify your email address.",
+                                " If you don't see the email, please check your spam folder or verify your email address.",
                             icon: "success",
                             showConfirmButton: true,
                             showDenyButton: false,
@@ -269,7 +270,8 @@
                         break;
                 }
             },
-            error: () => showServerErrorSwal()
+            error: () => showServerErrorSwal(),
+            complete: () => buttonSignUp.removeSpinner()
         });
     }
 </script>

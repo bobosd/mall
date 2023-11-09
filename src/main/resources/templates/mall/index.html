@@ -1,14 +1,15 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="mall/header::general-libraries-and-styles(~{::title}, ~{::link}, ~{this::head/script})">
+<head th:replace="~{mall/header::general-libraries-and-styles(~{::title}, ~{::link}, ~{this::head/script})}">
     <meta charset="UTF-8">
     <title>Mall</title>
-    <link th:include="mall/header::swiper"/>
+    <link th:replace="~{common/libraries::swiper-css}">
+    <script th:replace="~{common/libraries::swiper-js}"></script>
     <link rel="stylesheet" href="/styles/mall/all.css"/>
     <link rel="stylesheet" href="/styles/mall/index.css"/>
 </head>
 <body>
-<nav th:replace="mall/navbar::navbar"></nav>
+<nav th:replace="~{mall/navbar::navbar}"></nav>
 <main>
     <div class="floor ">
         <div class="first-screen">

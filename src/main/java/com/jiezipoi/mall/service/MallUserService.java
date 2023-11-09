@@ -4,6 +4,7 @@ import com.amazonaws.services.simpleemail.AmazonSimpleEmailService;
 import com.amazonaws.services.simpleemail.model.*;
 import com.jiezipoi.mall.dao.MallUserDao;
 import com.jiezipoi.mall.entity.User;
+import com.jiezipoi.mall.enums.UserStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 import org.thymeleaf.TemplateEngine;
@@ -22,8 +23,9 @@ public class MallUserService {
     }
 
     public void userSignUp(String nickname, String email, String password) {
-        createUnactivatedUser(nickname, email, password);
+        User unvactiveUser = createUnactivatedUser(nickname, email, password);
         sendVerificationEmail(email, nickname);
+        String token = generateActivationToken(unvactiveUser);
     }
 
     private void sendVerificationEmail(String email, String nickname) {
@@ -40,13 +42,15 @@ public class MallUserService {
         emailService.sendEmail(emailRequest);
     }
 
-    private void createUnactivatedUser(String nickname, String email, String password) {
+    private User createUnactivatedUser(String nickname, String email, String password) {
         String md5Password = DigestUtils.md5DigestAsHex(password.getBytes());
         User user = new User();
         user.setNickName(nickname);
         user.setEmail(email);
         user.setPasswordMd5(md5Password);
+        user.setUserStatus(UserStatus.UNACTIVATED);
         mallUserDao.insertSelective(user);
+        return user;
     }
 
     private Content generateSignUpEmailContent(String nickname) {
@@ -57,5 +61,9 @@ public class MallUserService {
 
     public boolean isExistingEmail(String email) {
         return mallUserDao.selectByEmail(email) != null;
+    }
+
+    private String generateActivationToken(User user) {
+        return "";
     }
 }

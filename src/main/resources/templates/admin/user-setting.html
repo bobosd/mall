@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="admin/header::general-libraries-and-styles(~{::title}, ~{::link}, ~{::head/script})">
+<head th:replace="~{admin/header::general-libraries-and-styles(~{::title}, ~{::link}, ~{::head/script})}">
     <title id="pageTitle">TEST</title>
 </head>
 <link rel="stylesheet" href="/styles/admin/user-setting.css">
 <body>
-<div th:replace="admin/sidebar::sidebar-fragment"></div>
+<div th:replace="~{admin/sidebar::sidebar-fragment}"></div>
 
 <div class="main">
     <!-- Edit username modal -->

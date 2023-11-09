@@ -30,7 +30,7 @@
         WHERE email = #{email,jdbcType=VARCHAR} AND password_md5 = #{password,jdbcType=VARCHAR}
     </select>
 
-    <insert id="insertSelective" parameterType="com.jiezipoi.mall.entity.User">
+    <insert id="insertSelective" parameterType="com.jiezipoi.mall.entity.User" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO user
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="id != null">

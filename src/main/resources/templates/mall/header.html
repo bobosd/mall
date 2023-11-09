@@ -3,24 +3,18 @@
 <head th:fragment="general-libraries-and-styles(title, links, script)">
     <meta charset="UTF-8">
     <title th:replace="${title}">Mall</title>
-    <script th:replace="common/libraries::fontawsome-js"></script>
-    <script th:replace="common/libraries::jQuery"></script>
-    <script th:replace="common/libraries::swal"></script>
-    <script th:replace="common/libraries::bootstrap-css"></script>
+    <script th:replace="~{common/libraries::fontawsome-js}"></script>
+    <script th:replace="~{common/libraries::jQuery}"></script>
+    <script th:replace="~{common/libraries::swal}"></script>
+    <script th:replace="~{common/libraries::bootstrap-css}"></script>
     <!-- bootstrap -->
     <script th:src="@{/js/generalUtils.js}"></script>
-    <link th:replace="common/libraries::fontawsome-css"/>
-    <link th:replace="common/libraries::bootstrap-css">
+    <link th:replace="~{common/libraries::fontawsome-css}"/>
+    <link th:replace="~{common/libraries::bootstrap-css}">
     <th:block th:replace="${links} ?: ~{}"/>
     <th:block th:replace="${script} ?: ~{}"/>
 </head>
 <body>
-
-<div th:fragment="swiper">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css"/>
-    <script src="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.js"></script>
-</div>
-
 
 </body>
 </html>

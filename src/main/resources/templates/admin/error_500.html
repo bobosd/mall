@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
-<head th:replace="admin/header::general-libraries-and-styles(~{::title}, ~{::link}, ~{this::head/script})">
+<head th:replace="~{admin/header::general-libraries-and-styles(~{::title}, ~{::link}, ~{this::head/script})}">
     <title id="page-title">Error</title>
 </head>
 <body>
-<div th:replace="admin/sidebar::sidebar-fragment"></div>
+<div th:replace="~{admin/sidebar::sidebar-fragment}"></div>
 <div class="main">
     ?
 </div>

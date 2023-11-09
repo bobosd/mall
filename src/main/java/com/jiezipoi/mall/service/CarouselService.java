@@ -7,11 +7,11 @@ import com.jiezipoi.mall.utils.CommonResponse;
 import com.jiezipoi.mall.utils.FileNameGenerator;
 import com.jiezipoi.mall.utils.Response;
 import com.jiezipoi.mall.utils.dataTable.DataTableResult;
+import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.annotation.Resource;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;

@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="admin/header::general-libraries-and-styles(~{::title}, ~{::link}, ~{::head/script})">
+<head th:replace="~{admin/header::general-libraries-and-styles(~{::title}, ~{::link}, ~{::head/script})}">
     <meta charset="UTF-8">
     <title th:text="#{create.product}"></title>
     <link rel="stylesheet" href="/styles/admin/goods.css">
-    <script th:replace="admin/header::datatable"></script>
-    <script th:replace="admin/header::select2"></script>
+    <script th:replace="~{admin/header::datatable}"></script>
+    <script th:replace="~{admin/header::select2}"></script>
 </head>
 <body>
-<div th:replace="admin/sidebar::sidebar-fragment"></div>
+<div th:replace="~{admin/sidebar::sidebar-fragment}"></div>
 <div class="main">
     <div class="block">
         <div class="block-title" th:text="#{product}"></div>
