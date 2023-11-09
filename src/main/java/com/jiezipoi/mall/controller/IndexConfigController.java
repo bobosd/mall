@@ -30,7 +30,7 @@ public class IndexConfigController {
 
     @PostMapping("/update")
     @ResponseBody
-    public Response<?> update(@RequestBody IndexConfig indexConfig, HttpServletRequest request) {
+    public Response<?> update(@RequestBody IndexConfig indexConfig) {
         return indexConfigService.updateIndexConfig(indexConfig);
     }
 

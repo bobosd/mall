@@ -106,7 +106,7 @@
 
     $(document).ready(function () {
         //reset password edit modal on close
-        $("#modal-password").on("hidden.bs.modal", (e) => {
+        $("#modal-password").on("hidden.bs.modal", () => {
             $("#modal-password input").val("");
             $(".password-validation-container").hide();
         });
