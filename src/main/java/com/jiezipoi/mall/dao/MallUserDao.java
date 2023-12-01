@@ -1,12 +1,12 @@
 package com.jiezipoi.mall.dao;
 
-import com.jiezipoi.mall.entity.User;
+import com.jiezipoi.mall.entity.MallUser;
 import org.apache.ibatis.annotations.Param;
 
 public interface MallUserDao {
-    int insertSelective(User user);
+    int insertSelective(MallUser user);
 
-    User selectByEmail(@Param("email") String email);
+    MallUser selectByEmail(@Param("email") String email);
 
-    User selectByEmailAndPassword(@Param("email") String email,@Param("password") String password);
+    MallUser selectByEmailAndPassword(@Param("email") String email, @Param("password") String password);
 }

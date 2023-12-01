@@ -9,10 +9,16 @@ import com.jiezipoi.mall.entity.Carousel;
 import com.jiezipoi.mall.service.GoodsCategoryService;
 import com.jiezipoi.mall.service.IndexConfigService;
 import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.servlet.view.RedirectView;
 
+import java.io.IOException;
 import java.util.List;
 
 @Controller
@@ -53,5 +59,21 @@ public class MallController {
     @GetMapping("/signup")
     public String signupPage() {
         return "/mall/signup";
+    }
+
+    @GetMapping("/login")
+    public String loginPage() {
+        if (isAuthenticated()) {
+            return "redirect:/";
+        }
+        return "/mall/login";
+    }
+
+    private boolean isAuthenticated() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || AnonymousAuthenticationToken.class.isAssignableFrom(authentication.getClass())) {
+            return false;
+        }
+        return authentication.isAuthenticated();
     }
 }
