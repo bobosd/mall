@@ -14,12 +14,46 @@
                 </div>
             </div>
             <div class="navbar-rgt">
-                <a><i class="fa-solid fa-earth"></i>语言</a>
-                <a><i class="fa-solid fa-right-to-bracket"></i>登入</a>
-                <a href="/signup">注册</a>
+                <div class="unlogged-options-container">
+                    <a href="/login"><span>Login</span></a>
+                    <a href="/signup"><span>Sign Up</span></a>
+                </div>
+                <div class="logged-options-container">
+                    <a><i class="fa-solid fa-user"></i><span class="nickname"></span></a>
+                    <a class="logout-option"><i class="fa-solid fa-right-from-bracket"></i><span>logout</span></a>
+                </div>
                 <a class="shopping-cart"><i class="fa-solid fa-cart-shopping"></i>购物车</a>
             </div>
         </div>
     </nav>
+
+    <script>
+        let mallUser = JSON.parse(localStorage.getItem("mallUser"));
+        if (mallUser != null) {
+            $(".nickname").text(mallUser.nickName);
+            $(".unlogged-options-container").hide();
+            $(".logged-options-container").show();
+        } else {
+            $(".unlogged-options-container").show();
+            $(".logged-options-container").hide();
+        }
+
+        $(".logout-option").click(() => logout());
+
+        function logout() {
+            $.ajax({
+                url: "/user/logout",
+                method: "POST",
+                success: (res) => {
+                    if (res.code === 200) {
+                        localStorage.removeItem("mallUser");
+                        window.location.replace("/");
+                    } else {
+                        showServerErrorSwal();
+                    }
+                }
+            });
+        }
+    </script>
 </div>
 </html>

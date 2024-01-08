@@ -44,9 +44,9 @@
             method: "POST",
             data: {email, password},
             success: (response) => {
-                console.log(response);
                 if (response.code === 200) {
                     window.location.replace("/");
+                    localStorage.setItem("mallUser", JSON.stringify(response.data));
                 } else {
                     Swal.fire({
                         title: "Invalid email or password",

@@ -10,21 +10,25 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import java.time.Duration;
+import java.util.HashSet;
 
 @Configuration
 public class SecurityConfig {
     private final JwtAuthenticationTokenFilter jwtAuthenticationTokenFilter;
+    private final ResourcePathConfig resourcePathConfig;
+    private final AuthenticationEntryPoint authenticationEntryPoint;
 
-    public SecurityConfig(JwtAuthenticationTokenFilter jwtAuthenticationTokenFilter) {
+    public SecurityConfig(JwtAuthenticationTokenFilter jwtAuthenticationTokenFilter, ResourcePathConfig resourcePathConfig, AuthenticationEntryPoint authenticationEntryPoint) {
         this.jwtAuthenticationTokenFilter = jwtAuthenticationTokenFilter;
+        this.resourcePathConfig = resourcePathConfig;
+        this.authenticationEntryPoint = authenticationEntryPoint;
     }
 
     @Bean
-
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
@@ -36,19 +40,20 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        String[] resourcePath = getResourcePathAsArray();
         http.csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(authorize -> {
-                    authorize.requestMatchers("/login", "/admin/login", "/user/login").permitAll()
-                            .requestMatchers("/styles/**", "/js/**", "/assets/**").permitAll()
-                            .requestMatchers("/carousel/**", ("/goods/**")).permitAll()
-                            .anyRequest().authenticated();
-                });
+                .authorizeHttpRequests(authorize -> authorize.requestMatchers("/login", "/admin/**", "/", "/user/login",
+                                "/signup", "/user/signup").permitAll()
+                        .requestMatchers(resourcePath).permitAll()
+                        .anyRequest().authenticated());
         http.addFilterBefore(jwtAuthenticationTokenFilter, UsernamePasswordAuthenticationFilter.class);
+        http.exceptionHandling((config) -> config.authenticationEntryPoint(authenticationEntryPoint));
         return http.build();
     }
 
-    public Duration getSessionExpireDuration() {
-        return Duration.ofHours(1);
+    private String[] getResourcePathAsArray() {
+        HashSet<String> resourcePath = resourcePathConfig.resourcePath();
+        return resourcePath.stream().map(s -> s + "**").toArray(String[]::new);
     }
 }

@@ -14,6 +14,14 @@
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
     </resultMap>
 
+    <resultMap id="RefreshTokenResultMap" type="com.jiezipoi.mall.entity.MallUserRefreshToken">
+        <id column="uuid" jdbcType="VARCHAR" property="uuid"/>
+        <result column="mall_user_meail" jdbcType="VARCHAR" property="mallUserEmail"/>
+        <result column="encoded_refresh_token" jdbcType="VARCHAR" property="encodedRefreshToken"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="expire_time" jdbcType="TIMESTAMP" property="expireTime"/>
+    </resultMap>
+
     <sql id="Base_Column_List">
         id, nick_name, email, password, introduce_sign, address, is_deleted, locked_flag, create_time
     </sql>
@@ -91,4 +99,22 @@
             </if>
         </trim>
     </insert>
+    
+    <insert id="insertRefreshToken" parameterType="com.jiezipoi.mall.entity.MallUserRefreshToken">
+        INSERT INTO mall_user_refresh_token
+        VALUES (#{uuid,jdbcType=VARCHAR}, #{mallUserEmail,jdbcType=VARCHAR}, #{encodedRefreshToken,jdbcType=VARCHAR},
+                #{createTime,jdbcType=TIMESTAMP}, #{expireTime,jdbcType=TIMESTAMP});
+    </insert>
+
+    <delete id="deleteRefreshToken">
+        DELETE
+        FROM mall_user_refresh_token
+        WHERE uuid = #{uuid,jdbcType=VARCHAR};
+    </delete>
+
+    <select id="selectRefreshTokenByEmail" resultMap="RefreshTokenResultMap">
+        SELECT *
+        FROM mall_user_refresh_token
+        WHERE mall_user_email = #{email,jdbcType=VARCHAR};
+    </select>
 </mapper>

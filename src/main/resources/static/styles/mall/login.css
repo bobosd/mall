@@ -27,7 +27,7 @@ form {
     width: 100%;
 }
 
-form * {
+form input, form .forgot-password{
     margin-bottom: 20px;
 }
 

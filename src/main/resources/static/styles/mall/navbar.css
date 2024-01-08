@@ -86,3 +86,20 @@ input[type="search"] {
 input[type="search"]:focus{
     outline: none;
 }
+
+.navbar-rgt div {
+    display: inline-block;
+}
+
+.navbar-rgt span {
+    font-size: 15px;
+    padding: 0 5px;
+}
+
+.logged-options-container {
+    display: none;
+}
+
+.logout-option:hover {
+    color: #ff0000;
+}
