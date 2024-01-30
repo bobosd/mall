@@ -4,12 +4,10 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.util.Date;
 
-public class MallUserRefreshToken {
-    public MallUserRefreshToken() {
-    }
+public class UserRefreshToken {
 
-    public MallUserRefreshToken(String uuid, String mallUserEmail, String encodedRefreshToken, Date createTime,
-                                Date expireTime) {
+    public UserRefreshToken(String uuid, String mallUserEmail, String encodedRefreshToken, Date createTime,
+                            Date expireTime) {
         this.uuid = uuid;
         this.mallUserEmail = mallUserEmail;
         this.encodedRefreshToken = encodedRefreshToken;

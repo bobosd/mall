@@ -21,6 +21,8 @@ import java.time.Duration;
 @Configuration
 @PropertySource("classpath:/config/jwt-config.properties")
 public class JwtConfig {
+    private final MallConfig mallConfig;
+
     @Value("${jwt.access.cookie.age}")
     private Duration accessTokenAge;
 
@@ -36,11 +38,21 @@ public class JwtConfig {
     @Value("${jwt.refresh.cookie.reset}")
     private Duration refreshCookieResetAge;
 
-    @Value("${jwt.private-key}")
+    @Value("${jwt.keys.private-key}")
     private String privateKeyFileName;
 
-    @Value("${jwt.public-key}")
+    @Value("${jwt.keys.public-key}")
     private String publicKeyFileName;
+
+    @Value("${jwt.keys.dirname}")
+    private String keysDirName;
+
+    @Value("${jwt.verify.age}")
+    private Duration verificationTokenDuration;
+
+    public JwtConfig(MallConfig mallConfig) {
+        this.mallConfig = mallConfig;
+    }
 
     public Duration getAccessTokenAge() {
         return accessTokenAge;
@@ -62,9 +74,13 @@ public class JwtConfig {
         return refreshCookieName;
     }
 
+    public Duration getVerificationTokenDuration() {
+        return verificationTokenDuration;
+    }
+
     @Bean
     public PrivateKey jwtPrivateKey() throws IOException, InvalidKeySpecException, NoSuchAlgorithmException {
-        Path file = Paths.get(privateKeyFileName);
+        Path file = Paths.get(mallConfig.getUploadDirectory(), this.keysDirName, privateKeyFileName);
         byte[] keyBytes = Files.readAllBytes(file);
         KeyFactory keyFactory = KeyFactory.getInstance("RSA");
         PKCS8EncodedKeySpec pkcs8EncodedKeySpec = new PKCS8EncodedKeySpec(keyBytes);
@@ -73,7 +89,7 @@ public class JwtConfig {
 
     @Bean
     public PublicKey jwtPublicKey() throws IOException, InvalidKeySpecException, NoSuchAlgorithmException {
-        Path file = Paths.get(publicKeyFileName);
+        Path file = Paths.get(mallConfig.getUploadDirectory(), this.keysDirName, publicKeyFileName);
         byte[] keyBytes = Files.readAllBytes(file);
         KeyFactory keyFactory = KeyFactory.getInstance("RSA");
         X509EncodedKeySpec x509EncodedKeySpec = new X509EncodedKeySpec(keyBytes);

@@ -43,8 +43,14 @@ public class SecurityConfig {
         String[] resourcePath = getResourcePathAsArray();
         http.csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(authorize -> authorize.requestMatchers("/login", "/admin/**", "/", "/user/login",
-                                "/signup", "/user/signup").permitAll()
+                .authorizeHttpRequests(authorize -> authorize.requestMatchers(
+                                "/",
+                                "/admin/**",
+                                "/login",
+                                "/signup",
+                                "/user/login",
+                                "/user/signup",
+                                "/user/activate-account/**").permitAll()
                         .requestMatchers(resourcePath).permitAll()
                         .anyRequest().authenticated());
         http.addFilterBefore(jwtAuthenticationTokenFilter, UsernamePasswordAuthenticationFilter.class);

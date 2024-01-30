@@ -1,10 +1,8 @@
 package com.jiezipoi.mall.dao;
 
 import com.jiezipoi.mall.entity.MallUser;
-import com.jiezipoi.mall.entity.MallUserRefreshToken;
+import com.jiezipoi.mall.enums.UserStatus;
 import org.apache.ibatis.annotations.Param;
-
-import java.util.List;
 
 public interface MallUserDao {
     int insertSelective(MallUser user);
@@ -13,9 +11,7 @@ public interface MallUserDao {
 
     MallUser selectByEmailAndPassword(@Param("email") String email, @Param("password") String password);
 
-    int insertRefreshToken(MallUserRefreshToken mallUserRefreshToken);
+    int updateStatusByEmail(@Param("email") String email, @Param("status") UserStatus status);
 
-    int deleteRefreshToken(@Param("uuid") String uuid);
-
-    List<MallUserRefreshToken> selectRefreshTokenByEmail(@Param("email") String email);
+    int insertVerificationCode(@Param("email") String email, @Param("verificationCode") String verificationCode);
 }

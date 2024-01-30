@@ -14,6 +14,7 @@
                 </div>
             </div>
             <div class="navbar-rgt">
+
                 <div class="unlogged-options-container">
                     <a href="/login"><span>Login</span></a>
                     <a href="/signup"><span>Sign Up</span></a>
@@ -28,17 +29,33 @@
     </nav>
 
     <script>
-        let mallUser = JSON.parse(localStorage.getItem("mallUser"));
-        if (mallUser != null) {
+        const MALL_USER_ITEM_NAME = "mallUser";
+        const refreshToken = getCookie("refresh_token");
+        if (refreshToken !== null) {
+            const mallUser = JSON.parse(localStorage.getItem(MALL_USER_ITEM_NAME));
             $(".nickname").text(mallUser.nickName);
             $(".unlogged-options-container").hide();
             $(".logged-options-container").show();
         } else {
+            localStorage.removeItem(MALL_USER_ITEM_NAME)
             $(".unlogged-options-container").show();
             $(".logged-options-container").hide();
         }
 
         $(".logout-option").click(() => logout());
+
+        function getCookie(name) {
+            name += "=";
+            let decodedCookies = decodeURIComponent(document.cookie);
+            let cookieArray = decodedCookies.split(";");
+            for (let i = 0; i < cookieArray.length; i++) {
+                let cookie = cookieArray[i].trim();
+                if (cookie.indexOf(name) === 0) {
+                    return cookie.substring(name.length, cookie.length);
+                }
+            }
+            return null;
+        }
 
         function logout() {
             $.ajax({

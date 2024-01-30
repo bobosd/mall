@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{mall/header::general-libraries-and-styles(~{::title}, ~{::link}, ~{this::head/script})}">
+    <meta charset="UTF-8">
+    <title>Mall</title>
+    <link rel="stylesheet" href="/styles/mall/all.css"/>
+    <link rel="stylesheet" href="/styles/mall/user-activation.css"/>
+</head>
+<body>
+<nav th:replace="~{mall/navbar::navbar}"></nav>
+<main>
+    <div class="activation-message-container">
+        <div class="title">
+            Confirmación de email
+        </div>
+        <div class="body">
+            <span class="check-icon"><i class="fa-solid fa-check"></i></span>
+            Su cuenta ha sido activada correctamente, en <span class="second-counter">10</span> segundos se
+            redireccionará a página de inicio.
+        </div>
+        <div class="button button-orange">Ir a inicio</div>
+    </div>
+</main>
+<footer th:replace="~{mall/footer::footer}"></footer>
+
+<script>
+    $(document).ready(() => {
+        $(".button").click(() => replaceToIndex());
+    });
+
+    function replaceToIndex() {
+        window.location.replace("/");
+    }
+</script>
+</body>
+</html>

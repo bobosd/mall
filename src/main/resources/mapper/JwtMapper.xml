@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.jiezipoi.mall.dao.JwtDao">
+    <resultMap id="RefreshTokenResultMap" type="com.jiezipoi.mall.entity.UserRefreshToken">
+        <id column="uuid" jdbcType="VARCHAR" property="uuid"/>
+        <result column="mall_user_meail" jdbcType="VARCHAR" property="mallUserEmail"/>
+        <result column="encoded_refresh_token" jdbcType="VARCHAR" property="encodedRefreshToken"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="expire_time" jdbcType="TIMESTAMP" property="expireTime"/>
+    </resultMap>
+
+    <insert id="insertRefreshToken" parameterType="com.jiezipoi.mall.entity.UserRefreshToken">
+        INSERT INTO mall_user_refresh_token
+        VALUES (#{uuid,jdbcType=VARCHAR}, #{mallUserEmail,jdbcType=VARCHAR}, #{encodedRefreshToken,jdbcType=VARCHAR},
+                #{createTime,jdbcType=TIMESTAMP}, #{expireTime,jdbcType=TIMESTAMP});
+    </insert>
+
+    <delete id="deleteRefreshToken">
+        DELETE
+        FROM mall_user_refresh_token
+        WHERE uuid = #{uuid,jdbcType=VARCHAR};
+    </delete>
+
+    <select id="selectRefreshTokenByEmail" resultMap="RefreshTokenResultMap">
+        SELECT *
+        FROM mall_user_refresh_token
+        WHERE mall_user_email = #{email,jdbcType=VARCHAR};
+    </select>
+</mapper>
