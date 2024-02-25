@@ -93,6 +93,9 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
      * @return 对应的cookie或者null
      */
     private String findCookieValueByName(Cookie[] cookies, String cookieName) {
+        if (cookies == null)
+            return null;
+
         Optional<Cookie> optionalCookie = Arrays.stream(cookies)
                 .filter(cookie -> cookie.getName().equals(cookieName))
                 .findFirst();

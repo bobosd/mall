@@ -5,6 +5,7 @@ import com.amazonaws.services.simpleemail.model.*;
 import com.jiezipoi.mall.dao.MallUserDao;
 import com.jiezipoi.mall.entity.MallUser;
 import com.jiezipoi.mall.enums.UserStatus;
+import com.jiezipoi.mall.exception.VerificationCodeNotFoundException;
 import com.jiezipoi.mall.security.MallUserDetails;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -95,7 +96,7 @@ public class MallUserService {
         return mallUserDao.selectByEmail(email) != null;
     }
 
-    public MallUser login(String email, String password) {
+    public MallUser findUser(String email, String password) {
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(email, password);
         Authentication authentication = authenticationManager.authenticate(authenticationToken);
         MallUserDetails userDetails = (MallUserDetails) authentication.getPrincipal();
@@ -110,12 +111,20 @@ public class MallUserService {
         this.jwtService.invalidateRefreshToken(refreshToken);
     }
 
-    public int setUserActivated(String email) {
-        return mallUserDao.updateStatusByEmail(email, UserStatus.ACTIVATED);
+    /**
+     * 验证用户是否是激活
+     * @param verificationCode 激活码
+     */
+    public void verifyUser(String verificationCode) throws VerificationCodeNotFoundException {
+        String email = mallUserDao.selectEmailByVerificationCode(verificationCode);
+        if (email == null) {
+            throw new VerificationCodeNotFoundException();
+        }
+        mallUserDao.deleteVerificationCodeByEmail(email);
+        setUserStatus(email, UserStatus.ACTIVATED);
     }
 
-    public int verifyUser(String verificationCode) {
-        //TODO: 根据code获得email然后激活用户
-        return 0;
+    public void setUserStatus(String email, UserStatus status) {
+        mallUserDao.updateStatusByEmail(email, status);
     }
 }

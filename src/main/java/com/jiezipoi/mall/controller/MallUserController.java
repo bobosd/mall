@@ -3,6 +3,8 @@ package com.jiezipoi.mall.controller;
 import com.jiezipoi.mall.config.JwtConfig;
 import com.jiezipoi.mall.dto.MallUserDTO;
 import com.jiezipoi.mall.entity.MallUser;
+import com.jiezipoi.mall.enums.UserStatus;
+import com.jiezipoi.mall.exception.VerificationCodeNotFoundException;
 import com.jiezipoi.mall.service.JwtService;
 import com.jiezipoi.mall.service.MallUserService;
 import com.jiezipoi.mall.utils.CommonResponse;
@@ -37,8 +39,13 @@ public class MallUserController {
 
     @GetMapping("/activate-account/{token}")
     public String userActivation(@PathVariable String token) {
+        try {
+            mallUserService.verifyUser(token);
+            return "/mall/user-activation-success";
+        } catch (VerificationCodeNotFoundException e) {
+            return "/mall/fallback";
+        }
 
-        return "/mall/user-activation";
     }
 
     @PostMapping("/signup")
@@ -87,7 +94,10 @@ public class MallUserController {
                              HttpServletResponse httpServletResponse) {
         MallUser mallUser;
         try {
-            mallUser = mallUserService.login(email, password);
+            mallUser = mallUserService.findUser(email, password);
+            if (mallUser.getUserStatus() == UserStatus.UNACTIVATED) {
+                return new Response<>(CommonResponse.FORBIDDEN);
+            }
         } catch (BadCredentialsException e) {
             return new Response<>(CommonResponse.INVALID_DATA);
         }

@@ -11,6 +11,7 @@ public enum CommonResponse {
     SUCCESS("success", 200),
     DELETE_SUCCESS("delete.success", 200),
     INVALID_DATA("invalid.data", 400),
+    FORBIDDEN("access.denied", 403),
     ERROR("save.failed", 404),
     DATA_NOT_EXIST("data.not.exists", 404),
     DATA_ALREADY_EXISTS("data.already.exists", 409),

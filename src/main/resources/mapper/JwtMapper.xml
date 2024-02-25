@@ -4,7 +4,7 @@
 <mapper namespace="com.jiezipoi.mall.dao.JwtDao">
     <resultMap id="RefreshTokenResultMap" type="com.jiezipoi.mall.entity.UserRefreshToken">
         <id column="uuid" jdbcType="VARCHAR" property="uuid"/>
-        <result column="mall_user_meail" jdbcType="VARCHAR" property="mallUserEmail"/>
+        <result column="mall_user_email" jdbcType="VARCHAR" property="mallUserEmail"/>
         <result column="encoded_refresh_token" jdbcType="VARCHAR" property="encodedRefreshToken"/>
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
         <result column="expire_time" jdbcType="TIMESTAMP" property="expireTime"/>
