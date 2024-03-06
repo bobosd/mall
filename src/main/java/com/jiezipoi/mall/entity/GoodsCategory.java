@@ -154,7 +154,7 @@ public class GoodsCategory {
      * @return array of parents id and itself
      */
     public long[] getParentIdAsArray() {
-        if (path.isBlank()) {
+        if (path == null || path.isBlank()) {
             return new long[]{};
         }
         String[] ids = path.split("\\.");

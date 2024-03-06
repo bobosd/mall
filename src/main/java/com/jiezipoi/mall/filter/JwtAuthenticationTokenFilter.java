@@ -50,7 +50,6 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
         Cookie[] cookies = request.getCookies();
         String accessToken = findCookieValueByName(cookies, jwtConfig.getAccessCookieName());
         String refreshToken = findCookieValueByName(cookies, jwtConfig.getRefreshCookieName());
-
         if (!StringUtils.hasText(refreshToken)) {
             filterChain.doFilter(request, response);
             return;

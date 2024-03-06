@@ -10,7 +10,7 @@ public interface GoodsCategoryDao {
 
     int insert(GoodsCategory category);
 
-    int insertSelective(GoodsCategory category);
+    long insertSelective(GoodsCategory category);
 
     GoodsCategory selectByPrimaryKey(Long id);
 
@@ -36,4 +36,6 @@ public interface GoodsCategoryDao {
     List<GoodsCategory> selectByIds(@Param("ids") long[] ids);
 
     List<GoodsCategory> selectByCategoryLevel(@Param("level") byte level);
+
+    int updatePathById(@Param("id") Long id, @Param("path") String path);
 }

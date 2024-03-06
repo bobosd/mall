@@ -124,10 +124,10 @@ a {
 }
 
 .block-title {
-    margin-bottom: 15px;
+    margin: 15px 0;
     display: inline-block;
     font-weight: lighter;
-    font-size: 24px;
+    font-size: 28px;
 }
 
 .block-content {

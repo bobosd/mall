@@ -9,6 +9,15 @@
     <script th:replace="~{common/libraries::swal}"></script>
     <script th:replace="~{common/libraries::swal-common-alert}"></script>
     <script th:src="@{/js/generalUtils.js}"></script>
+    <script>
+        //异步POST 请求失效后直接重定向
+        $(document).ajaxError(function (event, xhr) {
+            console.log(xhr);
+            if (xhr.status === 401) {
+                //window.location.href = "/admin/login";
+            }
+        });
+    </script>
     <th:block th:replace="${links} ?: ~{}"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css" integrity="sha512-MV7K8+y+gLIBoVD59lQIYicR65iaqukzvf/nwasF0nqhPay5w/9lJmVM2hMDcnK1OnMGCdVK+iQrJ7lzPJQd1w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" th:replace="~{common/libraries::bootstrap-css}">
@@ -22,6 +31,9 @@
 <div th:fragment="datatable">
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs5/dt-1.13.2/datatables.min.css"/>
     <script type="text/javascript" src="https://cdn.datatables.net/v/bs5/dt-1.13.2/datatables.min.js"></script>
+    <script>
+        $.fn.dataTable.ext.errMode = "throw";
+    </script>
     <th:block th:switch="__${#locale.toString()}__">
         <th:block th:case="zh_CN">
             <script th:replace="~{common/datatable-locale::zh_CN}"></script>

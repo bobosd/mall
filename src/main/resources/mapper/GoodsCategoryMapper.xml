@@ -108,7 +108,7 @@
         #{updateUser,jdbcType=INTEGER})
     </insert>
 
-    <insert id="insertSelective" parameterType="com.jiezipoi.mall.entity.GoodsCategory">
+    <insert id="insertSelective" parameterType="com.jiezipoi.mall.entity.GoodsCategory" useGeneratedKeys="true" keyProperty="id">
         INSERT goods_category
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="id != null ">
@@ -242,4 +242,10 @@
         WHERE category_level = #{level} AND
         is_deleted = 0;
     </select>
+
+    <update id="updatePathById">
+        UPDATE goods_category
+        SET path = #{path,jdbcType=VARCHAR}
+        WHERE id = #{id,jdbcType=BIGINT}
+    </update>
 </mapper>

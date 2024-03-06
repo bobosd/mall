@@ -22,7 +22,6 @@ public class MallUserDetailsService implements UserDetailsService {
         if (mallUser == null) {
             throw new UsernameNotFoundException(email);
         }
-        //TODO 查询对应的权限信息，把数据封装成UserDetails返回
         return new MallUserDetails(mallUser);
     }
 }

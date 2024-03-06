@@ -7,7 +7,6 @@
     <link rel="stylesheet" href="/styles/mall/user-activation.css"/>
 </head>
 <body>
-<nav th:replace="~{mall/navbar::navbar}"></nav>
 <main>
     <div class="activation-message-container">
         <div class="title">
@@ -23,6 +22,11 @@
 <footer th:replace="~{mall/footer::footer}"></footer>
 
 <script>
+    let mallUser;
+    mallUser = [(${mallUser})];
+
+    localStorage.setItem("mallUser", JSON.stringify(mallUser));
+
     $(document).ready(() => {
         $(".button").click(() => replaceToIndex());
     });

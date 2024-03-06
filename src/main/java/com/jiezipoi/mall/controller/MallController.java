@@ -1,24 +1,21 @@
 package com.jiezipoi.mall.controller;
 
-import com.jiezipoi.mall.enums.IndexConfigEnum;
 import com.jiezipoi.mall.config.CarouselConfig;
 import com.jiezipoi.mall.controller.vo.IndexConfigGoodsVO;
 import com.jiezipoi.mall.controller.vo.IndexLevel1CategoryVO;
 import com.jiezipoi.mall.dao.CarouselDao;
 import com.jiezipoi.mall.entity.Carousel;
+import com.jiezipoi.mall.enums.IndexConfigEnum;
 import com.jiezipoi.mall.service.GoodsCategoryService;
 import com.jiezipoi.mall.service.IndexConfigService;
 import jakarta.annotation.Resource;
-import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.servlet.view.RedirectView;
 
-import java.io.IOException;
 import java.util.List;
 
 @Controller
@@ -75,5 +72,10 @@ public class MallController {
             return false;
         }
         return authentication.isAuthenticated();
+    }
+
+    @GetMapping("/test")
+    public String testPage() {
+        return "/mall/test";
     }
 }

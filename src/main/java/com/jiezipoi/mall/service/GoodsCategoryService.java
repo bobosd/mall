@@ -4,6 +4,7 @@ import com.jiezipoi.mall.controller.vo.IndexLevel1CategoryVO;
 import com.jiezipoi.mall.controller.vo.IndexLevel2CategoryVO;
 import com.jiezipoi.mall.controller.vo.IndexLevel3CategoryVO;
 import com.jiezipoi.mall.dao.GoodsCategoryDao;
+import com.jiezipoi.mall.dto.GoodsCategoryDTO;
 import com.jiezipoi.mall.entity.GoodsCategory;
 import com.jiezipoi.mall.utils.CommonResponse;
 import com.jiezipoi.mall.utils.Response;
@@ -11,6 +12,7 @@ import com.jiezipoi.mall.utils.dataTable.DataTableResult;
 import com.jiezipoi.mall.utils.dataTable.request.GoodsCategoryRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -44,12 +46,19 @@ public class GoodsCategoryService {
         return response;
     }
 
-    public Response<?> saveCategory(GoodsCategory category) {
+    /**
+     * 用于创建category，接受一个DTO，含有category对象和一个用于表示父类path对象
+     * 无法直接获取path是因为无法知道被插入的id为多少，所以需要先插入，然后拼接父类id
+     * @param goodsCategoryDTO 包含GoodsCategory和父类的路径
+     * @return 响应
+     */
+    @Transactional
+    public Response<?> createCategory(GoodsCategoryDTO goodsCategoryDTO) {
+        GoodsCategory category = goodsCategoryDTO.getGoodsCategory();
+        String parentPath = goodsCategoryDTO.getParentPath();
         if (category.getCategoryName() == null ||
                 category.getCategoryLevel() == null ||
-                category.getPath() == null ||
                 category.getCategoryRank() == null) {
-            System.out.println(category.getCategoryLevel());
             return new Response<>(CommonResponse.INVALID_DATA);
         }
         GoodsCategory temp = goodsCategoryDao.selectByLevelAndName(category.getCategoryLevel(), category.getCategoryName());
@@ -57,7 +66,14 @@ public class GoodsCategoryService {
             return new Response<>(CommonResponse.DATA_ALREADY_EXISTS);
         }
         category.setCreateUser((int) session.getAttribute("userId"));
-        if (goodsCategoryDao.insertSelective(category) > 0) {
+        long id = goodsCategoryDao.insertSelective(category);
+        String path;
+        if (parentPath != null && parentPath.isBlank()) {
+            path = Long.toString(id);
+        } else {
+            path = parentPath + "." + id;
+        }
+        if (goodsCategoryDao.updatePathById(id, path) > 0) {
             return new Response<>(CommonResponse.SUCCESS);
         } else {
             return new Response<>(CommonResponse.ERROR);

@@ -115,13 +115,14 @@ public class MallUserService {
      * 验证用户是否是激活
      * @param verificationCode 激活码
      */
-    public void verifyUser(String verificationCode) throws VerificationCodeNotFoundException {
+    public MallUser activateUser(String verificationCode) throws VerificationCodeNotFoundException {
         String email = mallUserDao.selectEmailByVerificationCode(verificationCode);
         if (email == null) {
             throw new VerificationCodeNotFoundException();
         }
         mallUserDao.deleteVerificationCodeByEmail(email);
         setUserStatus(email, UserStatus.ACTIVATED);
+        return mallUserDao.selectByEmail(email);
     }
 
     public void setUserStatus(String email, UserStatus status) {

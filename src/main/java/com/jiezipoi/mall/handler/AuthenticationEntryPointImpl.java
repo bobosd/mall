@@ -19,12 +19,13 @@ public class AuthenticationEntryPointImpl implements AuthenticationEntryPoint {
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException)
             throws IOException {
+        int STATUS_CODE = HttpStatus.SC_UNAUTHORIZED; //401
         Response<String> responseContent = new Response<>("Authentication failed",
-                HttpStatus.SC_UNAUTHORIZED,
+                STATUS_CODE,
                 null);
         ObjectMapper objectMapper = new ObjectMapper();
         String jsonString = objectMapper.writeValueAsString(responseContent);
-        response.setStatus(200);
+        response.setStatus(STATUS_CODE);
         response.setContentType("application/json");
         response.setCharacterEncoding("utf-8");
         response.getWriter().println(jsonString);

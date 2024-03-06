@@ -57,7 +57,7 @@
             <h2>Sign up</h2>
             <form class="needs-validation" novalidate>
                 <div>
-                    <input class="form-control" placeholder="Name" id="input-username" required>
+                    <input class="form-control" placeholder="Nombre" id="input-username" required>
                     <div class="invalid-feedback"></div>
                 </div>
                 <div>
@@ -65,31 +65,31 @@
                     <div class="invalid-feedback"></div>
                 </div>
                 <div>
-                    <input class="form-control input-password" placeholder="Password" type="password"
+                    <input class="form-control input-password" placeholder="Contraseña" type="password"
                            autocomplete="password" id="input-password">
                     <div class="invalid-feedback"></div>
                 </div>
                 <div>
-                    <input class="form-control input-repeat-password" placeholder="Repeat password" type="password"
+                    <input class="form-control input-repeat-password" placeholder="Repetir contraseña" type="password"
                            autocomplete="password" id="input-repeat-password">
                     <div class="invalid-feedback"></div>
                 </div>
                 <div class="form-check">
                     <input class="form-check-input" type="checkbox" id="check-privacy-policy">
                     <label class="form-check-label" for="check-privacy-policy">
-                        I accept the privacy policy
+                        Acepto pólitica de privacidad
                     </label>
                     <div class="invalid-feedback"></div>
                 </div>
                 <div class="form-check">
                     <input class="form-check-input" type="checkbox" id="check-user-term">
                     <label class="form-check-label" for="check-user-term">
-                        <span>I have read and agree to the</span>
-                        <span class="hyperlink">Terms of Service</span>
+                        <span>he leído y acepto los </span>
+                        <span class="hyperlink">Términos y condiciónes</span>
                     </label>
                     <div class="invalid-feedback"></div>
                 </div>
-                <button class="button-sign-up" type="submit">Sign up</button>
+                <button class="button-sign-up" type="submit">Registrar</button>
             </form>
         </section>
     </div>
@@ -241,9 +241,9 @@
                 switch (response.code) {
                     case 409:
                         Swal.fire({
-                            title: "Email already exists",
-                            text: "This email is already associated with an account, please try to login or " +
-                                "choose \"Forgot password\".",
+                            title: "Email ya existe",
+                            text: "Este correo ya está asociado a una cuenta. Por favor, intenta iniciar sesión" +
+                                " o restablecer la contraseña.",
                             icon: "error",
                             showConfirmButton: true,
                             showDenyButton: false,
@@ -251,18 +251,18 @@
                         break;
                     case 200:
                         Swal.fire({
-                            title: "Success",
-                            text: "To complete the registration, please check your email and click the activation link." +
-                                " If you don't see the email, please check your spam folder or verify your email address.",
+                            title: "¡Listo! Revise tu correo.",
+                            text: "Hemos enviado un email que contiene enlace de activación, Por favor revisa tu " +
+                                "buzón de correo.",
                             icon: "success",
                             showConfirmButton: true,
-                            showDenyButton: false,
+                            showDenyButton: false
                         });
                         break;
                     case 400:
                         Swal.fire({
                             title: "Error",
-                            text: "Invalid data",
+                            text: "Dato inválido",
                             icon: "error",
                             showConfirmButton: true,
                             showDenyButton: false
