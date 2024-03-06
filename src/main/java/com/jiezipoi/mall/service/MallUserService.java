@@ -3,35 +3,65 @@ package com.jiezipoi.mall.service;
 import com.amazonaws.services.simpleemail.AmazonSimpleEmailService;
 import com.amazonaws.services.simpleemail.model.*;
 import com.jiezipoi.mall.dao.MallUserDao;
-import com.jiezipoi.mall.entity.User;
+import com.jiezipoi.mall.entity.MallUser;
+import com.jiezipoi.mall.enums.UserStatus;
+import com.jiezipoi.mall.exception.VerificationCodeNotFoundException;
+import com.jiezipoi.mall.security.MallUserDetails;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.util.DigestUtils;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
+
+import java.util.UUID;
 
 @Service
 public class MallUserService {
     private final AmazonSimpleEmailService emailService;
     private final MallUserDao mallUserDao;
     private final TemplateEngine templateEngine;
+    private final PasswordEncoder passwordEncoder;
+    private final AuthenticationManager authenticationManager;
+    private final JwtService jwtService;
 
-    public MallUserService(AmazonSimpleEmailService emailService, MallUserDao mallUserDao, TemplateEngine templateEngine) {
+    @Value("${mall.domain}")
+    private String domain;
+
+    public MallUserService(AmazonSimpleEmailService emailService,
+                           MallUserDao mallUserDao,
+                           TemplateEngine templateEngine,
+                           PasswordEncoder passwordEncoder,
+                           AuthenticationManager authenticationManager, JwtService jwtService) {
         this.emailService = emailService;
         this.mallUserDao = mallUserDao;
         this.templateEngine = templateEngine;
+        this.passwordEncoder = passwordEncoder;
+        this.authenticationManager = authenticationManager;
+        this.jwtService = jwtService;
     }
 
     public void userSignUp(String nickname, String email, String password) {
-        createUnactivatedUser(nickname, email, password);
-        sendVerificationEmail(email, nickname);
+        MallUser unactivatedUser = createUnactivatedUser(nickname, email, password);
+        String verificationCode = generateAndStoreVerificationCode(unactivatedUser);
+        String verificationUrl = generateUserVerificationUrl(verificationCode);
+        sendVerificationEmail(email, verificationUrl, nickname);
     }
 
-    private void sendVerificationEmail(String email, String nickname) {
-        Destination destination = new Destination().withToAddresses(email);
+    private String generateAndStoreVerificationCode(MallUser mallUser) {
+        String uuid = UUID.randomUUID().toString().replaceAll("-", "");
+        mallUserDao.insertVerificationCode(mallUser.getEmail(), uuid);
+        return uuid;
+    }
 
+    private void sendVerificationEmail(String email, String verificationUrl, String nickname) {
+        Destination destination = new Destination().withToAddresses(email);
+        Body htmlContent = new Body().withHtml(generateSignUpEmailContent(nickname, verificationUrl));
         Message message = new Message()
                 .withSubject(new Content("[JieziCloud] Email verification"))
-                .withBody(new Body().withHtml(generateSignUpEmailContent(nickname)));
+                .withBody(htmlContent);
 
         SendEmailRequest emailRequest = new SendEmailRequest()
                 .withSource("no-reply@jiezicloud.com")
@@ -40,22 +70,62 @@ public class MallUserService {
         emailService.sendEmail(emailRequest);
     }
 
-    private void createUnactivatedUser(String nickname, String email, String password) {
-        String md5Password = DigestUtils.md5DigestAsHex(password.getBytes());
-        User user = new User();
-        user.setNickName(nickname);
-        user.setEmail(email);
-        user.setPasswordMd5(md5Password);
-        mallUserDao.insertSelective(user);
+    private String generateUserVerificationUrl(String verificationCode) {
+        return this.domain + "/user/activate-account/" + verificationCode;
     }
 
-    private Content generateSignUpEmailContent(String nickname) {
+    private MallUser createUnactivatedUser(String nickname, String email, String password) {
+        String BCryptPassword = passwordEncoder.encode(password);
+        MallUser user = new MallUser();
+        user.setNickName(nickname);
+        user.setEmail(email);
+        user.setPassword(BCryptPassword);
+        user.setUserStatus(UserStatus.UNACTIVATED);
+        mallUserDao.insertSelective(user);
+        return user;
+    }
+
+    private Content generateSignUpEmailContent(String nickname, String verificationUrl) {
         Context thymeleafContext = new Context();
         thymeleafContext.setVariable("nickName", nickname);
+        thymeleafContext.setVariable("verificationUrl", verificationUrl);
         return new Content(templateEngine.process("email/sign-up-activation.html", thymeleafContext));
     }
 
     public boolean isExistingEmail(String email) {
         return mallUserDao.selectByEmail(email) != null;
+    }
+
+    public MallUser findUser(String email, String password) {
+        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(email, password);
+        Authentication authentication = authenticationManager.authenticate(authenticationToken);
+        MallUserDetails userDetails = (MallUserDetails) authentication.getPrincipal();
+        return userDetails.mallUser();
+    }
+
+    public MallUser getMallUserByEmail(String email) {
+        return mallUserDao.selectByEmail(email);
+    }
+
+    public void logout(String refreshToken) {
+        this.jwtService.invalidateRefreshToken(refreshToken);
+    }
+
+    /**
+     * 验证用户是否是激活
+     * @param verificationCode 激活码
+     */
+    public MallUser activateUser(String verificationCode) throws VerificationCodeNotFoundException {
+        String email = mallUserDao.selectEmailByVerificationCode(verificationCode);
+        if (email == null) {
+            throw new VerificationCodeNotFoundException();
+        }
+        mallUserDao.deleteVerificationCodeByEmail(email);
+        setUserStatus(email, UserStatus.ACTIVATED);
+        return mallUserDao.selectByEmail(email);
+    }
+
+    public void setUserStatus(String email, UserStatus status) {
+        mallUserDao.updateStatusByEmail(email, status);
     }
 }

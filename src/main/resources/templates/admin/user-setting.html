@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="admin/header::general-libraries-and-styles(~{::title}, ~{::link}, ~{::head/script})">
+<head th:replace="~{admin/header::general-libraries-and-styles(~{::title}, ~{::link}, ~{::head/script})}">
     <title id="pageTitle">TEST</title>
 </head>
 <link rel="stylesheet" href="/styles/admin/user-setting.css">
 <body>
-<div th:replace="admin/sidebar::sidebar-fragment"></div>
+<div th:replace="~{admin/sidebar::sidebar-fragment}"></div>
 
 <div class="main">
     <!-- Edit username modal -->
@@ -106,7 +106,7 @@
 
     $(document).ready(function () {
         //reset password edit modal on close
-        $("#modal-password").on("hidden.bs.modal", (e) => {
+        $("#modal-password").on("hidden.bs.modal", () => {
             $("#modal-password input").val("");
             $(".password-validation-container").hide();
         });
@@ -150,7 +150,7 @@
                 showServerErrorSwal();
             },
             complete: () => {
-                // noinspection JSUnresolvedFunction
+
                 nicknameModal.hide();
                 btnConfirm.removeSpinner();
             },

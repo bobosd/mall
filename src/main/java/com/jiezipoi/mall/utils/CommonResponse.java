@@ -1,16 +1,17 @@
 package com.jiezipoi.mall.utils;
 
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import java.util.Locale;
 
 public enum CommonResponse {
     SUCCESS("success", 200),
     DELETE_SUCCESS("delete.success", 200),
     INVALID_DATA("invalid.data", 400),
+    FORBIDDEN("access.denied", 403),
     ERROR("save.failed", 404),
     DATA_NOT_EXIST("data.not.exists", 404),
     DATA_ALREADY_EXISTS("data.already.exists", 409),

@@ -3,6 +3,49 @@
 
 <!-- Sweet Alert 2 -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" th:fragment="swal"></script>
+<script th:fragment="swal-common-alert">
+    function showServerErrorSwal() {
+        Swal.fire({
+            title: "[[#{error.server}]]",
+            icon: "error",
+            showConfirmButton: true,
+            position: "top"
+        });
+    }
+
+    function showChangeSavedSwal() {
+        Swal.fire({
+            title: "[[#{saved}]]",
+            text: " ",
+            icon: "success",
+            timer: 1000,
+            showConfirmButton: false,
+            position: "top"
+        });
+    }
+
+    function showCreateSuccessSwal() {
+        Swal.fire({
+            title: "[[#{created}]]",
+            text: " ",
+            icon: "success",
+            timer: 1000,
+            showConfirmButton: false,
+            position: "top"
+        });
+    }
+
+    function showDeleteSuccessSwal() {
+        Swal.fire({
+            title: "[[#{delete.success}]]",
+            text: " ",
+            icon: "success",
+            timer: 1000,
+            position: "top",
+            showConfirmButton: false,
+        });
+    }
+</script>
 
 
 <!-- Bootstrap 5.3.2 -->
@@ -32,5 +75,12 @@
     <script th:fragment="fontawsome-js" src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/js/all.min.js"
             integrity="sha512-rpLlll167T5LJHwp0waJCh3ZRf7pO6IT1+LZOhAyP6phAirwchClbTZV3iqL3BMrVxIYRbzGTpli4rfxsCK6Vw=="
             crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+</th:block>
+
+
+<!-- Swiper -->
+<th:block>
+    <link th:fragment="swiper-css" rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css"/>
+    <script th:fragment="swiper-js" src="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.js"></script>
 </th:block>
 </html>

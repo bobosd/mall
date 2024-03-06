@@ -1,5 +1,6 @@
 package com.jiezipoi.mall.controller;
 
+import com.jiezipoi.mall.dto.GoodsCategoryDTO;
 import com.jiezipoi.mall.entity.GoodsCategory;
 import com.jiezipoi.mall.service.GoodsCategoryService;
 import com.jiezipoi.mall.utils.Response;
@@ -29,8 +30,8 @@ public class GoodsCategoryController {
 
     @PostMapping("/product-category/save")
     @ResponseBody
-    public Response<?> save(@RequestBody GoodsCategory category) {
-        return service.saveCategory(category);
+    public Response<?> save(@RequestBody GoodsCategoryDTO goodsCategoryDTO) {
+        return service.createCategory(goodsCategoryDTO);
     }
 
     @PostMapping("/product-category/update")

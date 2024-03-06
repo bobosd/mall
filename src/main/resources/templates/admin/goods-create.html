@@ -1,20 +1,20 @@
 <!--suppress HtmlFormInputWithoutLabel -->
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="admin/header::general-libraries-and-styles(~{::title}, ~{::link}, ~{::head/script})">
+<head th:replace="~{admin/header::general-libraries-and-styles(~{::title}, ~{::link}, ~{::head/script})}">
     <meta charset="UTF-8">
     <title th:text="#{create.product}"></title>
-    <script th:replace="admin/header::select2"></script>
-    <script th:replace="admin/header::cropper"></script>
-    <script th:replace="admin/header::CKEditor"></script>
+    <script th:replace="~{admin/header::select2}"></script>
+    <script th:replace="~{admin/header::cropper}"></script>
+    <script th:replace="~{admin/header::CKEditor}"></script>
     <link rel="stylesheet" href="/styles/admin/goods-create.css">
 </head>
 <body>
-<div th:replace="admin/sidebar::sidebar-fragment"></div>
+<div th:replace="~{admin/sidebar::sidebar-fragment}"></div>
 <div class="main">
     <div class="block">
         <div class="block-title" th:text="#{product.info}"></div>
-        <div th:replace="admin/goods-form-fragment::goods-form"></div>
+        <div th:replace="~{admin/goods-form-fragment::goods-form}"></div>
         <button class="button button-blue btn-create float-end" th:text="#{create}"></button>
     </div>
 </div>

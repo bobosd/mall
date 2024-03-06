@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="admin/header::general-libraries-and-styles(~{::title}, ~{::link}, ~{::head/script})">
-    <script th:replace="admin/header::CKEditor"></script>
+<head th:replace="~{admin/header::general-libraries-and-styles(~{::title}, ~{::link}, ~{::head/script})}">
+    <script th:replace="~{admin/header::CKEditor}"></script>
     <title>coupling-test</title>
 </head>
 <body>
-<div th:replace="admin/sidebar::sidebar-fragment"></div>
+<div th:replace="~{admin/sidebar::sidebar-fragment}"></div>
 <div class="main">
     <div class="content">
         <div id="editor">This is some sample content</div>

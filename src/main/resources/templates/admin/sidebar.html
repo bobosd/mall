@@ -2,7 +2,7 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <body th:fragment="sidebar-fragment">
-    <div th:replace="admin/user-setting-modal::user-settings-modal"></div>
+    <div th:replace="~{admin/user-setting-modal::user-settings-modal}"></div>
     <div class="sidebar no-text-select">
         <div class="logo-content no-text-select">
             <div class="logo text-center">
@@ -95,7 +95,7 @@
                 </div>
                 <div class="navbar-option dropdown-list">
                     <div class="navbar-option-text">
-                        <span class="nickname" th:text="${#session.getAttribute('nickname')}"></span>
+                        <span class="nickname" th:text="${#ctx.session.get('nickname')}"></span>
                         <i class="fa-solid fa-user"></i>
                     </div>
                     <div class="dropdown-content user-dropdown" th:style="'left:calc(100% - '+#{css.admin.user.dropdown.left}+'px);'">

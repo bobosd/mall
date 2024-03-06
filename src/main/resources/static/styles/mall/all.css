@@ -34,3 +34,16 @@ body {
     font-weight: bold;
     font-size: 32px;
 }
+
+.button {
+    display: inline-block;
+    font-size: 13px;
+    padding: 2px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.button-orange {
+    color: #ffffff;
+    background: #fc830a;
+}

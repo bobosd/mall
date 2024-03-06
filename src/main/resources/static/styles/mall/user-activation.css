@@ -1,0 +1,39 @@
+main {
+    display: flex;
+    justify-content: center;
+}
+
+.activation-message-container {
+    display: inline-block;
+    border-radius: 13px;
+    border: 1px #cccccc solid;
+    margin: 50px 0;
+    padding: 30px 20px;
+}
+
+.check-icon {
+    color: #5ac569;
+    font-size: 20px;
+}
+
+.button {
+    display: block;
+    width: max-content;
+    margin: 20px auto 0 auto;
+}
+
+.title {
+    font-size: 26px;
+    font-family: "Roboto", sans-serif;
+    font-weight: 300;
+    border-bottom: 1px #cccccc solid;
+    padding: 0 0 20px 0;
+}
+
+.body {
+    margin: 30px 0 0 0;
+    padding: 30px 10px;
+    background-color: #d9efe0;
+    border-radius: 8px;
+    min-width: 700px;
+}

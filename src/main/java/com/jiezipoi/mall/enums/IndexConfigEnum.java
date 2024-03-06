@@ -1,4 +1,4 @@
-package com.jiezipoi.mall.commons;
+package com.jiezipoi.mall.enums;
 
 public enum IndexConfigEnum {
 

@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="admin/header::general-libraries-and-styles(~{::title}, ~{::link}, ~{::head/script})">
+<head th:replace="~{admin/header::general-libraries-and-styles(~{::title}, ~{::link}, ~{::head/script})}">
     <title th:text="#{new.arrivals}"></title>
     <link rel="stylesheet" href="/styles/admin/index-config.css">
-    <link th:include="admin/header::datatable">
+    <link th:insert="~{admin/header::datatable}">
 </head>
 <body>
-<div th:replace="admin/sidebar::sidebar-fragment"></div>
+<div th:replace="~{admin/sidebar::sidebar-fragment}"></div>
 <div class="main">
     <div class="block">
         <div class="block-title" th:text="#{index.config}"></div>

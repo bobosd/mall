@@ -3,34 +3,46 @@
 <head th:fragment="general-libraries-and-styles(title, links, script)">
     <meta charset="UTF-8">
     <title th:replace="${title}">Mall</title>
-    <script th:replace="common/libraries::bootstrap-js"></script>
-    <script th:replace="common/libraries::jQuery"></script>
+    <script th:replace="~{common/libraries::bootstrap-js}"></script>
+    <script th:replace="~{common/libraries::jQuery}"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/js/all.min.js" integrity="sha512-rpLlll167T5LJHwp0waJCh3ZRf7pO6IT1+LZOhAyP6phAirwchClbTZV3iqL3BMrVxIYRbzGTpli4rfxsCK6Vw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script th:replace="common/libraries::swal"></script>
+    <script th:replace="~{common/libraries::swal}"></script>
+    <script th:replace="~{common/libraries::swal-common-alert}"></script>
     <script th:src="@{/js/generalUtils.js}"></script>
+    <script>
+        //异步POST 请求失效后直接重定向
+        $(document).ajaxError(function (event, xhr) {
+            console.log(xhr);
+            if (xhr.status === 401) {
+                //window.location.href = "/admin/login";
+            }
+        });
+    </script>
     <th:block th:replace="${links} ?: ~{}"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css" integrity="sha512-MV7K8+y+gLIBoVD59lQIYicR65iaqukzvf/nwasF0nqhPay5w/9lJmVM2hMDcnK1OnMGCdVK+iQrJ7lzPJQd1w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <link rel="stylesheet" th:replace="common/libraries::bootstrap-css">
+    <link rel="stylesheet" th:replace="~{common/libraries::bootstrap-css}">
     <link rel="stylesheet" th:href="@{/styles/admin/all.css}">
     <link rel="stylesheet" th:href="@{/styles/admin/sidebar.css}">
     <link rel="stylesheet" th:href="@{/styles/admin/modal.css}">
     <th:block th:replace="${script} ?: ~{}"/>
-    <th:block th:replace="this::utils"/>
 </head>
 <body>
 
 <div th:fragment="datatable">
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs5/dt-1.13.2/datatables.min.css"/>
     <script type="text/javascript" src="https://cdn.datatables.net/v/bs5/dt-1.13.2/datatables.min.js"></script>
+    <script>
+        $.fn.dataTable.ext.errMode = "throw";
+    </script>
     <th:block th:switch="__${#locale.toString()}__">
         <th:block th:case="zh_CN">
-            <script th:replace="common/datatable-locale::zh_CN"></script>
+            <script th:replace="~{common/datatable-locale::zh_CN}"></script>
         </th:block>
         <th:block th:case="es_ES">
-            <script th:replace="common/datatable-locale::es_ES"></script>
+            <script th:replace="~{common/datatable-locale::es_ES}"></script>
         </th:block>
         <th:block th:case="en_US">
-            <script th:replace="common/datatable-locale::en_US"></script>
+            <script th:replace="~{common/datatable-locale::en_US}"></script>
         </th:block>
     </th:block>
 </div>
@@ -53,47 +65,4 @@
 </div>
 
 </body>
-<script th:fragment="utils">
-    function showServerErrorSwal() {
-        Swal.fire({
-            title: "[[#{error.server}]]",
-            icon: "error",
-            showConfirmButton: true,
-            position: "top"
-        });
-    }
-
-    function showChangeSavedSwal(callBack) {
-        Swal.fire({
-            title: "[[#{saved}]]",
-            text: " ",
-            icon: "success",
-            timer: 1000,
-            showConfirmButton: false,
-            position: "top"
-        });
-    }
-
-    function showCreateSuccessSwal() {
-        Swal.fire({
-            title: "[[#{created}]]",
-            text: " ",
-            icon: "success",
-            timer: 1000,
-            showConfirmButton: false,
-            position: "top"
-        });
-    }
-
-    function showDeleteSuccessSwal() {
-        Swal.fire({
-            title: "[[#{delete.success}]]",
-            text: " ",
-            icon: "success",
-            timer: 1000,
-            position: "top",
-            showConfirmButton: false,
-        });
-    }
-</script>
 </html>

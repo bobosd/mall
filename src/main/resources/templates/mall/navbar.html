@@ -5,7 +5,7 @@
     <nav>
         <div class="navbar">
             <div class="navbar-lft">
-                <a>商城后台界面</a>
+                <a href="/admin/login">Panel admin</a>
             </div>
             <div class="navbar-center">
                 <div class="search-box">
@@ -14,12 +14,63 @@
                 </div>
             </div>
             <div class="navbar-rgt">
-                <a><i class="fa-solid fa-earth"></i>语言</a>
-                <a><i class="fa-solid fa-right-to-bracket"></i>登入</a>
-                <a href="/signup">注册</a>
-                <a class="shopping-cart"><i class="fa-solid fa-cart-shopping"></i>购物车</a>
+
+                <div class="unlogged-options-container">
+                    <a href="/login"><span>Login</span></a>
+                    <a href="/signup"><span>Registrar</span></a>
+                </div>
+                <div class="logged-options-container">
+                    <a><i class="fa-solid fa-user"></i><span class="nickname"></span></a>
+                    <a class="logout-option"><i class="fa-solid fa-right-from-bracket"></i><span>logout</span></a>
+                </div>
+                <a class="shopping-cart"><i class="fa-solid fa-cart-shopping"></i> cesta</a>
             </div>
         </div>
     </nav>
+
+    <script>
+        const MALL_USER_ITEM_NAME = "mallUser";
+        const refreshToken = getCookie("refresh_token");
+        if (refreshToken !== null) {
+            const mallUser = JSON.parse(localStorage.getItem(MALL_USER_ITEM_NAME));
+            $(".nickname").text(mallUser.nickName);
+            $(".unlogged-options-container").hide();
+            $(".logged-options-container").show();
+        } else {
+            localStorage.removeItem(MALL_USER_ITEM_NAME)
+            $(".unlogged-options-container").show();
+            $(".logged-options-container").hide();
+        }
+
+        $(".logout-option").click(() => logout());
+
+        function getCookie(name) {
+            name += "=";
+            let decodedCookies = decodeURIComponent(document.cookie);
+            let cookieArray = decodedCookies.split(";");
+            for (let i = 0; i < cookieArray.length; i++) {
+                let cookie = cookieArray[i].trim();
+                if (cookie.indexOf(name) === 0) {
+                    return cookie.substring(name.length, cookie.length);
+                }
+            }
+            return null;
+        }
+
+        function logout() {
+            $.ajax({
+                url: "/user/logout",
+                method: "POST",
+                success: (res) => {
+                    if (res.code === 200) {
+                        localStorage.removeItem("mallUser");
+                        window.location.replace("/");
+                    } else {
+                        showServerErrorSwal();
+                    }
+                }
+            });
+        }
+    </script>
 </div>
 </html>

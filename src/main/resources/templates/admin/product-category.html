@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="admin/header::general-libraries-and-styles(~{::title}, ~{::link}, ~{::head/script})">
+<head th:replace="~{admin/header::general-libraries-and-styles(~{::title}, ~{::link}, ~{::head/script})}">
     <title id="page-title"></title>
     <link rel="stylesheet" href="/styles/admin/product-category.css">
-    <link th:replace="admin/header::datatable"/>
+    <link th:replace="~{admin/header::datatable}"/>
 </head>
 
 <body>
-<div th:replace="admin/sidebar::sidebar-fragment"></div>
+<div th:replace="~{admin/sidebar::sidebar-fragment}"></div>
 <div class="main">
     <div class="block">
         <div class="block-title" th:text="#{product_categories}"></div>
@@ -96,7 +96,7 @@
                         data.data = response.data.list;
                     }
                     return JSON.stringify(data);
-                }
+                },
             },
             columns: [
                 {
@@ -155,6 +155,7 @@
         $("#btn-create-category").click(() => createCategory());
         //modal listener
         $("#modal-category").on("hidden.bs.modal", () => {
+            $("#btn-update-category").unbind();
             $("#input-category-name").val(null);
             $("#input-rank-order").val(null);
         });
@@ -219,6 +220,7 @@
             data: JSON.stringify(category),
             contentType: "application/json",
             success: (res) => {
+                console.log(res);
                 if (res.code === 200) {
                     categoryModal.hide();
                     showChangeSavedSwal();
@@ -240,13 +242,22 @@
         });
     }
 
+    function flatParentStack() {
+        let path = "";
+        for (let i = 0; i < parentStack.length; i++) {
+            path += parentStack[i];
+
+        }
+    }
+
     function createCategory() {
         const btnCreateCategory = $("#btn-create-category");
         const category = {
             categoryName: $("#input-category-name").val(),
             categoryRank: $("#input-rank-order").val(),
             categoryLevel: categoryLevel,
-            parentId: parentId
+            parentId: parentId,
+            path: parentStack.join("."),
         }
 
         if (!validateCategoryForm(category)) {
@@ -260,6 +271,7 @@
             data: JSON.stringify(category),
             contentType: "application/json",
             success: (res) => {
+                console.log(res);
                 if (res.code === 200) {
                     categoryModal.hide();
                     showCreateSuccessSwal();

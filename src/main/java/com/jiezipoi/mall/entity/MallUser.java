@@ -5,11 +5,11 @@ import com.jiezipoi.mall.enums.UserStatus;
 
 import java.time.LocalDateTime;
 
-public class User {
+public class MallUser {
     private Long id;
     private String nickName;
     private String email;
-    private String passwordMd5;
+    private String password;
     private String introduceSign;
     private String address;
     private Byte isDeleted;
@@ -42,12 +42,12 @@ public class User {
         this.email = email == null ? null : email.trim();
     }
 
-    public String getPasswordMd5() {
-        return passwordMd5;
+    public String getPassword() {
+        return password;
     }
 
-    public void setPasswordMd5(String passwordMd5) {
-        this.passwordMd5 = passwordMd5;
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public String getIntroduceSign() {
