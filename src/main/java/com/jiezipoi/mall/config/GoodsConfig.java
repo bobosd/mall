@@ -13,7 +13,7 @@ public class GoodsConfig {
     private final MallConfig mallConfig;
 
     @Value("${goods.file.path}")
-    private String fileStorePath;
+    private String goodsFileName;
 
     @Value("${goods.file.temp.prefix}")
     private String userTempFilePrefix;
@@ -36,7 +36,7 @@ public class GoodsConfig {
      * @return 外部访问时使用的地址
      */
     public String getExposeUrl(Path filePath) {
-        Path basePath = getFileStorePath();
+        Path basePath = getGoodsFilePath();
         Path relativizePath = basePath.relativize(filePath);
         String normalizePath = relativizePath.toString().replaceAll("\\\\", "/");//替换 '\' 为 '/'
         return this.exposeUrl + normalizePath;
@@ -58,8 +58,8 @@ public class GoodsConfig {
         return userTempDataFilename;
     }
 
-    public Path getFileStorePath() {
-        return Paths.get(mallConfig.getUploadDirectory() + fileStorePath);
+    public Path getGoodsFilePath() {
+        return Paths.get(mallConfig.getUploadDirectory(), goodsFileName);
     }
 
     public String getUserTempFilePrefix() {

@@ -7,6 +7,7 @@
     <script th:replace="~{admin/header::cropper}"></script>
     <script th:replace="~{admin/header::CKEditor}"></script>
     <link rel="stylesheet" href="/styles/admin/goods-create.css">
+    <link rel="stylesheet" th:replace="~{admin/goods-form-fragment::goods-form-style}">
 </head>
 <body>
 <div th:replace="~{admin/sidebar::sidebar-fragment}"></div>
@@ -20,6 +21,7 @@
 </div>
 
 <script>
+    sidebarSetSelected($(".goods-management"));
     $(document).ready(() => {
         $("#btn-update").click(() => saveChanges());
 
@@ -56,6 +58,10 @@
             window.location.href = "/admin/goods"
         });
     });
+
+    function getGoodsId() {
+        return [[${goods.getId()}]];
+    }
 
     function saveChanges() {
         if (validateForm() === false) {
@@ -103,6 +109,54 @@
             error: () => showServerErrorSwal(),
             complete: () => $("#btn-update").removeSpinner(),
         });
+    }
+
+    function customUploadAdapter(editor) {
+        editor.plugins.get("FileRepository").createUploadAdapter = (loader) => new UploadAdapter(loader);
+    }
+
+    ClassicEditor.create(document.querySelector("#editor"), {
+        extraPlugins: [customUploadAdapter]
+    }).then(e => editor = e);
+
+    class UploadAdapter {
+        constructor(loader) {
+            //CKEditor 5 instance
+            this.loader = loader;
+        }
+
+        upload() {
+            return this.loader.file.then(file => {
+                return new Promise((resolve, reject) => {
+                    const data = new FormData();
+                    data.append("file", file);
+                    data.append("goodsId", getGoodsId());
+                    $.ajax({
+                        url: "/admin/goods/upload/details",
+                        method: "post",
+                        processData: false,
+                        contentType: false,
+                        data: data,
+                        success: (res) => {
+                            if (res.code === 200) {
+                                resolve({default: res.data});
+                            } else {
+                                showErrorAlert("error");
+                                reject();
+                            }
+                        },
+                        error: () => {
+                            showServerErrorSwal();
+                            reject();
+                        },
+                    });
+                });
+            })
+        }
+
+        abort() {
+            console.log("Abort");
+        }
     }
 </script>
 </body>

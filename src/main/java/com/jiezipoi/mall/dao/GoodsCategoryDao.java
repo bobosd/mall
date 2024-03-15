@@ -14,15 +14,16 @@ public interface GoodsCategoryDao {
 
     GoodsCategory selectByPrimaryKey(Long id);
 
-    GoodsCategory selectByLevelAndName(@Param("categoryLevel") Byte categoryLevel,
-                                       @Param("categoryName") String categoryName);
+    GoodsCategory selectByParentIdAndName(@Param("parentId") Long parentId,
+                                          @Param("categoryName") String categoryName);
 
     int updateByPrimaryKeySelective(GoodsCategory category);
 
     int updateByPrimaryKey(GoodsCategory category);
 
     List<GoodsCategory> findGoodsCategoryList(@Param("categoryLevel") Integer categoryLevel,
-                                              @Param("parentId") Long parentId);
+                                              @Param("parentId") Long parentId,
+                                              @Param("orderDir") String orderDir);
 
     int getTotalGoodsCategories(@Param("categoryLevel") Integer categoryLevel,
                                 @Param("parentId") Long parentId);

@@ -90,17 +90,22 @@
 
         $("#slc-l1").select2({
             placeholder: "[[#{product.category.level1}]]",
+            minimumResultsForSearch: -1, //hide search box
             ajax: {
                 url: "/admin/product-category/listByLevelAndParent",
                 method: "POST",
                 dataType: "json",
-                data: {parentId: 0, level: 1},
+                data: (params) => {
+                    const search = params.term;
+                    return {parentId: 0, level: 1, search: search}
+                },
                 processResults: processCategoryResult,
             }
         });
 
         $("#slc-l2").select2({
             language: "zh-CN",
+            minimumResultsForSearch: -1,//hide search box
             placeholder: "[[#{product.category.level2}]]",
             ajax: {
                 url: "/admin/product-category/listByLevelAndParent",
@@ -113,6 +118,7 @@
 
         $("#slc-l3").select2({
             placeholder: "[[#{product.category.level2}]]",
+            minimumResultsForSearch: -1,//hide search box
             ajax: {
                 url: "/admin/product-category/listByLevelAndParent",
                 method: "POST",
@@ -131,7 +137,7 @@
         return $("#slc-l2").val();
     }
 
-    function initDatatable() {
+    function initDatatable() { //TODO: category select2的搜索和DataTable的搜索
         table = $("#table").DataTable({
             autoWidth: false,
             processing: true,

@@ -47,6 +47,14 @@
                 if (response.code === 200) {
                     window.location.replace("/");
                     localStorage.setItem("mallUser", JSON.stringify(response.data));
+                } else if (response.code === 403) {
+                    Swal.fire({
+                        title: "Usuario no verificado",
+                        text: "por favor, revise su banjeda de entrada y sigue los pasos para activar la cuenta",
+                        showDenyButton: false,
+                        showConfirmButton: true,
+                        icon: "error"
+                    });
                 } else {
                     Swal.fire({
                         title: "Invalid email or password",

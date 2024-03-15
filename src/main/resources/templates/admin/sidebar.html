@@ -12,7 +12,7 @@
         </div>
 
         <div class="sidebar-option-list no-text-select">
-            <div class="sidebar-option-list-tittle">Tittle</div>
+            <div class="sidebar-option-list-title" th:text="#{summary}"></div>
             <a th:href="@{/admin/index}">
                 <div class="sidebar-option dashboard">
                     <i class="fa-solid fa-chart-line"></i>
@@ -21,7 +21,7 @@
             </a>
         </div>
         <div class="sidebar-option-list no-text-select">
-            <div class="sidebar-option-list-tittle">首页配置</div>
+            <div class="sidebar-option-list-title" th:text="#{index.config}"></div>
             <a th:href="@{/admin/carousel}">
                 <div class="sidebar-option carousel-setting">
                     <i class="fa-solid fa-images"></i>
@@ -48,7 +48,7 @@
             </a>
         </div>
         <div class="sidebar-option-list no-text-select">
-            <div class="sidebar-option-list-tittle">商品配置</div>
+            <div class="sidebar-option-list-title" th:text="#{product.config}"></div>
             <a th:href="@{/admin/goods}">
                 <div class="sidebar-option goods-management">
                     <i class="fa-solid fa-box-open"></i>
@@ -116,6 +116,7 @@
             let toggle = () => {
                 $(".sidebar-option-text").toggle();
                 $(".logo-name").toggle();
+                $(".sidebar-option-list-title").css("visibility", "hidden");
             };
 
             $(".sidebar-toggle").click(function () {

@@ -11,17 +11,17 @@
 }
 
 .category-menu {
-    padding: 5px 15px;
     margin-right: 15px;
     border: 1px #DDDDDD solid;
     border-radius: 5px;
 }
 
 .category-level1 {
-    width: max-content;
-    padding: 2px 15px;
-    border-radius: 5px;
+    width: 220px;
+    padding: 10px 25px;
     cursor: pointer;
+    font-size: 15px;
+    display: block;
 }
 
 .category-level1:hover {
@@ -68,6 +68,10 @@
 
 .category-level3:hover, .category-level2-name:hover {
     color: #fc830a;
+}
+
+.category-level3 {
+    font-size: 14px;
 }
 
 .category-sub-menu-container {

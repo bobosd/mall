@@ -62,7 +62,6 @@ public class IndexConfigService {
     }
 
     public Response<?> updateIndexConfig(IndexConfig indexConfig) {
-        System.out.println(indexConfig);
         if (indexConfig.getConfigType() == null ||
                 indexConfig.getId() == null ||
                 indexConfig.getConfigName().isBlank() ||

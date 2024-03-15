@@ -16,6 +16,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpSession;
+
+import java.io.IOException;
 import java.util.List;
 
 @Controller
@@ -28,7 +30,7 @@ public class GoodsController {
 
     @GetMapping("/goods")
     public String goodsPage() {
-        return "/admin/goods-list";
+        return "admin/goods-list";
     }
 
     @GetMapping("/goods/form")
@@ -41,7 +43,7 @@ public class GoodsController {
             List<GoodsCategory> categories = categoryService.getGoodsCategoryAndParent(categoryId);
             modelMap.addAttribute("category", categories);
         }
-        return "/admin/goods-create";
+        return "admin/goods-create";
     }
 
     @GetMapping("/goods/edit/{id}")
@@ -53,9 +55,9 @@ public class GoodsController {
             List<GoodsCategory> categories = categoryService.getGoodsCategoryAndParent(categoryId);
             modelMap.addAttribute("goods", goods);
             modelMap.addAttribute("category", categories);
-            return "/admin/goods-edit";
+            return "admin/goods-edit";
         } else {
-            return "/admin/fallback";
+            return "admin/fallback";
         }
     }
 
@@ -92,18 +94,38 @@ public class GoodsController {
         return goodsService.saveTempCoverImage(image, userId);
     }
 
-    @PostMapping("/goods/upload-goods-detail-image")
-    @ResponseBody
-    public Response<?> uploadGoodsDetailImage(@RequestParam("file") MultipartFile image,
-                                              @RequestParam(value = "goodsId", required = false) Integer goodsId,
-                                              HttpSession session) {
-        int userId = (int) session.getAttribute("userId");
-        return goodsService.uploadGoodsDetailImage(image, goodsId, userId);
-    }
-
     @PostMapping("/goods/list")
     @ResponseBody
     public Response<?> list(@RequestBody GoodsCategoryRequest request) {
         return goodsService.list(request.getStart(), request.getLength(), request.getPath(), request.getCategoryLevel());
+    }
+
+    @PostMapping("/goods/temp/upload/details")
+    @ResponseBody
+    public Response<?> uploadTempDetails(@RequestParam("file") MultipartFile file,
+                                         @RequestParam("goodsId") HttpSession session) {
+        int userId = (int) session.getAttribute("userId");
+        try {
+            String url = goodsService.saveTempDetailsFile(file, userId);
+            Response<String> response = new Response<>(CommonResponse.SUCCESS);
+            response.setData(url);
+            return response;
+        } catch (IOException e) {
+            return new Response<>(CommonResponse.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping("/goods/upload/details")
+    @ResponseBody
+    public Response<?> uploadDetails(@RequestParam("file") MultipartFile file,
+                                     @RequestParam("goodsId") String goodsId) {
+        try {
+            String url = goodsService.saveDetailsFile(file, goodsId);
+            Response<String> response = new Response<>(CommonResponse.SUCCESS);
+            response.setData(url);
+            return response;
+        } catch (IOException e) {
+            return new Response<>(CommonResponse.INTERNAL_SERVER_ERROR);
+        }
     }
 }

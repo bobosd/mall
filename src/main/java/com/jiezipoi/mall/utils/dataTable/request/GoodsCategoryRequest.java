@@ -3,7 +3,6 @@ package com.jiezipoi.mall.utils.dataTable.request;
 public class GoodsCategoryRequest extends DataTableRequest {
     private Integer categoryLevel;
     private Long parentId;
-
     private String path;
 
     public Integer getCategoryLevel() {

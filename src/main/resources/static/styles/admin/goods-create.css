@@ -42,3 +42,11 @@ select {
 .image-preview-container button {
     margin: 8px 0;
 }
+
+.image-preview-container .d-none:last-child {
+    background-color: #b4b4b4;
+}
+
+.image-preview-container .d-none:first-child {
+    background-color: #228bff;
+}

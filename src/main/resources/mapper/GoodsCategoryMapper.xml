@@ -41,7 +41,7 @@
             </if>
             AND is_deleted = 0
         </where>
-        ORDER BY category_rank DESC
+        ORDER BY category_rank ${orderDir};
     </select>
 
     <select id="getTotalGoodsCategories" resultType="int">
@@ -61,14 +61,13 @@
         FROM goods_category
         WHERE id = #{id}
     </select>
-
-    <select id="selectByLevelAndName" resultMap="BaseResultMap">
+    
+    <select id="selectByParentIdAndName" resultMap="BaseResultMap">
         SELECT
         <include refid="Base_column_list"/>
         FROM goods_category
-        WHERE category_name = #{categoryName,jdbcType=VARCHAR}
-        AND category_level = #{categoryLevel,jdbcType=TINYINT}
-        AND is_deleted = 0 LIMIT 1;
+        WHERE parent_id = #{parentId,jdbcType=BIGINT}
+        AND category_name = #{categoryName,jdbcType=VARCHAR};
     </select>
 
     <select id="selectByLevelAndParentIdsAndNumber" resultMap="BaseResultMap">
@@ -117,6 +116,9 @@
             <if test="categoryLevel != null ">
                 category_level,
             </if>
+            <if test="parentId != null">
+                parent_id,
+            </if>
             <if test="path">
                 path,
             </if>
@@ -148,6 +150,9 @@
             </if>
             <if test="categoryLevel != null">
                 #{categoryLevel,jdbcType=TINYINT},
+            </if>
+            <if test="parentId != null">
+                #{parentId,jdbcType=BIGINT},
             </if>
             <if test="path != null">
                 #{path,jdbcType=VARCHAR},
@@ -240,7 +245,8 @@
         <include refid="Base_column_list"/>
         FROM goods_category
         WHERE category_level = #{level} AND
-        is_deleted = 0;
+        is_deleted = 0
+        ORDER BY category_rank;
     </select>
 
     <update id="updatePathById">

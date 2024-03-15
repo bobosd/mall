@@ -76,7 +76,7 @@
             lengthChange: false,
             paging: false,
             filter: false,
-            order: [1, 'desc'],
+            order: [1, 'asc'],
             language: dataTableLocale,
             ajax: {
                 url: "/admin/product-category/list",
@@ -135,8 +135,8 @@
                     if (eventDOM.closest("td").hasClass("td-function") || categoryLevel === 3) {
                         return;
                     }
-                    parentStack.push(parentId);
                     parentId = data.id;
+                    parentStack.push(parentId);
                     categoryLevel += 1;
                     renderCategoryTable();
                 });
@@ -175,7 +175,9 @@
     }
 
     function goBack() {
-        parentId = parentStack.pop();
+        parentStack.pop();
+        const lastElement = parentStack[parentStack.length - 1];
+        parentId = lastElement == null ? 0 : lastElement;
         categoryLevel -= 1;
         renderCategoryTable();
     }
@@ -257,8 +259,11 @@
             categoryRank: $("#input-rank-order").val(),
             categoryLevel: categoryLevel,
             parentId: parentId,
-            path: parentStack.join("."),
         }
+        const data = {
+            goodsCategory: category,
+            parentPath: parentStack.join(".")
+        };
 
         if (!validateCategoryForm(category)) {
             return;
@@ -268,10 +273,9 @@
         $.ajax({
             url: "/admin/product-category/save",
             method: "POST",
-            data: JSON.stringify(category),
+            data: JSON.stringify(data),
             contentType: "application/json",
             success: (res) => {
-                console.log(res);
                 if (res.code === 200) {
                     categoryModal.hide();
                     showCreateSuccessSwal();

@@ -65,7 +65,6 @@ public class GoodsService {
      * @return 将字符串中所有的Temp地址替换为正式地址
      */
     private String replaceTempUrl(String text) {
-        System.out.println(text);
         String tempUrlRegex =
                 "/goods/img/(" + goodsConfig.getUserTempFilePrefix() + "\\w+/)?\\w+" + goodsConfig.getImageSuffix();
         Pattern pattern = Pattern.compile(tempUrlRegex);
@@ -78,7 +77,6 @@ public class GoodsService {
             matcher.appendReplacement(stringBuilder, replacement);
         }
         matcher.appendTail(stringBuilder);
-        System.out.println(stringBuilder);
         return stringBuilder.toString();
     }
 
@@ -90,7 +88,7 @@ public class GoodsService {
                 String imageSuffix = goodsConfig.getImageSuffix();
                 if (file.toString().endsWith(imageSuffix)) {
                     Path fileName = file.getFileName();
-                    Files.move(file, goodsConfig.getFileStorePath().resolve(fileName));
+                    Files.move(file, goodsConfig.getGoodsFilePath().resolve(fileName));
                 } else {
                     Files.delete(file);
                 }
@@ -161,9 +159,9 @@ public class GoodsService {
     public Response<?> saveTempCoverImage(MultipartFile file, int userId) {
         Response<String> response = new Response<>();
         Path uploadDir = getUserTempDir(userId);
-        String filename = FileNameGenerator.generateFileName() + ".jpg";
+        String filename = generateImageFileName();
         try {
-            Path savedLocation = saveImage(uploadDir, filename, file);
+            Path savedLocation = saveFile(uploadDir, filename, file);
             String url = goodsConfig.getExposeUrl(savedLocation);
             response.setResponse(CommonResponse.SUCCESS);
             response.setData(url);
@@ -173,8 +171,29 @@ public class GoodsService {
         return response;
     }
 
+    /**
+     * 长传临时的商品介绍文件（创建时保存的）
+     *
+     * @param file      用户上传的文件
+     * @param userId    用户ID
+     * @return 对应的地址
+     */
+    public String saveTempDetailsFile(MultipartFile file, int userId) throws IOException {
+        Path uploadDir = getUserTempDir(userId);
+        String filename = FileNameGenerator.generateFileName() + goodsConfig.getUserTempFilePrefix();
+        Path savedLocation = saveFile(uploadDir, filename, file);
+        return goodsConfig.getExposeUrl(savedLocation);
+    }
+
+    public String saveDetailsFile(MultipartFile file, String goodsId) throws IOException {
+        Path uploadDir = goodsConfig.getGoodsFilePath();
+        String filename = generateImageFileName(goodsId);
+        Path savedLocation = saveFile(uploadDir, filename, file);
+        return goodsConfig.getExposeUrl(savedLocation);
+    }
+
     private Path getUserTempDir(int userId) {
-        Path uploadDirString = goodsConfig.getFileStorePath();
+        Path uploadDirString = goodsConfig.getGoodsFilePath();
         return Paths.get(uploadDirString + "/" + goodsConfig.getUserTempFileName(userId));
         //return: {config_path}/temp_{userid}
     }
@@ -193,37 +212,11 @@ public class GoodsService {
         }
     }
 
-    public Response<?> uploadGoodsDetailImage(MultipartFile image, Integer goodsId, int userId) {
-        Path uploadDir;
-        if (goodsId != null && goodsId != 0) {
-            uploadDir = getGoodsStoragePath();
-        } else {
-            uploadDir = getUserTempDir(userId);
-        }
-        String fileName = FileNameGenerator.generateFileName() + ".jpg";
-        Path imagePath = Paths.get(uploadDir + "/" + fileName);
-        try {
-            if (!Files.exists(uploadDir)) {
-                Files.createDirectories(uploadDir);
-            }
-            Files.write(imagePath, image.getBytes());
-            Response<String> response = new Response<>();
-            response.setResponse(CommonResponse.SUCCESS);
-            response.setData(goodsConfig.getUserTempFileName(userId) + fileName);
-            return response;
-        } catch (IOException e) {
-            return new Response<>(CommonResponse.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    private Path getGoodsStoragePath() {
-        return goodsConfig.getFileStorePath();
-    }
-
     public Response<?> list(Integer start, Integer limit, String categoryPath, Integer level) {
         if (start == null || limit == null) {
             return new Response<>(CommonResponse.INVALID_DATA);
         }
+
         List<Goods> goods;
         int totalCount;
         if (categoryPath == null && level == null) {
@@ -261,13 +254,13 @@ public class GoodsService {
         if (file != null) {
             //删除旧图片，保存新图片并且修改Goods对象值
             try {
-                Path uploadDir = goodsConfig.getFileStorePath();
+                Path uploadDir = goodsConfig.getGoodsFilePath();
                 Goods queryGoods = goodsDao.selectGoodsById(goods.getId());
                 String oldImageUrl = queryGoods.getGoodsCoverImg();
                 String oldFileName = getFileNameByUrl(oldImageUrl);
                 deleteGoodsImage(oldFileName);
-                String fileName = FileNameGenerator.generateFileName();
-                Path imagePath = saveImage(uploadDir, fileName, file);
+                String fileName = generateImageFileName();
+                Path imagePath = saveFile(uploadDir, fileName, file);
                 String goodsImageUrl = goodsConfig.getExposeUrl(imagePath);
                 goods.setGoodsCoverImg(goodsImageUrl);
             } catch (IOException e) {
@@ -288,7 +281,7 @@ public class GoodsService {
         return temp[temp.length - 1];
     }
 
-    private Path saveImage(Path directory, String fileName, MultipartFile file) throws IOException{
+    private Path saveFile(Path directory, String fileName, MultipartFile file) throws IOException{
         if (!Files.exists(directory)) {
             Files.createDirectories(directory);
         }
@@ -298,7 +291,24 @@ public class GoodsService {
     }
 
     private void deleteGoodsImage(String fileName) throws IOException {
-        Path storePath = goodsConfig.getFileStorePath();
+        Path storePath = goodsConfig.getGoodsFilePath();
         Files.delete(Path.of(storePath + File.separator + fileName));
+    }
+
+    /**
+     * @param prefix （可选）前缀
+     * 随即生成带有后缀的文件名
+     * @return 带有后缀的文件名
+     */
+    private String generateImageFileName(String prefix) {
+        String fileName = FileNameGenerator.generateFileName() + goodsConfig.getImageSuffix();
+        if (prefix != null) {
+            fileName = prefix + "_" + fileName;
+        }
+        return fileName;
+    }
+
+    private String generateImageFileName() {
+        return generateImageFileName(null);
     }
 }

@@ -15,6 +15,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
@@ -55,7 +56,7 @@ public class MallController {
 
     @GetMapping("/signup")
     public String signupPage() {
-        return "/mall/signup";
+        return "mall/signup";
     }
 
     @GetMapping("/login")
@@ -63,7 +64,7 @@ public class MallController {
         if (isAuthenticated()) {
             return "redirect:/";
         }
-        return "/mall/login";
+        return "mall/login";
     }
 
     private boolean isAuthenticated() {
@@ -76,6 +77,11 @@ public class MallController {
 
     @GetMapping("/test")
     public String testPage() {
-        return "/mall/test";
+        return "mall/test";
+    }
+
+    @GetMapping("/search")
+    public String searchPage(@RequestParam("keyWord") String keyWord) {
+        return "mall/product-search";
     }
 }

@@ -21,6 +21,8 @@
 </body>
 
 <script>
+    sidebarSetSelected($(".goods-management"));
+
     $(document).ready(() => {
         $(".btn-create").click(() => createGoods());
         $(".btn-upload-image").click(() => uploadCoverImage());
@@ -57,6 +59,9 @@
                         $(".img-product").prop("src", url);
                         prepareCropper(width, height);
                         $(".btn-upload-image").show();
+                        const buttonChange = $(".btn-change-image");
+                        buttonChange.addClass("button-gray");
+                        buttonChange.removeClass("button-blue");
                     } else {
                         $(".input-image").val("");
                         Swal.fire({
@@ -103,7 +108,6 @@
     }
 
     function uploadCoverImage() {
-        console.log("1");
         const btn = $(".btn-create");
         btn.addSpinner();
         cropper.getCroppedCanvas().toBlob((blob) => {
@@ -121,6 +125,9 @@
                         showChangeSavedSwal();
                         cropper.destroy();
                         $(".btn-upload-image").hide();
+                        const buttonChange = $(".btn-change-image");
+                        buttonChange.removeClass("button-gray");
+                        buttonChange.addClass("button-blue");
                         $(".img-product").attr("src", response.data);
                     }
                 },
@@ -170,8 +177,53 @@
             complete: () => btn.removeSpinner()
         });
     }
+
+    //CKEditor image uploader config
+    function customUploadAdapter(editor) {
+        editor.plugins.get("FileRepository").createUploadAdapter = (loader) => new UploadAdapter(loader);
+    }
+
+    ClassicEditor.create(document.querySelector("#editor"), {
+        extraPlugins: [customUploadAdapter]
+    }).then(e => editor = e);
+
+    class UploadAdapter {
+        constructor(loader) {
+            //CKEditor 5 instance
+            this.loader = loader;
+        }
+
+        upload() {
+            return this.loader.file.then(file => {
+                return new Promise((resolve, reject) => {
+                    const data = new FormData();
+                    data.append("file", file);
+                    $.ajax({
+                        url: "/admin/goods/temp/upload/details",
+                        method: "post",
+                        processData: false,
+                        contentType: false,
+                        data: data,
+                        success: (res) => {
+                            if (res.code === 200) {
+                                resolve({default: res.data});
+                            } else {
+                                showErrorAlert("error");
+                                reject();
+                            }
+                        },
+                        error: () => {
+                            showServerErrorSwal();
+                            reject();
+                        },
+                    });
+                });
+            })
+        }
+
+        abort() {
+            console.log("Abort");
+        }
+    }
 </script>
-
-<!--Load server saved data-->
-
 </html>

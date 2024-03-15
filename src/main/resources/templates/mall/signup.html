@@ -257,7 +257,7 @@
                             icon: "success",
                             showConfirmButton: true,
                             showDenyButton: false
-                        });
+                        }).then(() => window.location.replace("/"));
                         break;
                     case 400:
                         Swal.fire({

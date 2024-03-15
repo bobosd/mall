@@ -1,10 +1,19 @@
-<!--suppress HtmlFormInputWithoutLabel -->
+<!--suppress HtmlFormInputWithoutLabel, JSUnresolvedFunction -->
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title></title>
+    <style th:fragment="goods-form-style">
+        label {
+            font-size: 12px;
+            font-weight: bold;
+        }
+    </style>
+</head>
 <div th:fragment="goods-form">
     <div class="block-content">
         <div class="row">
-            <label th:text="#{product_categories} + ':'"></label>
+            <label th:text="#{product_categories}"></label>
             <div class="col-4">
                 <select id="slc-category-level-1"
                         class="select2"
@@ -29,25 +38,31 @@
 
         <div class="row">
             <div class="col-6">
+                <label for="input-goods-name" th:text="#{product.name}"></label>
                 <input class="form-control form-control-sm" id="input-goods-name" th:placeholder="#{product.name}">
             </div>
             <div class="col-6">
+                <label for="input-goods-intro" th:text="#{product.description}"></label>
                 <input class="form-control form-control-sm" id="input-goods-intro" th:placeholder="#{product.description}">
             </div>
         </div>
         <div class="row">
             <div class="col-4">
+                <label for="input-original-price" th:text="#{product.cost.price}"></label>
                 <input class="form-control form-control-sm" id="input-original-price" th:placeholder="#{product.cost.price}">
             </div>
             <div class="col-4">
+                <label for="input-selling-price" th:text="#{product.sale.price}"></label>
                 <input class="form-control form-control-sm" id="input-selling-price" th:placeholder="#{product.sale.price}">
             </div>
             <div class="col-4">
+                <label for="input-stock" th:text="#{stock}"></label>
                 <input class="form-control form-control-sm" id="input-stock" th:placeholder="#{stock}">
             </div>
         </div>
         <div class="row">
             <div class="col-12">
+                <label for="slc-goods-tag" th:text="#{product.tag}"></label>
                 <select id="slc-goods-tag" th:placeholder="#{product.tag}" multiple></select>
             </div>
         </div>
@@ -64,7 +79,7 @@
             <div><i class="fa-solid fa-box fa-4x"></i></div>
             <span th:text="#{upload.product.image} + '(150*150)'"></span>
         </div>
-        <input type="file" id="input-product-img" accept="image/png, image/gif, image/jpeg" hidden>
+        <input type="file" id="input-product-img" accept="image/png, image/gif, image/jpeg, image/webp" hidden>
         <div id="editor"></div>
         <div class="form-check form-switch">
             <label class="form-check-label" for="switch-on-sale" th:text="#{available.sale}"></label>
@@ -128,7 +143,6 @@
         }
 
         const processCategoryResult = (response) => {
-            console.log(response);
             if (response.code === 200) {
                 const options = response.data.map((c) => ({id: c.id, text: c.categoryName}));
                 return {results: options};
@@ -182,14 +196,6 @@
                 placeholder: "[[#{product.tag}]]",
             });
         }
-
-        function customUploadAdapter(editor) {
-            editor.plugins.get("FileRepository").createUploadAdapter = (loader) => new UploadAdapter(loader);
-        }
-
-        ClassicEditor.create(document.querySelector("#editor"), {
-            extraPlugins: [customUploadAdapter]
-        }).then(e => editor = e);
 
         function getLevel2Parent() {
             return $("#slc-category-level-1").val();
@@ -246,6 +252,7 @@
 
         function getSellingPrice() {
             let price = $("#input-selling-price").val();
+            price = price.replace(",", ".");
             const validator = new Validator(price);
             if (!validator.isNumeric()) {
                 return null;
@@ -256,6 +263,7 @@
 
         function getOriginalPrice() {
             let price = $("#input-original-price").val();
+            price = price.replace(",", ".");
             const validator = new Validator(price);
             if (!validator.isNumeric()) {
                 return null;
@@ -279,46 +287,6 @@
         }
 
         <!-- image upload adapter -->
-        class UploadAdapter {
-            constructor(loader) {
-                //CKEditor 5 instance
-                this.loader = loader;
-                console.log(loader);
-            }
-
-            upload() {
-                return this.loader.file.then(file => {
-                    return new Promise((resolve, reject) => {
-                        const data = new FormData();
-                        data.append("file", file);
-                        $.ajax({
-                            url: "/goods/temp/upload/cover-image",
-                            method: "post",
-                            processData: false,
-                            contentType: false,
-                            data: data,
-                            success: (res) => {
-                                console.log("uploaded", res);
-                                if (res.code === 200) {
-                                    resolve({default: "/admin/goods/img/" + res.data});
-                                } else {
-                                    showErrorAlert("error");
-                                    reject();
-                                }
-                            },
-                            error: () => {
-                                showServerErrorSwal();
-                                reject();
-                            },
-                        });
-                    });
-                })
-            }
-
-            abort() {
-                console.log("Abort");
-            }
-        }
 
         function validateForm() {
             let isValid = true;
@@ -346,7 +314,16 @@
             const src = $(".img-product").attr("src");
             if ((src == null || src.startsWith("blob")) && !isEditing) {
                 isValid = false;
-                $(".image-upload-container").setInvalid();
+                if (src == null) {
+                    $(".image-upload-container").setInvalid();
+                } else {
+                    Swal.fire({
+                        title: "[[#{warning.need.upload.image}]]",
+                        text: " ",
+                        showConfirmButton: true,
+                        icon: "warning"
+                    });
+                }
             }
 
             if (editor.getData().trim().length === 0) {

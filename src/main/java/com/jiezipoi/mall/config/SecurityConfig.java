@@ -55,7 +55,7 @@ public class SecurityConfig {
                         .requestMatchers(resourcePath).permitAll()
                         .anyRequest().authenticated());
         http.addFilterBefore(jwtAuthenticationTokenFilter, UsernamePasswordAuthenticationFilter.class);
-        http.exceptionHandling((config) -> config.authenticationEntryPoint(authenticationEntryPoint));
+        http.exceptionHandling(config -> config.authenticationEntryPoint(authenticationEntryPoint));
         return http.build();
     }
 

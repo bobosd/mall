@@ -37,9 +37,11 @@ public class GoodsCategoryService {
                 request.getParentId() == null) {
             return new Response<>(CommonResponse.INVALID_DATA);
         }
-
+        String orderDir = request.getOrder()
+                .get(0)
+                .getDir();
         List<GoodsCategory> goodsCategories = goodsCategoryDao.findGoodsCategoryList(
-                request.getCategoryLevel(),request.getParentId());
+                request.getCategoryLevel(), request.getParentId(), orderDir);
         DataTableResult dataTableResult = new DataTableResult(goodsCategories, goodsCategories.size());
         Response<DataTableResult> response = new Response<>(CommonResponse.SUCCESS);
         response.setData(dataTableResult);
@@ -61,12 +63,13 @@ public class GoodsCategoryService {
                 category.getCategoryRank() == null) {
             return new Response<>(CommonResponse.INVALID_DATA);
         }
-        GoodsCategory temp = goodsCategoryDao.selectByLevelAndName(category.getCategoryLevel(), category.getCategoryName());
+        GoodsCategory temp = goodsCategoryDao.selectByParentIdAndName(category.getParentId(), category.getCategoryName());
         if (temp != null) {
             return new Response<>(CommonResponse.DATA_ALREADY_EXISTS);
         }
         category.setCreateUser((int) session.getAttribute("userId"));
-        long id = goodsCategoryDao.insertSelective(category);
+        goodsCategoryDao.insertSelective(category);
+        long id = category.getId();
         String path;
         if (parentPath != null && parentPath.isBlank()) {
             path = Long.toString(id);
@@ -88,7 +91,7 @@ public class GoodsCategoryService {
         if (temp == null) {
             return new Response<>(CommonResponse.DATA_NOT_EXIST);
         }
-        temp = goodsCategoryDao.selectByLevelAndName(category.getCategoryLevel(), category.getCategoryName());
+        temp = goodsCategoryDao.selectByParentIdAndName(category.getParentId(), category.getCategoryName());
         if (temp != null && !temp.getId().equals(category.getId())) {
             return new Response<>(CommonResponse.DATA_ALREADY_EXISTS);
         }
