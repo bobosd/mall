@@ -5,16 +5,16 @@
     <nav>
         <div class="navbar">
             <div class="navbar-lft">
-                <a href="/admin/login">Panel admin</a>
+                <img class="navbar-mall-icon" src="/assets/img/poi_128x128.png" alt="mall icon">
+                <a class="navbar-admin-panel-button" href="/admin/login">Panel admin</a>
             </div>
             <div class="navbar-center">
                 <div class="search-box">
-                    <input type="search" placeholder="Search">
+                    <input class="search-input" type="search" placeholder="Buscar">
                     <div class="search-button"><i class="fa-solid fa-magnifying-glass"></i></div>
                 </div>
             </div>
             <div class="navbar-rgt">
-
                 <div class="unlogged-options-container">
                     <a href="/login"><span>Login</span></a>
                     <a href="/signup"><span>Registrar</span></a>
@@ -29,6 +29,10 @@
     </nav>
 
     <script>
+        $(".navbar-mall-icon").click(() => {
+            window.location.href = "/";
+        });
+
         const MALL_USER_ITEM_NAME = "mallUser";
         const refreshToken = getCookie("refresh_token");
         if (refreshToken !== null) {
@@ -71,6 +75,33 @@
                 }
             });
         }
+
+        //search function
+        $(".search-input").on("keydown", (e) => {
+            if (e.keyCode === 13) {
+                const keyWord = e.target.value;
+                searchGoods(keyWord);
+            }
+        });
+
+        $(".search-button").click(() => {
+            const keyWord = $(".search-input").val();
+            searchGoods(keyWord);
+        });
+
+        function searchGoods(keyWord) {
+            keyWord = keyWord.trim();
+            window.location.href = "/search?keyWord=" + keyWord;
+        }
+
+        (function () {
+            const url = window.location;
+            const params = new URLSearchParams(url.search);
+            const keyWord = params.get("keyWord");
+            if (keyWord != null) {
+                $(".search-input").val(keyWord);
+            }
+        })();
     </script>
 </div>
 </html>

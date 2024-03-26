@@ -25,6 +25,8 @@ public interface GoodsCategoryDao {
                                               @Param("parentId") Long parentId,
                                               @Param("orderDir") String orderDir);
 
+    List<GoodsCategory> selectAllCategory();
+
     int getTotalGoodsCategories(@Param("categoryLevel") Integer categoryLevel,
                                 @Param("parentId") Long parentId);
 

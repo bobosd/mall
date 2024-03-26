@@ -3,7 +3,9 @@ package com.jiezipoi.mall.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jiezipoi.mall.entity.Goods;
+import com.jiezipoi.mall.entity.GoodsBrand;
 import com.jiezipoi.mall.entity.GoodsCategory;
+import com.jiezipoi.mall.service.GoodsBrandService;
 import com.jiezipoi.mall.service.GoodsCategoryService;
 import com.jiezipoi.mall.service.GoodsService;
 import com.jiezipoi.mall.utils.CommonResponse;
@@ -14,7 +16,6 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
@@ -23,10 +24,15 @@ import java.util.List;
 @Controller
 @RequestMapping("/admin")
 public class GoodsController {
-    @Resource
-    private GoodsService goodsService;
-    @Resource
-    private GoodsCategoryService categoryService;
+    private final GoodsService goodsService;
+    private final GoodsCategoryService categoryService;
+    private final GoodsBrandService goodsBrandService;
+
+    public GoodsController(GoodsService goodsService, GoodsCategoryService categoryService, GoodsBrandService goodsBrandService) {
+        this.goodsService = goodsService;
+        this.categoryService = categoryService;
+        this.goodsBrandService = goodsBrandService;
+    }
 
     @GetMapping("/goods")
     public String goodsPage() {
@@ -53,6 +59,8 @@ public class GoodsController {
             Goods goods = (Goods) response.getData();
             Long categoryId = goods.getGoodsCategoryId();
             List<GoodsCategory> categories = categoryService.getGoodsCategoryAndParent(categoryId);
+            GoodsBrand goodsBrand = goodsBrandService.getGoodsBrandById(goods.getGoodsBrandId());
+            modelMap.addAttribute("goodsBrand", goodsBrand);
             modelMap.addAttribute("goods", goods);
             modelMap.addAttribute("category", categories);
             return "admin/goods-edit";
@@ -67,9 +75,14 @@ public class GoodsController {
                                    @RequestParam(value = "coverImage", required = false) MultipartFile file) {
         try {
             Goods goods = new ObjectMapper().readValue(goodsJsonString, Goods.class);
-            return goodsService.updateGoods(goods, file);
+            goodsService.updateGoods(goods, file);
+            return new Response<>(CommonResponse.SUCCESS);
         } catch (JsonProcessingException e) {
+            e.printStackTrace();
             return new Response<>(CommonResponse.INVALID_DATA);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return new Response<>(CommonResponse.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -77,12 +90,20 @@ public class GoodsController {
     @ResponseBody
     public Response<?> createGoods(@RequestBody Goods goods, HttpSession session) {
         int userId = (int) session.getAttribute("userId");
-        return goodsService.createGoods(goods, userId);
+        try {
+            goodsService.createGoods(goods, userId);
+            return new Response<>(CommonResponse.SUCCESS);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return new Response<>(CommonResponse.INTERNAL_SERVER_ERROR);
+        } catch (IllegalArgumentException e) {
+            return new Response<>(CommonResponse.INVALID_DATA);
+        }
     }
 
     @PostMapping("/goods/saveTempGoods")
     @ResponseBody
-    public Response<?> saveTempGoods(Goods goods, HttpSession session) {
+    public Response<?> saveTempGoods(@RequestBody Goods goods, HttpSession session) {
         int userId = (int) session.getAttribute("userId");
         return goodsService.saveTempGoods(goods, userId);
     }

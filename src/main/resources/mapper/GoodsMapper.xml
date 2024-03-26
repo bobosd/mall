@@ -3,9 +3,10 @@
 
 <mapper namespace="com.jiezipoi.mall.dao.GoodsDao">
     <resultMap id="BaseResultMap" type="com.jiezipoi.mall.entity.Goods">
-        <id column="id" jdbcType="BIGINT" property="id"/>
+        <id column="goods_id" jdbcType="BIGINT" property="goodsId"/>
         <result column="goods_name" jdbcType="VARCHAR" property="goodsName"/>
         <result column="goods_intro" jdbcType="VARCHAR" property="goodsIntro"/>
+        <result column="goods_brand_id" jdbcType="BIGINT" property="goodsBrandId"/>
         <result column="goods_category_id" jdbcType="BIGINT" property="goodsCategoryId"/>
         <result column="goods_cover_img" jdbcType="VARCHAR" property="goodsCoverImg"/>
         <result column="goods_carousel" jdbcType="VARCHAR" property="goodsCarousel"/>
@@ -13,32 +14,42 @@
         <result column="original_price" jdbcType="DECIMAL" property="originalPrice"/>
         <result column="selling_price" jdbcType="DECIMAL" property="sellingPrice"/>
         <result column="stock_num" jdbcType="INTEGER" property="stockNum"/>
-        <result column="tag" jdbcType="VARCHAR" property="tag"/>
         <result column="goods_sell_status" jdbcType="TINYINT" property="goodsSellStatus"/>
         <result column="create_user" jdbcType="INTEGER" property="createUser"/>
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
         <result column="update_user" jdbcType="INTEGER" property="updateUser"/>
         <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
     </resultMap>
+    
+    <resultMap id="GoodsResultWithTags" type="com.jiezipoi.mall.entity.Goods" extends="BaseResultMap">
+        <collection property="tag" ofType="com.jiezipoi.mall.entity.GoodsTag"
+                    resultMap="com.jiezipoi.mall.dao.GoodsTagDao.GoodsTagResultMap">
+            <id property="goodsTagId" column="goods_tag_id"/>
+            <result property="tagName" column="tag_name"/>
+        </collection>
+    </resultMap>
 
     <sql id="base_column_list">
-        goods_info.id, goods_info.goods_name, goods_info.goods_intro, goods_info.goods_category_id, goods_info.goods_cover_img,
+        goods_info.goods_id, goods_info.goods_name, goods_info.goods_intro, goods_info.goods_brand_id, goods_info.goods_category_id, goods_info.goods_cover_img,
         goods_info.goods_carousel, goods_info.goods_detail_content, goods_info.original_price, goods_info.selling_price,
-        goods_info.stock_num, goods_info.tag, goods_info.goods_sell_status, goods_info.create_user, goods_info.create_time,
+        goods_info.stock_num, goods_info.goods_sell_status, goods_info.create_user, goods_info.create_time,
         goods_info.update_user, goods_info.update_time
     </sql>
 
-    <insert id="insertSelective" parameterType="com.jiezipoi.mall.entity.Goods">
+    <insert id="insertSelective" parameterType="com.jiezipoi.mall.entity.Goods" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO goods_info
         <trim prefix="(" suffix=")" suffixOverrides=",">
-            <if test="id != null">
-                id,
+            <if test="goodsId != null">
+                goods_id,
             </if>
             <if test="goodsName != null and goodsName != ''">
                 goods_name,
             </if>
             <if test="goodsIntro != null and goodsIntro != ''">
                 goods_intro,
+            </if>
+            <if test="goodsBrandId != null">
+                goods_brand_id,
             </if>
             <if test="goodsCategoryId != null">
                 goods_category_id,
@@ -61,9 +72,6 @@
             <if test="stockNum != null">
                 stock_num,
             </if>
-            <if test="tag != null and tag != ''">
-                tag,
-            </if>
             <if test="goodsSellStatus != null">
                 goods_sell_status,
             </if>
@@ -82,14 +90,17 @@
         </trim>
 
         <trim prefix="VALUES (" suffix=")" suffixOverrides=",">
-            <if test="id != null">
-                #{id,jdbcType=BIGINT},
+            <if test="goodsId != null">
+                #{goodsId,jdbcType=BIGINT},
             </if>
             <if test="goodsName != null and goodsName != ''">
                 #{goodsName,jdbcType=VARCHAR},
             </if>
             <if test="goodsIntro != null and goodsIntro != ''">
                 #{goodsIntro,jdbcType=VARCHAR},
+            </if>
+            <if test="goodsBrandId != null">
+                #{goodsBrandId,jdbcType=BIGINT},
             </if>
             <if test="goodsCategoryId != null">
                 #{goodsCategoryId,jdbcType=BIGINT},
@@ -112,9 +123,6 @@
             <if test="stockNum != null">
                 #{stockNum,jdbcType=INTEGER},
             </if>
-            <if test="tag != null and tag != ''">
-                #{tag,jdbcType=VARCHAR},
-            </if>
             <if test="goodsSellStatus != null">
                 #{goodsSellStatus,jdbcType=TINYINT},
             </if>
@@ -133,11 +141,11 @@
         </trim>
     </insert>
 
-    <select id="list" resultMap="BaseResultMap">
+    <select id="list" resultMap="GoodsResultWithTags">
         SELECT
         <include refid="base_column_list"/>
         FROM goods_info
-        LIMIT #{start}, #{limit}
+        LIMIT #{start}, #{limit};
     </select>
 
     <select id="getGoodsCount" resultType="int">
@@ -162,10 +170,12 @@
             gc.path = #{path,jdbcType=VARCHAR};
     </select>
 
-    <select id="selectGoodsById" resultMap="BaseResultMap">
-        SELECT <include refid="base_column_list"/>
+    <select id="selectGoodsById" resultMap="GoodsResultWithTags">
+        SELECT goods_info.*, goods_has_tag.*, goods_tag.*
         FROM goods_info
-        WHERE id = #{goodsId,jdbcType=BIGINT}
+        LEFT JOIN goods_has_tag ON goods_info.goods_id = goods_has_tag.goods_id
+        LEFT JOIN goods_tag ON goods_has_tag.tag_id = goods_tag.goods_tag_id
+        WHERE goods_info.goods_id = #{goodsId,jdbcType=BIGINT}
     </select>
 
     <update id="updateByPrimaryKeySelective" parameterType="com.jiezipoi.mall.entity.Goods">
@@ -176,6 +186,9 @@
             </if>
             <if test="goodsIntro != null">
                 goods_intro = #{goodsIntro,jdbcType=VARCHAR},
+            </if>
+            <if test="goodsBrandId != null">
+                goods_brand_id = #{goodsBrandId,jdbcType=BIGINT},
             </if>
             <if test="goodsCategoryId != null">
                 goods_category_id = #{goodsCategoryId,jdbcType=BIGINT},
@@ -198,9 +211,6 @@
             <if test="stockNum != null">
                 stock_num = #{stockNum,jdbcType=INTEGER},
             </if>
-            <if test="tag != null">
-                tag = #{tag,jdbcType=VARCHAR},
-            </if>
             <if test="goodsSellStatus != null">
                 goods_sell_status = #{goodsSellStatus,jdbcType=BOOLEAN},
             </if>
@@ -217,17 +227,17 @@
                 update_time = #{updateTime,jdbcType=TIMESTAMP},
             </if>
         </set>
-        WHERE id = #{id,jdbcType=BIGINT}
+        WHERE goods_id = #{goodsId,jdbcType=BIGINT}
     </update>
 
     <select id="selectGoodsByIds" resultMap="BaseResultMap">
         SELECT <include refid="base_column_list"/>
         FROM goods_info
-        WHERE id IN
+        WHERE goods_id IN
         <foreach collection="ids" item="id" open="(" separator="," close=")">
             #{id}
         </foreach>
-        ORDER BY FIELD(id, <foreach collection="ids" item="goods_id" separator=",">
+        ORDER BY FIELD(goods_id, <foreach collection="ids" item="goods_id" separator=",">
         #{goods_id}
     </foreach>)
     </select>

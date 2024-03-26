@@ -79,6 +79,7 @@
     }
 
     function initSelect2() {
+
         const processCategoryResult = (response) => {
             if (response.code === 200) {
                 const options = response.data.map((c) => ({id: c.id, text: c.categoryName, path: c.path}));
@@ -139,6 +140,7 @@
 
     function initDatatable() { //TODO: category select2的搜索和DataTable的搜索
         table = $("#table").DataTable({
+            pageLength: 25,
             autoWidth: false,
             processing: true,
             serverSide: true,
@@ -167,7 +169,7 @@
             },
             columns: [
                 {
-                    data: "id",
+                    data: "goodsId",
                 },
                 {
                     data: "goodsName"
@@ -184,7 +186,7 @@
                 }
             ],
             createdRow: (row, goods) => {
-                $(row).click(() => openGoodsEditPage(goods.id));
+                $(row).click(() => openGoodsEditPage(goods.goodsId));
             }
         });
     }

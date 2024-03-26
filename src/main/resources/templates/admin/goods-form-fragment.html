@@ -13,26 +13,32 @@
 <div th:fragment="goods-form">
     <div class="block-content">
         <div class="row">
-            <label th:text="#{product_categories}"></label>
-            <div class="col-4">
+            <div class="col-3">
+                <label th:text="#{product_categories}"></label>
                 <select id="slc-category-level-1"
                         class="select2"
                         th:lang="${#locale.toString() == 'zh_CN' ? 'zh-CN' : #locale.getCountry()}">
                 </select>
             </div>
-            <div class="col-4">
+            <div class="col-3">
+                <label></label>
                 <select id="slc-category-level-2"
                         class="select2"
                         th:lang="${#locale.toString() == 'zh_CN' ? 'zh-CN' : #locale.getCountry()}"
                         disabled>
                 </select>
             </div>
-            <div class="col-4">
+            <div class="col-3">
+                <label></label>
                 <select id="slc-category-level-3"
                         class="select2"
                         th:lang="${#locale.toString() == 'zh_CN' ? 'zh-CN' : #locale.getCountry()}"
                         disabled>
                 </select>
+            </div>
+            <div class="col-3">
+                <label for="slc-goods-brand" th:text="#{product.brand}"></label>
+                <select class="select2" id="slc-goods-brand" th:placeholder="#{product.brand}"></select>
             </div>
         </div>
 
@@ -45,6 +51,7 @@
                 <label for="input-goods-intro" th:text="#{product.description}"></label>
                 <input class="form-control form-control-sm" id="input-goods-intro" th:placeholder="#{product.description}">
             </div>
+
         </div>
         <div class="row">
             <div class="col-4">
@@ -155,6 +162,7 @@
             $("#slc-category-level-1").select2({
                 language: "es",
                 placeholder: "[[#{product.category.level1}]]",
+                minimumResultsForSearch: -1,
                 ajax: {
                     url: "/admin/product-category/listByLevelAndParent",
                     method: "POST",
@@ -166,6 +174,7 @@
 
             $("#slc-category-level-2").select2({
                 placeholder: "[[#{product.category.level2}]]",
+                minimumResultsForSearch: -1,
                 ajax: {
                     url: "/admin/product-category/listByLevelAndParent",
                     method: "POST",
@@ -177,6 +186,7 @@
 
             $("#slc-category-level-3").select2({
                 placeholder: "[[#{product.category.level3}]]",
+                minimumResultsForSearch: -1,
                 ajax: {
                     url: "/admin/product-category/listByLevelAndParent",
                     method: "POST",
@@ -194,6 +204,34 @@
                     },
                 },
                 placeholder: "[[#{product.tag}]]",
+            });
+
+            $("#slc-goods-brand").select2({
+                placeholder: "[[#{product.brand}]]",
+                width: "100%",
+                minimumInputLength: 1,
+                dataType: "json",
+                ajax: {
+                    url: "/admin/goods/brand/search-containing",
+                    async: false,
+                    method: "POST",
+                    delay: 100,
+                    dataType: "json",
+                    data: (param) => {
+                        return {search: param.term}
+                    },
+                    processResults: (res) => {
+                        if (res.code === 200) {
+                            const options = res.data.map((brand) => ({
+                                id: brand.goodsBrandId,
+                                text: brand.goodsBrandName
+                            }));
+                            return {results: options};
+                        } else {
+                            return {results: []};
+                        }
+                    }
+                }
             });
         }
 
@@ -216,19 +254,27 @@
 
         function collectFormData() {
             return {
-                id: getGoodsId(),
+                goodsId: getGoodsId(),
                 goodsName: $("#input-goods-name").val(),
                 goodsIntro: $("#input-goods-intro").val(),
+                goodsBrandId: $("#slc-goods-brand").val(),
+                goodsBrand: $("#input-goods-brand").val(),
                 goodsCategoryId: getSelectedCategoryId(),
                 goodsCoverImg: getCoverImgSrc(),
-                //goodsCarousel
                 goodsDetailContent: editor.getData(),
                 originalPrice: getOriginalPrice(),
                 sellingPrice: getSellingPrice(),
                 stockNum: getStockNum(),
-                tag: null, //$("#slc-goods-tag").val(),
+                tag: getTags(),
                 goodsSellStatus: $("#switch-on-sale").prop("checked"),
             };
+        }
+
+        function getTags() {
+            const tagArray = $("#slc-goods-tag").select2('data');
+            return tagArray.map((option) => {
+                return {goodsTagId: null, tagName: option.text};
+            });
         }
 
         function getCoverImgSrc() {
@@ -354,6 +400,7 @@
     <script th:inline="javascript" th:charset="UTF-8">
         const goods = [[${goods}]];
         const category = [[${category}]];
+        const goodsBrand = [[${goodsBrand}]];
         $(document).ready(() => loadSavedData());
 
         function loadSavedData() {
@@ -364,7 +411,7 @@
             const categorySelects = [$("#slc-category-level-1"), $("#slc-category-level-2"), $("#slc-category-level-3")];
 
             if (category != null) {
-                category.reverse(); //the category array is starting by secondary level, but at parent level change will call clear event
+                category.reverse();
                 category.forEach((c) => {
                     const {id, categoryLevel, categoryName} = c;
                     const select = categorySelects[categoryLevel - 1];
@@ -374,10 +421,16 @@
                 });
             }
 
+            if (goodsBrand != null) {
+                const brandOption = new Option(goodsBrand.goodsBrandName, goodsBrand.goodsBrandId, true, true);
+                $("#slc-goods-brand").append(brandOption).trigger("change");
+            }
+
             //input form
             const {
                 goodsName,
                 goodsIntro,
+                goodsBrandId,
                 goodsCoverImg,
                 originalPrice,
                 sellingPrice,
@@ -388,6 +441,7 @@
             } = goods;
             $("#input-goods-name").val(goodsName);
             $("#input-goods-intro").val(goodsIntro);
+            $("#input-goods-brand").val(goodsBrandId);
             $("#input-original-price").val(originalPrice);
             $("#input-selling-price").val(sellingPrice);
             $("#input-stock").val(stockNum);
@@ -399,6 +453,11 @@
                 $(".img-product").attr("src", goodsCoverImg);
                 $(".btn-upload-image").hide();
             }
+            tag.forEach((t) => {
+                const option = new Option(t.tagName, t.goodsTagId, true, true);
+                $("#slc-goods-tag").append(option);
+            });
+            $("#slc-goods-tag").trigger("change");
         }
     </script>
 </div>

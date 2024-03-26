@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jiezipoi.mall.dao.GoodsBrandDao">
+    <resultMap id="BaseResultMap" type="com.jiezipoi.mall.entity.GoodsBrand">
+        <id column="goods_brand_id" property="goodsBrandId" jdbcType="BIGINT"/>
+        <result column="goods_brand_name" property="goodsBrandName" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <select id="selectGoodsBrandById" resultMap="BaseResultMap">
+        SELECT *
+        FROM goods_brand
+        WHERE goods_brand_id = #{brandId,jdbcType=BIGINT};
+    </select>
+
+    <select id="findAllGoodsBrand" resultMap="BaseResultMap">
+        SELECT *
+        FROM goods_brand
+        <if test="keyWord != null and keyWord != ''">
+            WHERE goods_brand_name LIKE #{keyWord,jdbcType=VARCHAR}
+        </if>
+        LIMIT #{start,jdbcType=INTEGER}, #{limit,jdbcType=INTEGER}
+    </select>
+
+    <select id="findByGoodsNameContaining" resultMap="BaseResultMap">
+        <bind name="likeKeyword" value="'%'+keyword+'%'"/>
+        SELECT *
+        FROM goods_brand
+        WHERE goods_brand_name LIKE #{likeKeyword}
+    </select>
+
+    <insert id="insertGoodsBrand">
+        INSERT INTO goods_brand
+        VALUES (NULL, #{brandName,jdbcType=VARCHAR});
+    </insert>
+
+    <update id="updateGoodsBrandById">
+        UPDATE goods_brand
+        SET goods_brand_name = #{brandName,jdbcType=VARCHAR}
+        WHERE goods_brand_id = #{brandId,jdbcType=BIGINT}
+    </update>
+
+    <delete id="deleteGoodsBrandById">
+        DELETE FROM goods_brand
+        WHERE goods_brand_id = #{brandId,jdbcType=BIGINT}
+    </delete>
+
+    <select id="selectGoodsBrandCount" resultType="int">
+        SELECT COUNT(goods_brand_id)
+        FROM goods_brand;
+    </select>
+
+    <select id="selectGoodsBrandByName" resultMap="BaseResultMap">
+        SELECT *
+        FROM goods_brand
+        WHERE goods_brand_name = #{brandName,jdbcType=VARCHAR}
+    </select>
+
+    <select id="countAssociatedGoodsByBrandId" resultType="int">
+        SELECT COUNT(goods_id)
+        FROM goods_info
+        WHERE goods_brand_id = #{goodsBrandId,jdbcType=BIGINT};
+    </select>
+</mapper>

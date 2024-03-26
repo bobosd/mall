@@ -4,9 +4,10 @@ nav {
 }
 
 .navbar {
+    padding: 0 20px;
     height: 80px;
     margin: 0 auto;
-    max-width: 1278px;
+    max-width: 1500px;
     overflow: hidden;
     display: flex;
     justify-content: space-between;
@@ -28,6 +29,27 @@ nav a:hover {
     background-color: #d9d9d9;
     text-decoration: none;
     color: #000000;
+}
+
+.navbar-lft {
+    display: flex;
+    align-items: center;
+}
+
+.navbar-lft .navbar-mall-icon {
+    height: 65px;
+    margin-right: 20px;
+    cursor: pointer;
+}
+
+.navbar-lft .navbar-admin-panel-button {
+    font-size: 15px;
+    background-color: #d9d9d9;
+}
+
+.navbar-admin-panel-button:hover {
+    background-color: #fc830a;
+    color: #ffffff;
 }
 
 .navbar-center {

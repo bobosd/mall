@@ -254,4 +254,10 @@
         SET path = #{path,jdbcType=VARCHAR}
         WHERE id = #{id,jdbcType=BIGINT}
     </update>
+
+    <select id="selectAllCategory" resultMap="BaseResultMap">
+        SELECT *
+        FROM goods_category
+        WHERE is_deleted = 0;
+    </select>
 </mapper>

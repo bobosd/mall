@@ -60,7 +60,7 @@
     });
 
     function getGoodsId() {
-        return [[${goods.getId()}]];
+        return [[${goods.getGoodsId()}]];
     }
 
     function saveChanges() {
@@ -94,8 +94,9 @@
                     if (cropper != null) {
                         cropper.destroy();
                     }
-                    const goods = response.data;
-                    $(".img-product").attr("src", goods.goodsCoverImg);
+                    if (goods.goodsCoverImg != null) {
+                        $(".img-product").attr("src", goods.goodsCoverImg);
+                    }
                 } else {
                     Swal.fire({
                         title: response.message,
@@ -152,10 +153,6 @@
                     });
                 });
             })
-        }
-
-        abort() {
-            console.log("Abort");
         }
     }
 </script>

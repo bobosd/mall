@@ -5,11 +5,13 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class Goods implements Serializable {
-    private Long id;
+    private Long goodsId;
     private String goodsName;
     private String goodsIntro;
+    private Long goodsBrandId;
     private Long goodsCategoryId;
     private String goodsCoverImg;
     private String goodsCarousel;
@@ -17,7 +19,7 @@ public class Goods implements Serializable {
     private BigDecimal originalPrice;
     private BigDecimal sellingPrice;
     private Integer stockNum;
-    private String tag;
+    private List<GoodsTag> tag;
     private Boolean goodsSellStatus;
     private Integer createUser;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
@@ -26,12 +28,12 @@ public class Goods implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime updateTime;
 
-    public Long getId() {
-        return id;
+    public Long getGoodsId() {
+        return goodsId;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setGoodsId(Long goodsId) {
+        this.goodsId = goodsId;
     }
 
     public String getGoodsName() {
@@ -48,6 +50,14 @@ public class Goods implements Serializable {
 
     public void setGoodsIntro(String goodsIntro) {
         this.goodsIntro = goodsIntro == null ? null : goodsIntro.trim();
+    }
+
+    public Long getGoodsBrandId() {
+        return goodsBrandId;
+    }
+
+    public void setGoodsBrandId(Long goodsBrand) {
+        this.goodsBrandId = goodsBrand;
     }
 
     public Long getGoodsCategoryId() {
@@ -106,11 +116,11 @@ public class Goods implements Serializable {
         this.stockNum = stockNum;
     }
 
-    public String getTag() {
+    public List<GoodsTag> getTag() {
         return tag;
     }
 
-    public void setTag(String tag) {
+    public void setTag(List<GoodsTag> tag) {
         this.tag = tag;
     }
 
@@ -157,8 +167,9 @@ public class Goods implements Serializable {
     @Override
     public String toString() {
         return "Goods{" +
-                "id=" + id +
+                "id=" + goodsId +
                 ", goodsName='" + goodsName + '\'' +
+                ", brand='" + goodsBrandId + '\'' +
                 ", goodsIntro='" + goodsIntro + '\'' +
                 ", goodsCategoryId=" + goodsCategoryId +
                 ", goodsCoverImg='" + goodsCoverImg + '\'' +

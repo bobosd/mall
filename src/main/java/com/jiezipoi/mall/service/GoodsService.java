@@ -4,11 +4,13 @@ import com.jiezipoi.mall.config.GoodsConfig;
 import com.jiezipoi.mall.dao.GoodsCategoryDao;
 import com.jiezipoi.mall.dao.GoodsDao;
 import com.jiezipoi.mall.entity.Goods;
+import com.jiezipoi.mall.entity.GoodsTag;
 import com.jiezipoi.mall.utils.CommonResponse;
 import com.jiezipoi.mall.utils.FileNameGenerator;
 import com.jiezipoi.mall.utils.Response;
 import com.jiezipoi.mall.utils.dataTable.DataTableResult;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
@@ -23,40 +25,34 @@ public class GoodsService {
     final GoodsDao goodsDao;
     final GoodsCategoryDao goodsCategoryDao;
     final GoodsConfig goodsConfig;
+    final GoodsTagService goodsTagService;
 
-    public GoodsService(GoodsDao goodsDao, GoodsConfig goodsConfig, GoodsCategoryDao goodsCategoryDao) {
+    public GoodsService(GoodsDao goodsDao, GoodsConfig goodsConfig, GoodsCategoryDao goodsCategoryDao, GoodsTagService goodsTagService) {
         this.goodsCategoryDao = goodsCategoryDao;
         this.goodsDao = goodsDao;
         this.goodsConfig = goodsConfig;
+        this.goodsTagService = goodsTagService;
     }
 
     /**
      * 创建商品，把储存的临时数据和图片都转移到goods文件夹中
      * @param goods 商品
      * @param userId 用户ID
-     * @return 服务器响应
      */
-    public Response<?> createGoods(Goods goods, int userId) {
+    @Transactional
+    public void createGoods(Goods goods, int userId) throws IOException {
         if (!isValidGoods(goods)) {
-            return new Response<>(CommonResponse.INVALID_DATA);
+            throw new IllegalArgumentException();
         }
 
         String tempCoverImgUrl = goods.getGoodsCoverImg();
-        goods.setGoodsCoverImg(replaceTempUrl(tempCoverImgUrl));
+        goods.setGoodsCoverImg(convertTempUrlToPermanentUrl(tempCoverImgUrl));
         String tempDetail = goods.getGoodsDetailContent();
-        goods.setGoodsDetailContent(replaceTempUrl(tempDetail));
-
-        try {
-            walkUserTempFile(userId);
-        } catch (IOException e) {
-            return new Response<>(CommonResponse.INTERNAL_SERVER_ERROR);
-        }
-
-        if (goodsDao.insertSelective(goods) > 0) {
-            return new Response<>(CommonResponse.SUCCESS);
-        } else {
-            return new Response<>(CommonResponse.ERROR);
-        }
+        goods.setGoodsDetailContent(convertTempUrlToPermanentUrl(tempDetail));
+        walkUserTempFile(userId);
+        goodsDao.insertSelective(goods);
+        List<GoodsTag> tagWithId = goodsTagService.getOrCreateGoodsTagByTagName(goods.getTag());
+        goodsTagService.assignTagToGoodsInDB(goods.getGoodsId(), tagWithId);
     }
 
     /**
@@ -64,9 +60,11 @@ public class GoodsService {
      * @param text 含有Temp地址的字符串
      * @return 将字符串中所有的Temp地址替换为正式地址
      */
-    private String replaceTempUrl(String text) {
+    private String convertTempUrlToPermanentUrl(String text) {
         String tempUrlRegex =
-                "/goods/img/(" + goodsConfig.getUserTempFilePrefix() + "\\w+/)?\\w+" + goodsConfig.getImageSuffix();
+                goodsConfig.getExposeUrl() +
+                        "(" + goodsConfig.getUserTempFilePrefix() + "\\w+/)?\\w+" +
+                        goodsConfig.getImageSuffix();
         Pattern pattern = Pattern.compile(tempUrlRegex);
         Matcher matcher = pattern.matcher(text);
         StringBuilder stringBuilder = new StringBuilder();
@@ -145,6 +143,7 @@ public class GoodsService {
             outputStream.close();
             return new Response<>(CommonResponse.SUCCESS);
         } catch (IOException e) {
+            e.printStackTrace();
             return new Response<>(CommonResponse.ERROR);
         }
     }
@@ -200,14 +199,15 @@ public class GoodsService {
 
     public Goods getUserTempGoods(int userId) {
         Path userTempFile = getUserTempDir(userId);
-        String serializedGoodsDir = userTempFile + "/" + goodsConfig.getUserTempDataFilename();
-        if (!Files.exists(Paths.get(serializedGoodsDir))) {
+        Path serializedGoodsDir = userTempFile.resolve(goodsConfig.getUserTempDataFilename());
+        if (!Files.exists(serializedGoodsDir)) {
             return null;
         }
-        try (FileInputStream fileInputStream = new FileInputStream(serializedGoodsDir);
+        try (FileInputStream fileInputStream = new FileInputStream(serializedGoodsDir.toFile());
              ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream)) {
             return (Goods) objectInputStream.readObject();
         } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
             return null;
         }
     }
@@ -247,33 +247,25 @@ public class GoodsService {
         return response;
     }
 
-    public Response<?> updateGoods(Goods goods, MultipartFile file) {
+    @Transactional
+    public void updateGoods(Goods goods, MultipartFile file) throws IOException {
         if (!isValidForUpdate(goods)) {
-            return new Response<>(CommonResponse.INVALID_DATA);
+            throw new IllegalArgumentException();
         }
         if (file != null) {
             //删除旧图片，保存新图片并且修改Goods对象值
-            try {
-                Path uploadDir = goodsConfig.getGoodsFilePath();
-                Goods queryGoods = goodsDao.selectGoodsById(goods.getId());
-                String oldImageUrl = queryGoods.getGoodsCoverImg();
-                String oldFileName = getFileNameByUrl(oldImageUrl);
-                deleteGoodsImage(oldFileName);
-                String fileName = generateImageFileName();
-                Path imagePath = saveFile(uploadDir, fileName, file);
-                String goodsImageUrl = goodsConfig.getExposeUrl(imagePath);
-                goods.setGoodsCoverImg(goodsImageUrl);
-            } catch (IOException e) {
-                return new Response<>(CommonResponse.INTERNAL_SERVER_ERROR);
-            }
+            Path uploadDir = goodsConfig.getGoodsFilePath();
+            Goods queryGoods = goodsDao.selectGoodsById(goods.getGoodsId());
+            String oldImageUrl = queryGoods.getGoodsCoverImg();
+            String oldFileName = getFileNameByUrl(oldImageUrl);
+            deleteGoodsImage(oldFileName);
+            String fileName = generateImageFileName();
+            Path imagePath = saveFile(uploadDir, fileName, file);
+            String goodsImageUrl = goodsConfig.getExposeUrl(imagePath);
+            goods.setGoodsCoverImg(goodsImageUrl);
         }
-        if (goodsDao.updateByPrimaryKeySelective(goods) > 0) {
-            Response<Goods> response = new Response<>(CommonResponse.SUCCESS);
-            response.setData(goods);
-            return response;
-        } else {
-            return new Response<>(CommonResponse.DATA_NOT_EXIST);
-        }
+        goodsDao.updateByPrimaryKeySelective(goods);
+        goodsTagService.updateGoodsHasTag(goods.getGoodsId(), goods.getTag());
     }
 
     private String getFileNameByUrl(String url) {

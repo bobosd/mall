@@ -1,8 +1,10 @@
 package com.jiezipoi.mall.controller.vo;
 
 import com.jiezipoi.mall.entity.Goods;
+import com.jiezipoi.mall.entity.GoodsTag;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 public class IndexConfigGoodsVO {
     private Long goodsId;
@@ -10,14 +12,14 @@ public class IndexConfigGoodsVO {
     private String goodsIntro;
     private String goodsCoverImg;
     private BigDecimal sellingPrice;
-    private String tag;
+    private List<GoodsTag> tag;
 
     public IndexConfigGoodsVO() {
 
     }
 
     public IndexConfigGoodsVO(Goods goods) {
-        this.goodsId = goods.getId();
+        this.goodsId = goods.getGoodsId();
         this.goodsName = goods.getGoodsName();
         this.goodsIntro = goods.getGoodsIntro();
         this.goodsCoverImg = goods.getGoodsCoverImg();
@@ -65,11 +67,11 @@ public class IndexConfigGoodsVO {
         this.sellingPrice = sellingPrice;
     }
 
-    public String getTag() {
+    public List<GoodsTag> getTag() {
         return tag;
     }
 
-    public void setTag(String tag) {
+    public void setTag(List<GoodsTag> tag) {
         this.tag = tag;
     }
 }

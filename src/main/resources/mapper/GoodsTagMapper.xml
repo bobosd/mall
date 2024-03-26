@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--  xmlns="http://mybatis.org/schema/mybatis-mapper"  -->
+<mapper namespace="com.jiezipoi.mall.dao.GoodsTagDao">
+    <resultMap id="GoodsTagResultMap" type="com.jiezipoi.mall.entity.GoodsTag">
+        <id property="goodsTagId" column="goods_tag_id"/>
+        <result property="tagName" column="tag_name"/>
+    </resultMap>
+
+    <select id="selectGoodsTagById" resultMap="GoodsTagResultMap">
+        SELECT *
+        FROM goods_tag
+        WHERE goods_tag_id = #{id,jdbcType=BIGINT}
+    </select>
+
+    <insert id="insertTag" parameterType="com.jiezipoi.mall.entity.GoodsTag" useGeneratedKeys="true" keyProperty="goodsTagId">
+        INSERT INTO goods_tag
+        VALUES #{tagName,jdbcType=VARCHAR};
+    </insert>
+
+    <select id="selectGoodsTagByName" resultMap="GoodsTagResultMap">
+        SELECT *
+        FROM goods_tag
+        WHERE tag_name IN
+        <foreach collection="nameArray" item="tagName" open="(" separator="," close=")">
+            #{tagName,jdbcType=VARCHAR}
+        </foreach>
+    </select>
+
+    <insert id="insertBatch" parameterType="list" useGeneratedKeys="true" keyProperty="list.goodsTagId" keyColumn="goods_tag_id">
+        <foreach collection="list" item="tag">
+            INSERT INTO goods_tag (goods_tag_id, tag_name)
+            VALUES
+            (
+            NULL,
+            #{tag.tagName,jdbcType=VARCHAR}
+            );
+        </foreach>
+    </insert>
+
+    <insert id="insertGoodsHasTag">
+        INSERT INTO goods_has_tag
+        VALUES
+            <foreach collection="tagList" item="tag" separator=",">
+                (
+                #{goodsId,jdbcType=BIGINT},
+                #{tag.goodsTagId,jdbcType=BIGINT}
+                )
+            </foreach>
+    </insert>
+
+    <select id="selectGoodsHasTagByGoodsId" resultMap="GoodsTagResultMap">
+        SELECT goods_tag.*
+        FROM goods_tag
+        JOIN goods_has_tag ON goods_tag_id = goods_has_tag.tag_id
+        WHERE goods_id = #{goodsId,jdbcType=BIGINT};
+    </select>
+
+    <delete id="deleteGoodsHasTagByGoodsIdAndTagId">
+        DELETE FROM goods_has_tag
+        WHERE goods_id = #{goodsId,jdbcType=BIGINT} AND tag_id IN
+        <foreach collection="tagList" item="goodsTag" open="(" separator="," close=")">
+            #{goodsTag.goodsTagId,jdbcType=BIGINT}
+        </foreach>
+    </delete>
+</mapper>

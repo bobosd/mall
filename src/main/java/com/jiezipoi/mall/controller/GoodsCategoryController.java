@@ -54,8 +54,7 @@ public class GoodsCategoryController {
 
     @PostMapping("/product-category/listByLevelAndParent")
     @ResponseBody
-    public Response<?> listByLevelAndParent(Integer level, Long parentId, String search) {
-        System.out.println(search);
+    public Response<?> listByLevelAndParent(Integer level, Long parentId) {
         return service.selectByLevelAndParentIdsAndNumber(parentId, level);
     }
 }

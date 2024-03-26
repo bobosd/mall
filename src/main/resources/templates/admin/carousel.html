@@ -3,8 +3,8 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{admin/header::general-libraries-and-styles(~{::title}, ~{::link}, ~{this::head/script})}">
     <title id="page-title"></title>
-    <link th:include="~{admin/header::datatable}">
-    <link th:include="~{admin/header::cropper}">
+    <link th:insert="~{admin/header::datatable}">
+    <link th:insert="~{admin/header::cropper}">
     <link rel="stylesheet" href="/styles/admin/carousel.css">
 </head>
 <body>

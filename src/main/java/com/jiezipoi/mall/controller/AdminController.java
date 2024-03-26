@@ -106,4 +106,9 @@ public class AdminController {
         request.setAttribute("configType", configType);
         return "admin/index-config";
     }
+
+    @GetMapping("/goods-brand")
+    public String productBrandPage() {
+        return "admin/goods-brand";
+    }
 }

@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{admin/header::general-libraries-and-styles(~{::title}, ~{::link}, ~{::head/script})}">
+    <title id="page-title"></title>
+    <link rel="stylesheet" href="/styles/admin/goods-brand.css">
+    <link th:replace="~{admin/header::datatable}"/>
+</head>
+
+<body>
+<div th:replace="~{admin/sidebar::sidebar-fragment}"></div>
+<div class="main">
+    <div class="block">
+        <div class="block-title" th:text="#{product.brand}"></div>
+        <div class="block-content">
+            <div class="goods-brand-options">
+                <button class="button button-blue btn-add-brand" th:text="#{add}"></button>
+            </div>
+            <table>
+                <thead>
+                <tr>
+                    <th th:text="#{brand.name}"></th>
+                    <th></th>
+                    <th></th>
+                </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modal-brand" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" th:text="#{add}"></h5>
+                <span class="close-btn-dot" data-bs-dismiss="modal" data-backdrop="false"></span>
+            </div>
+            <div class="modal-body">
+                <label for="input-brand-name" th:text="#{brand.name}"></label>
+                <input class="form-control form-control-sm" id="input-brand-name" autocomplete="off">
+            </div>
+            <div class="modal-footer">
+                <button class="button button-gray btn-close-modal" th:text="#{cancel}"></button>
+                <button class="button button-blue btn-update-brand" th:text="#{save}"></button>
+                <button class="button button-blue btn-create-brand" th:text="#{create}"></button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const brandModal = new bootstrap.Modal(document.getElementById("modal-brand"));
+
+    $(document).ready(() => {
+        initListener();
+    });
+
+    datatable = $("table").DataTable({
+        pageLength: 25,
+        autoWidth: true,
+        processing: true,
+        serverSide: true,
+        searching: true,
+        filter: false,
+        language: dataTableLocale,
+        ajax: {
+            url: "/admin/goods/brand/list",
+            method: "POST",
+            contentType: "application/json",
+            data: (data) => {
+                return JSON.stringify(data);
+            },
+            dataFilter: (response) => {
+                response = JSON.parse(response);
+                const data = {}
+                if (response.code === 200) {
+                    data.recordsTotal = response.data.recordsTotal;
+                    data.recordsFiltered = response.data.recordsTotal;
+                    data.data = response.data.list;
+                }
+                return JSON.stringify(data);
+            },
+        },
+        columns: [
+            {
+                data: "goodsBrandName",
+                orderable: false
+            },
+            {
+                data: "goodsBrandId",
+                render: () => {
+                    return '<button class="button button-blue btn-edit-brand"><i class="fa-solid fa-edit"></i></button>';
+                },
+                orderable: false,
+                width: 1,
+                className: "td-function"
+            },
+            {
+                data: "goodsBrandId",
+                render: () => {
+                    return '<button class="button button-red btn-delete-brand"><i class="fa-solid fa-trash-can"></i></button>';
+                },
+                orderable: false,
+                width: 1,
+                className: "td-function"
+            },
+        ],
+        createdRow: (row, data) => {
+            $(row).find(".btn-edit-brand").click(() => showUpdateBrandModal(data));
+            $(row).find(".btn-delete-brand").click(() => showConfirmDeleteSwal(data.goodsBrandId));
+        }
+    });
+
+    function initListener() {
+        $(".btn-add-brand").click(() => showCreateBrandModal());
+        $(".btn-close-modal").click(() => hideBrandModal());
+        $(".btn-create-brand").click(() => createBrand());
+        $(".btn-update-brand").click(() => updateBrand());
+    }
+
+    function showCreateBrandModal() {
+        $("#modal-brand").attr("brand-id", null);
+        $(".btn-create-brand").show();
+        $(".btn-update-brand").hide();
+        brandModal.show();
+    }
+
+    function showUpdateBrandModal(brand) {
+        $("#input-brand-name").val(brand.goodsBrandName);
+        $("#modal-brand").attr("brand-id", brand.goodsBrandId);
+        $(".btn-update-brand").show();
+        $(".btn-create-brand").hide();
+        brandModal.show();
+    }
+
+    function hideBrandModal() {
+        $("#input-brand-name").val(null);
+        brandModal.hide();
+    }
+
+    function createBrand() {
+        if (brandValidationCheck() === false) {
+            return;
+        }
+        const createButton = $(".btn-create-brand");
+        createButton.addSpinner();
+        const brandName = $("#input-brand-name").val().trim();
+        $.ajax({
+            url: "/admin/goods/brand/create",
+            method: "POST",
+            data: {brandName: brandName},
+            success: (res) => {
+                if (res.code === 200) {
+                    showCreateSuccessSwal();
+                    hideBrandModal();
+                    datatable.draw();
+                } else if (res.code === 409) {
+                    Swal.fire({
+                        title: "[[#{warning.brand.duplicated}]]",
+                        text: " ",
+                        icon: "warning",
+                        showConfirmButton: true,
+                        position: "top"
+                    });
+                }
+            },
+            error: () => showServerErrorSwal(),
+            complete: () => createButton.removeSpinner()
+        });
+    }
+
+    function updateBrand() {
+        if (brandValidationCheck() === false) {
+            return;
+        }
+        const updateButton = $(".btn-update-brand");
+        updateButton.addSpinner();
+        const brandName = $("#input-brand-name").val().trim();
+        const id = $("#modal-brand").attr("brand-id");
+        $.ajax({
+            url: "/admin/goods/brand/update",
+            method: "POST",
+            data: {id: id ,brandName: brandName},
+            success: (res) => {
+                if (res.code === 200) {
+                    showChangeSavedSwal();
+                    hideBrandModal();
+                    datatable.draw();
+                } else if (res.code === 409) {
+                    Swal.fire({
+                        title: "[[#{warning.brand.duplicated}]]",
+                        text: " ",
+                        icon: "warning",
+                        showConfirmButton: true,
+                        position: "top"
+                    });
+                }
+            },
+            error: () => showServerErrorSwal(),
+            complete: () => updateButton.removeSpinner()
+        });
+    }
+
+    function brandValidationCheck() {
+        let isValid = true;
+        const nameInput = $("#input-brand-name");
+        const brandName = nameInput.val();
+
+        if (brandName == null || brandName.trim() === '') {
+            nameInput.setInvalid();
+            isValid = false;
+        }
+
+        return isValid;
+    }
+
+    function showConfirmDeleteSwal(id) {
+        Swal.fire({
+            title: "[[#{confirm.delete}]]",
+            text: " ",
+            icon: "warning",
+            showConfirmButton: true,
+            showDenyButton: true,
+        }).then((result) => {
+            if (result.isConfirmed) {
+                deleteBrand(id);
+            }
+        });
+    }
+
+    function deleteBrand(id) {
+        $.ajax({
+            url: "/admin/goods/brand/delete",
+            method: "POST",
+            data: {id: id},
+            success: (res) => {
+                if (res.code === 200) {
+                    showDeleteSuccessSwal();
+                    datatable.draw();
+                } else if (res.code === 409) {
+                    Swal.fire({
+                        title: "[[#{brand.has.associated.goods}]]",
+                        text: " ",
+                        icon: "warning",
+                        showConfirmButton: true,
+                        showDenyButton: false,
+                    });
+                }
+            },
+            error: () => showServerErrorSwal(),
+            complete: () => updateButton.removeSpinner()
+        });
+    }
+
+    sidebarSetSelected($(".goods-brand"));
+</script>
+</body>
+</html>

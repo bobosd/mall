@@ -15,9 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -31,7 +29,8 @@ public class GoodsCategoryService {
     }
 
     public Response<?> getCategoriesPage(GoodsCategoryRequest request) {
-        if (request.getStart() == null ||
+        if (request == null ||
+                request.getStart() == null ||
                 request.getLength() == null ||
                 request.getCategoryLevel() == null ||
                 request.getParentId() == null) {

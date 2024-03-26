@@ -6,7 +6,7 @@ import org.apache.ibatis.annotations.Param;
 import java.util.List;
 
 public interface GoodsDao {
-    int insertSelective(Goods goods);
+    long insertSelective(Goods goods);
 
     List<Goods> list(@Param("start") int start, @Param("limit") int limit);
 

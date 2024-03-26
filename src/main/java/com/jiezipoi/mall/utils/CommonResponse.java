@@ -15,6 +15,7 @@ public enum CommonResponse {
     ERROR("save.failed", 404),
     DATA_NOT_EXIST("data.not.exists", 404),
     DATA_ALREADY_EXISTS("data.already.exists", 409),
+    DATA_INTEGRITY_VIOLATION("data.integrity.violation", 409),
     INTERNAL_SERVER_ERROR("error.server", 500),
     ;
 
