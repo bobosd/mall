@@ -4,7 +4,7 @@ import com.jiezipoi.mall.controller.vo.IndexLevel1CategoryVO;
 import com.jiezipoi.mall.controller.vo.IndexLevel2CategoryVO;
 import com.jiezipoi.mall.controller.vo.IndexLevel3CategoryVO;
 import com.jiezipoi.mall.dao.GoodsCategoryDao;
-import com.jiezipoi.mall.dto.GoodsCategoryDTO;
+import com.jiezipoi.mall.dto.CreateGoodsCategoryDTO;
 import com.jiezipoi.mall.entity.GoodsCategory;
 import com.jiezipoi.mall.utils.CommonResponse;
 import com.jiezipoi.mall.utils.Response;
@@ -50,13 +50,13 @@ public class GoodsCategoryService {
     /**
      * 用于创建category，接受一个DTO，含有category对象和一个用于表示父类path对象
      * 无法直接获取path是因为无法知道被插入的id为多少，所以需要先插入，然后拼接父类id
-     * @param goodsCategoryDTO 包含GoodsCategory和父类的路径
+     * @param createGoodsCategoryDTO 包含GoodsCategory和父类的路径
      * @return 响应
      */
     @Transactional
-    public Response<?> createCategory(GoodsCategoryDTO goodsCategoryDTO) {
-        GoodsCategory category = goodsCategoryDTO.getGoodsCategory();
-        String parentPath = goodsCategoryDTO.getParentPath();
+    public Response<?> createCategory(CreateGoodsCategoryDTO createGoodsCategoryDTO) {
+        GoodsCategory category = createGoodsCategoryDTO.getGoodsCategory();
+        String parentPath = createGoodsCategoryDTO.getParentPath();
         if (category.getCategoryName() == null ||
                 category.getCategoryLevel() == null ||
                 category.getCategoryRank() == null) {
@@ -68,7 +68,7 @@ public class GoodsCategoryService {
         }
         category.setCreateUser((int) session.getAttribute("userId"));
         goodsCategoryDao.insertSelective(category);
-        long id = category.getId();
+        long id = category.getGoodsCategoryId();
         String path;
         if (parentPath != null && parentPath.isBlank()) {
             path = Long.toString(id);
@@ -83,15 +83,15 @@ public class GoodsCategoryService {
     }
 
     public Response<?> updateGoodsCategory(GoodsCategory category) {
-        if (category.getId() == null || category.getCategoryName() == null || category.getCategoryLevel() == null) {
+        if (category.getGoodsCategoryId() == null || category.getCategoryName() == null || category.getCategoryLevel() == null) {
             return new Response<>(CommonResponse.INVALID_DATA);
         }
-        GoodsCategory temp = goodsCategoryDao.selectByPrimaryKey(category.getId());
+        GoodsCategory temp = goodsCategoryDao.selectByPrimaryKey(category.getGoodsCategoryId());
         if (temp == null) {
             return new Response<>(CommonResponse.DATA_NOT_EXIST);
         }
         temp = goodsCategoryDao.selectByParentIdAndName(category.getParentId(), category.getCategoryName());
-        if (temp != null && !temp.getId().equals(category.getId())) {
+        if (temp != null && !temp.getGoodsCategoryId().equals(category.getGoodsCategoryId())) {
             return new Response<>(CommonResponse.DATA_ALREADY_EXISTS);
         }
         category.setUpdateTime(LocalDateTime.now());

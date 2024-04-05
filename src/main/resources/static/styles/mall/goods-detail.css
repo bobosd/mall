@@ -1,0 +1,137 @@
+.main-content {
+    padding: 20px 0;
+    display: flex;
+    justify-content: space-around;
+}
+
+.floor {
+    padding: 20px 20px;
+}
+
+.goods-image-container {
+    width: 45%;
+}
+
+.goods-image-container img {
+    width: 100%;
+}
+
+.goods-info {
+    width: 45%;
+}
+
+.goods-name {
+    padding-top: 30px;
+    font-family: "Open Sans", open-sans, sans-serif;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.goods-intro {
+    color: #7e7e7e;
+    font-size: 16px;
+}
+
+.goods-price {
+    padding-top: 20px;
+    font-family: "Open Sans", open-sans, sans-serif;
+    font-weight: bold;
+    display: flex;
+}
+
+.goods-price-int-part {
+    font-size: 30px;
+}
+
+.goods-price-decimal-part {
+    font-size: 15px;
+    margin-top: 6px;
+    margin-left: 6px;
+}
+
+
+.add-to-cart-options {
+    display: flex;
+    padding-top: 20px;
+}
+
+.amount-options {
+    color: #7e7e7e;
+    cursor: pointer;
+    padding: 2px 10px;
+    transition-duration: 0.3s;
+    border-radius: 12px;
+    margin: 0 4px;
+    font-size: 12px;
+}
+
+.amount-options:focus-within {
+
+}
+
+.amount-options:hover {
+    background-color: #fc830a;
+    color: #ffffff;
+}
+
+.choose-amount {
+    align-items: center;
+    display: flex;
+    border-radius: 12px;
+    border: 1px solid #DDDDDD;
+    height: 35px;
+}
+
+.choose-amount:focus-within,.choose-amount:focus {
+    border: 1px solid #fc830a;
+    box-shadow: 0 0 0 3px #fcac6b;
+}
+
+.input-buy-amount {
+    border: none;
+    border-radius: inherit;
+    width: 40px;
+    margin: 0;
+    text-align: center;
+}
+
+.input-buy-amount:focus {
+    outline: none;
+}
+
+.input-buy-amount:focus {
+    outline: none;
+}
+
+.button-add-to-cart {
+    display: flex;
+    justify-content: center;
+    padding: 7px 0;
+    background-color: #FC830AFF;
+    font-size: 16px;
+    font-weight: bold;
+    color: #FFFFFF;
+    border-radius: 7px;
+    cursor: pointer;
+    border: none;
+    margin-top: 20px;
+}
+
+/* hide default arrow button in numeric input */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    /* display: none; <- Crashes Chrome on hover */
+    -webkit-appearance: none;
+    margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
+}
+
+input[type=number] {
+    -moz-appearance:textfield; /* Firefox */
+}
+
+.goods-description {
+    padding: 20px 40px 10px 40px;
+    border: 1px #d9d9d9 solid;
+    border-radius: 20px;
+}
+

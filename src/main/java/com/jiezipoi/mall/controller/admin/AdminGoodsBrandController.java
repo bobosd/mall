@@ -1,4 +1,4 @@
-package com.jiezipoi.mall.controller;
+package com.jiezipoi.mall.controller.admin;
 
 import com.jiezipoi.mall.entity.GoodsBrand;
 import com.jiezipoi.mall.exception.ForeignKeyConstraintException;
@@ -16,10 +16,10 @@ import java.util.NoSuchElementException;
 
 @Controller
 @RequestMapping("/admin/goods/brand")
-public class GoodsBrandController {
+public class AdminGoodsBrandController {
     private final GoodsBrandService goodsBrandService;
 
-    public GoodsBrandController(GoodsBrandService goodsBrandService) {
+    public AdminGoodsBrandController(GoodsBrandService goodsBrandService) {
         this.goodsBrandService = goodsBrandService;
     }
 

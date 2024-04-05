@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{mall/header::general-libraries-and-styles(~{::title}, ~{::link}, ~{this::head/script})}">
+    <meta charset="UTF-8">
+    <title>Mall</title>
+    <link rel="stylesheet" href="/styles/mall/all.css"/>
+    <link rel="stylesheet" href="/styles/mall/product-search.css">
+</head>
+<body>
+<nav th:replace="~{mall/navbar::navbar}"></nav>
+<div class="floor">
+    <div th:replace="~{mall/goods-list-fragment::content}"></div>
+</div>
+<script th:replace="~{mall/goods-list-fragment::script}"></script>
+<footer th:replace="~{mall/footer::footer}"></footer>
+</body>
+</html>

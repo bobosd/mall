@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -162,6 +163,10 @@ public class Goods implements Serializable {
 
     public void setUpdateTime(LocalDateTime updateTime) {
         this.updateTime = updateTime;
+    }
+
+    public BigInteger getSellingPriceDecimalPart() {
+        return sellingPrice.remainder(BigDecimal.ONE).movePointRight(sellingPrice.scale()).abs().toBigInteger();
     }
 
     @Override

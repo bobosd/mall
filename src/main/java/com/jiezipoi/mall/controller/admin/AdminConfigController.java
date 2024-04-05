@@ -1,4 +1,4 @@
-package com.jiezipoi.mall.controller;
+package com.jiezipoi.mall.controller.admin;
 
 import com.jiezipoi.mall.entity.IndexConfig;
 import com.jiezipoi.mall.service.IndexConfigService;
@@ -8,11 +8,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.annotation.Resource;
-import jakarta.servlet.http.HttpServletRequest;
 
 @Controller
 @RequestMapping("/admin/index-config")
-public class IndexConfigController {
+public class AdminConfigController {
     @Resource
     private IndexConfigService indexConfigService;
 

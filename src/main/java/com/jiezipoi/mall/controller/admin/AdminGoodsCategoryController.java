@@ -1,6 +1,6 @@
-package com.jiezipoi.mall.controller;
+package com.jiezipoi.mall.controller.admin;
 
-import com.jiezipoi.mall.dto.GoodsCategoryDTO;
+import com.jiezipoi.mall.dto.CreateGoodsCategoryDTO;
 import com.jiezipoi.mall.entity.GoodsCategory;
 import com.jiezipoi.mall.service.GoodsCategoryService;
 import com.jiezipoi.mall.utils.Response;
@@ -10,10 +10,10 @@ import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequestMapping("/admin")
-public class GoodsCategoryController {
+public class AdminGoodsCategoryController {
     private final GoodsCategoryService service;
 
-    public GoodsCategoryController(GoodsCategoryService service) {
+    public AdminGoodsCategoryController(GoodsCategoryService service) {
         this.service = service;
     }
 
@@ -30,8 +30,8 @@ public class GoodsCategoryController {
 
     @PostMapping("/product-category/save")
     @ResponseBody
-    public Response<?> save(@RequestBody GoodsCategoryDTO goodsCategoryDTO) {
-        return service.createCategory(goodsCategoryDTO);
+    public Response<?> save(@RequestBody CreateGoodsCategoryDTO createGoodsCategoryDTO) {
+        return service.createCategory(createGoodsCategoryDTO);
     }
 
     @PostMapping("/product-category/update")

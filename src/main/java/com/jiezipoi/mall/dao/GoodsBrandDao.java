@@ -9,7 +9,7 @@ public interface GoodsBrandDao {
     GoodsBrand selectGoodsBrandById(@Param("brandId") Long brandId);
     List<GoodsBrand> findAllGoodsBrand(@Param("start") Integer start,
                                        @Param("limit") Integer limit,
-                                       @Param("keyWord") String keyWord);
+                                       @Param("keyword") String keyword);
 
     List<GoodsBrand> findByGoodsNameContaining(@Param("keyword") String keyword);
 

@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+<div th:fragment="content">
+    <div class="filter">
+        <div class="price-filter">
+            <div class="filter-title">
+                <span>Precio</span>
+            </div>
+            <div class="price-filter-container">
+                <input class="form-control form-control-sm minimum-price" th:value="${priceFrom + '€'}">
+                <div class="separator"></div>
+                <input class="form-control form-control-sm maximum-price" th:value="${priceTo + '€'}">
+            </div>
+        </div>
+        <div class="brand-filter">
+            <div class="filter-title">
+                <span>Marca</span>
+            </div>
+            <div class="brand-container">
+                <th:block th:each="brand : ${brands}">
+                    <div th:class="${brand.isNeedHighLight() ? 'brand-filter-option filter-option selected': 'brand-filter-option filter-option' }"
+                         th:attr="brand-id=${brand.getGoodsBrandId()}"
+                         th:text="${brand.getGoodsBrandName()}"></div>
+                </th:block>
+            </div>
+        </div>
+        <div class="category-filter">
+            <div class="filter-title">Categoría</div>
+            <div class="category-container">
+                <th:block th:each="category : ${categories}">
+                    <div th:class="${category.isNeedHighLight() ? 'category-filter-option filter-option selected' : 'category-filter-option filter-option'}"
+                         th:attr="category-id=${category.getGoodsCategoryId()}"
+                         th:text="${category.getGoodsCategoryName()}"></div>
+                </th:block>
+            </div>
+        </div>
+    </div>
+    <div class="search-result">
+        <div th:each="goods : ${goodsList}">
+            <div class="goods-container" th:attr="goods-id=${goods.getGoodsId()}">
+                <div class="goods-image-container">
+                    <img th:src="${goods.getGoodsCoverImg()}" alt="goods image">
+                </div>
+                <div class="goods-name">
+                    <span th:text="${goods.getGoodsName()}"></span>
+                </div>
+                <div class="goods-price">
+                    <span th:text="${goods.getEuroFormatPrice()}"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script th:fragment="script" th:inline="javascript" charset="UTF-8">
+    $(document).ready(() => {
+        initListener();
+    });
+
+    function initListener() {
+        bindFilterEvent();
+    }
+
+    function bindFilterEvent() {
+        bindBrandFilterEvent();
+        bindPriceFilterEvent();
+        bindCategoryFilterEvent();
+        bindGoodsClickEvent();
+    }
+
+    function bindGoodsClickEvent() {
+        $(".goods-container").click((e) => {
+            const container = $(e.target).closest(".goods-container");
+            const goodsId = container.attr("goods-id");
+            console.log(container);
+            let url = getBaseUrl();
+            url += "/goods/detail/" + goodsId;
+            window.location.href = url;
+        })
+    }
+
+    function bindPriceFilterEvent() {
+        const priceInput = $(".price-filter-container input");
+        priceInput.focusin(e => {
+            const {target} = e;
+            if (target.classList.contains("is-invalid")) {
+                target.classList.remove("is-invalid");
+            }
+            target.value = target.value.replace("€", ""); //remove euro on focus in
+        });
+        priceInput.focusout(e => {
+            let value = e.target.value;
+            let intRegex = /^\d+$/;
+            if (intRegex.test(value) === false) {
+                e.target.classList.add("is-invalid");
+            } else {
+                e.target.value += "€";
+                if (isPriceModified()) {
+                    applyFilterAndRefreshPage();
+                }
+            }
+        });
+    }
+
+    function bindCategoryFilterEvent() {
+        $(".category-filter-option").click((e) => {
+            const {target} = e;
+            target.classList.contains("selected") ? target.classList.remove("selected") : target.classList.add("selected");
+            applyFilterAndRefreshPage();
+        });
+    }
+
+    function bindBrandFilterEvent() {
+        $(".brand-filter-option").click((e) => {
+            const {target} = e;
+            target.classList.contains("selected") ? target.classList.remove("selected") : target.classList.add("selected");
+            applyFilterAndRefreshPage();
+        });
+    }
+
+    function applyFilterAndRefreshPage() {
+        const params = generateFilterParams();
+        refreshPageWithFilter(params);
+    }
+
+    function generateFilterParams() {
+        const params = {};
+        const keyword = getKeyword();
+        if (keyword != null) {
+            params.keyword = getKeyword();
+        }
+        //brands
+        if ($(".brand-filter-option.selected").length > 0) {
+            params.brand = getSelectedBrandsId();
+        }
+        //categories
+        if ($(".category-filter-option.selected").length > 0) {
+            params.category = getSelectedCategoriesId();
+        }
+        //price
+        if ($(".price-filter-container .is-invalid").length === 0 && (isPriceModified() || isPriceFilterAlreadyApplied())) {
+            params.priceFrom = getMinPrice();
+            params.priceTo = getMaxPrice();
+        }
+        return params;
+    }
+
+    function isPriceFilterAlreadyApplied() {
+        const paramString = window.location.search;
+        const params = new URLSearchParams(paramString);
+        return params.get("priceFrom") != null;
+    }
+
+    function isPriceModified() {
+        const priceFrom = [[${priceFrom.intValue()}]];
+        const priceTo = [[${priceTo.intValue()}]];
+        return priceFrom !== getMinPrice() || priceTo !== getMaxPrice();
+    }
+
+    function getMinPrice() {
+        let price = $(".minimum-price").val();
+        price = price.replace("€", "");
+        return parseInt(price);
+    }
+
+    function getMaxPrice() {
+        let price = $(".maximum-price").val();
+        price = price.replace("€", "");
+        return parseInt(price);
+    }
+
+    function getKeyword() {
+        const paramString = window.location.search;
+        const params = new URLSearchParams(paramString);
+        return params.get("keyword");
+    }
+
+    function getSelectedBrandsId() {
+        const brandIds = [];
+        $(".brand-filter-option.selected").each((i, e) => {
+            const brandId = e.getAttribute("brand-id");
+            brandIds.push(brandId);
+        });
+        return brandIds.join(",");
+    }
+
+    function getSelectedCategoriesId() {
+        const categoryIds = [];
+        $(".category-filter-option.selected").each((i, e) => {
+            const brandId = e.getAttribute("category-id");
+            categoryIds.push(brandId);
+        });
+        return categoryIds.join(",");
+    }
+
+    function refreshPageWithFilter (params) {
+        const baseUrl = window.location.origin + window.location.pathname;
+        const queryString = Object.keys(params).map(key => key + "=" + encodeURIComponent(params[key])).join("&");
+        const fullUrl = baseUrl + "?" + queryString;
+        window.location.replace(fullUrl);
+    }
+</script>
+</body>
+</html>

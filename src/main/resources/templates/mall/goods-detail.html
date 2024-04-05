@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{mall/header::general-libraries-and-styles(~{::title}, ~{::link}, ~{this::head/script})}">
+    <meta charset="UTF-8">
+    <title>Mall</title>
+    <link rel="stylesheet" href="/styles/mall/all.css"/>
+    <link rel="stylesheet" href="/styles/mall/goods-detail.css"/>
+
+</head>
+<body>
+<nav th:replace="~{mall/navbar::navbar}"></nav>
+<main>
+    <div class="floor">
+        <div class="main-content">
+            <div class="goods-image-container">
+                <img th:src="${goods.getGoodsCoverImg()}" alt="goods-image">
+            </div>
+            <div class="goods-info">
+                <div class="goods-name">
+                    <span th:text="${goods.getGoodsName()}"></span>
+                </div>
+                <div class="goods-intro">
+                    <span th:text="${goods.getGoodsIntro()}"></span>
+                </div>
+                <div class="goods-price">
+                    <span class="goods-price-int-part" th:text="${goods.getSellingPrice().intValue()}"></span>
+                    <span class="goods-price-decimal-part" th:text="${goods.getSellingPriceDecimalPart() + currencySymbol}"></span>
+                </div>
+                <div class="add-to-cart-options">
+                    <div class="choose-amount">
+                        <div class="reduce-buy-amount amount-options"><i class="fa-solid fa-minus"></i></div>
+                        <input class="input-buy-amount note" value="1" step="1" type="number" max="99" min="1">
+                        <div class="add-buy-amount amount-options"><i class="fa-solid fa-plus"></i></div>
+                    </div>
+                </div>
+                <div class="button-add-to-cart no-text-select">Añadir a la cesta</div>
+            </div>
+        </div>
+    </div>
+    <div class="floor">
+
+    </div>
+    <div class="floor">
+        <div class="goods-description" th:utext="${goods.getGoodsDetailContent()}">
+        </div>
+    </div>
+</main>
+<footer th:replace="~{mall/footer::footer}"></footer>
+<script>
+    $(document).ready(() => {
+        initListener();
+    });
+
+    function initListener() {
+        blindGoodsAmountOptionsEvent();
+        blindAddToCartEvent();
+    }
+
+    function blindAddToCartEvent() {
+        $(".button-add-to-cart").click(() => addToCart());
+    }
+
+    function onAmountContainerFocusEvent() {
+        $(".choose-amount").focusin(() => {
+            console.log();
+        });
+    }
+
+    function blindGoodsAmountOptionsEvent() {
+        const input = $(".input-buy-amount");
+        $(".add-buy-amount").click(() => {
+            const amount = parseInt(input.val()) + 1;
+            input.val(amount);
+        });
+
+        $(".reduce-buy-amount").click(() => {
+            const amount = parseInt(input.val()) - 1;
+            if (amount === 0) {
+                return;
+            }
+            input.val(amount);
+        });
+    }
+
+    function getGoodsId() {
+        return [[${goods.getGoodsId()}]];
+    }
+
+    function getQuantity() {
+        return parseInt($(".input-buy-amount").val());
+    }
+
+    function addToCart() {
+        const shoppingCartItem = {goodsId: getGoodsId(), goodsCount: getQuantity()};
+        $.ajax({
+            method: "POST",
+            url: "/shopping-cart/add",
+            data: JSON.stringify(shoppingCartItem),
+            contentType: "application/json",
+            success: (res) => {
+                console.log(res);
+            }
+        });
+    }
+</script>
+</body>
+</html>

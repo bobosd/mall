@@ -4,9 +4,10 @@ import com.jiezipoi.mall.entity.MallUser;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.io.Serializable;
 import java.util.Collection;
 
-public record MallUserDetails(MallUser mallUser) implements UserDetails {
+public record MallUserDetails(MallUser mallUser) implements UserDetails, Serializable {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

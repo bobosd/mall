@@ -111,7 +111,7 @@
                     orderable: false
                 },
                 {
-                    data: "id",
+                    data: "goods_category_id",
                     render: () => {
                         return '<button class="button button-blue btn-edit-category"><i class="fa-solid fa-edit"></i></button>';
                     },
@@ -120,7 +120,7 @@
                     className: "td-function"
                 },
                 {
-                    data: "id",
+                    data: "goods_category_id",
                     render: () => {
                         return '<button class="button button-red btn-delete-category"><i class="fa-solid fa-trash-can"></i></button>';
                     },
@@ -135,14 +135,14 @@
                     if (eventDOM.closest("td").hasClass("td-function") || categoryLevel === 3) {
                         return;
                     }
-                    parentId = data.id;
+                    parentId = data.goodsCategoryId;
                     parentStack.push(parentId);
                     categoryLevel += 1;
                     renderCategoryTable();
                 });
 
                 $(row).find(".btn-edit-category").click(() => showUpdateCategoryModal(data));
-                $(row).find(".btn-delete-category").click(() => showConfirmDeleteSwal(data.id));
+                $(row).find(".btn-delete-category").click(() => showConfirmDeleteSwal(data.goodsCategoryId));
             }
         });
     }
@@ -205,7 +205,7 @@
     function updateCategory(data) {
         const btnCreate = $("#btn-update-category");
         const category = {
-            id: data.id,
+            id: data.goodsCategoryId,
             categoryRank: $("#input-rank-order").val(),
             categoryName: $("#input-category-name").val(),
             categoryLevel: data.categoryLevel

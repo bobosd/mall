@@ -8,7 +8,11 @@ body {
 }
 
 .floor:first-child {
-    padding: 10px 20px 50px 20px;
+    padding-top: 20px;
+}
+
+.floor:last-child {
+    padding-bottom: 0;
 }
 
 .floor > div {
@@ -17,7 +21,7 @@ body {
 }
 
 .floor-dark {
-    background-color: #DDDDDD;
+    background-color: #F2F2F2;
 }
 
 .floor-left-title {
@@ -47,4 +51,10 @@ body {
 .button-orange {
     color: #ffffff;
     background: #fc830a;
+}
+
+.no-text-select {
+    -webkit-user-select: none; /* Safari */
+    -ms-user-select: none; /* IE 10 and IE 11 */
+    user-select: none; /* Standard syntax */
 }

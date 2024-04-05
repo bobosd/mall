@@ -3,7 +3,7 @@
 
 <mapper namespace="com.jiezipoi.mall.dao.GoodsCategoryDao">
     <resultMap id="BaseResultMap" type="com.jiezipoi.mall.entity.GoodsCategory">
-        <id column="id" jdbcType="BIGINT" property="id"/>
+        <id column="goods_category_id" jdbcType="BIGINT" property="goodsCategoryId"/>
         <result column="category_level" jdbcType="TINYINT" property="categoryLevel"/>
         <result column="path" jdbcType="VARCHAR" property="path"/>
         <result column="parent_id" jdbcType="BIGINT" property="parentId"/>
@@ -17,7 +17,7 @@
     </resultMap>
 
     <sql id="Base_column_list">
-        id,
+        goods_category_id,
         category_level,
         path,
         parent_id,
@@ -59,7 +59,7 @@
     <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
         SELECT <include refid="Base_column_list"/>
         FROM goods_category
-        WHERE id = #{id}
+        WHERE goods_category_id = #{id}
     </select>
     
     <select id="selectByParentIdAndName" resultMap="BaseResultMap">
@@ -86,22 +86,22 @@
     <update id="deleteByPrimaryKey" parameterType="java.lang.Long">
         update goods_category
         SET is_deleted = 1
-        WHERE id = #{categoryId,jdbcType=BIGINT}
+        WHERE goods_category_id = #{categoryId,jdbcType=BIGINT}
     </update>
 
     <update id="deleteBatch">
         UPDATE goods_category
         SET is_deleted = 1
-        WHERE id IN
+        WHERE goods_category_id IN
         <foreach collection="array" item="id" open="(" separator="," close=")">
         #{id}
         </foreach>;
     </update>
 
     <insert id="insert" parameterType="com.jiezipoi.mall.entity.GoodsCategory">
-        INSERT INTO goods_category (id, category_level, path, category_name, category_rank, is_deleted,
+        INSERT INTO goods_category (goods_category_id, category_level, path, category_name, category_rank, is_deleted,
         create_time, create_user, update_time, update_user)
-        VALUES (#{id,jdbcType=BIGINT}, #{categoryLevel,jdbcType=TINYINT}, #{path,jdbcType=VARCHAR},
+        VALUES (#{goodsCategoryId,jdbcType=BIGINT}, #{categoryLevel,jdbcType=TINYINT}, #{path,jdbcType=VARCHAR},
         #{categoryName,jdbcType=VARCHAR}, #{categoryRank,jdbcType=INTEGER}, #{isDeleted,jdbcType=TINYINT},
         #{createTime,jdbcType=TIMESTAMP}, #{createUser,jdbcType=INTEGER}, #{updateTime,jdbcType=TIMESTAMP},
         #{updateUser,jdbcType=INTEGER})
@@ -110,8 +110,8 @@
     <insert id="insertSelective" parameterType="com.jiezipoi.mall.entity.GoodsCategory" useGeneratedKeys="true" keyProperty="id">
         INSERT goods_category
         <trim prefix="(" suffix=")" suffixOverrides=",">
-            <if test="id != null ">
-                id,
+            <if test="goodsCategoryId != null">
+                goods_category_id,
             </if>
             <if test="categoryLevel != null ">
                 category_level,
@@ -145,8 +145,8 @@
             </if>
         </trim>
         <trim prefix="VALUES (" suffix=")" suffixOverrides=",">
-            <if test="id != null">
-                #{id,jdbcType=BIGINT},
+            <if test="goodsCategoryId != null">
+                #{goodsCategoryId,jdbcType=BIGINT},
             </if>
             <if test="categoryLevel != null">
                 #{categoryLevel,jdbcType=TINYINT},
@@ -212,7 +212,7 @@
                 update_user = #{updateUser,jdbcType=INTEGER}
             </if>
         </set>
-        WHERE id = #{id,jdbcType=BIGINT}
+        WHERE goods_category_id = #{goodsCategoryId,jdbcType=BIGINT}
     </update>
 
     <update id="updateByPrimaryKey" parameterType="com.jiezipoi.mall.entity.GoodsCategory">
@@ -226,14 +226,14 @@
         create_user = #{createUser,jdbcType=INTEGER},
         update_time = #{updateTime,jdbcType=TIMESTAMP},
         update_user = #{updateUser,jdbcType=INTEGER}
-        WHERE id = #{id,jdbcType=BIGINT}
+        WHERE goods_category_id = #{goodsCategoryId,jdbcType=BIGINT}
     </update>
 
     <select id="selectByIds" resultMap="BaseResultMap">
         SELECT
         <include refid="Base_column_list"/>
         FROM goods_category
-        WHERE id IN
+        WHERE goods_category_id IN
         <foreach collection="ids" item="id" open="(" separator="," close=")">
             #{id}
         </foreach>
@@ -252,7 +252,7 @@
     <update id="updatePathById">
         UPDATE goods_category
         SET path = #{path,jdbcType=VARCHAR}
-        WHERE id = #{id,jdbcType=BIGINT}
+        WHERE goods_category_id = #{id,jdbcType=BIGINT}
     </update>
 
     <select id="selectAllCategory" resultMap="BaseResultMap">

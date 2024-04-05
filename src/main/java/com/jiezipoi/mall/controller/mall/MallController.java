@@ -1,4 +1,4 @@
-package com.jiezipoi.mall.controller;
+package com.jiezipoi.mall.controller.mall;
 
 import com.jiezipoi.mall.config.CarouselConfig;
 import com.jiezipoi.mall.controller.vo.IndexConfigGoodsVO;
@@ -7,30 +7,32 @@ import com.jiezipoi.mall.dao.CarouselDao;
 import com.jiezipoi.mall.entity.Carousel;
 import com.jiezipoi.mall.enums.IndexConfigEnum;
 import com.jiezipoi.mall.service.GoodsCategoryService;
+import com.jiezipoi.mall.service.GoodsService;
 import com.jiezipoi.mall.service.IndexConfigService;
-import jakarta.annotation.Resource;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
 @Controller
 public class MallController {
-    @Resource
-    private CarouselDao carouselDao;
-    @Resource
-    private CarouselConfig carouselConfig;
+    private final CarouselDao carouselDao;
+    private final CarouselConfig carouselConfig;
+    private final GoodsCategoryService categoryService;
+    private final IndexConfigService indexConfigService;
 
-    @Resource
-    private GoodsCategoryService categoryService;
+    public MallController(CarouselDao carouselDao, CarouselConfig carouselConfig, GoodsCategoryService categoryService,
+                          IndexConfigService indexConfigService, GoodsService goodsService) {
+        this.carouselDao = carouselDao;
+        this.carouselConfig = carouselConfig;
+        this.categoryService = categoryService;
+        this.indexConfigService = indexConfigService;
+    }
 
-    @Resource
-    private IndexConfigService indexConfigService;
 
     @GetMapping({"/index", "/", "/index.html"})
     public String indexPage(ModelMap modelMap) {
@@ -54,11 +56,13 @@ public class MallController {
         return "mall/index";
     }
 
+    //get registration page
     @GetMapping("/signup")
     public String signupPage() {
         return "mall/signup";
     }
 
+    //get login page
     @GetMapping("/login")
     public String loginPage() {
         if (isAuthenticated()) {
@@ -78,10 +82,5 @@ public class MallController {
     @GetMapping("/test")
     public String testPage() {
         return "mall/test";
-    }
-
-    @GetMapping("/search")
-    public String searchPage(@RequestParam("keyWord") String keyWord) {
-        return "mall/product-search";
     }
 }

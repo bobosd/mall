@@ -156,7 +156,7 @@
     <select id="listByCategory" resultMap="BaseResultMap">
         SELECT <include refid="base_column_list"/>
         FROM goods_info
-        JOIN goods_category gc on gc.id = goods_info.goods_category_id
+        JOIN goods_category gc on gc.goods_category_id = goods_info.goods_category_id
         WHERE gc.path LIKE CONCAT(#{path,jdbcType=VARCHAR}, '.%') OR
             gc.path = #{path,jdbcType=VARCHAR}
         LIMIT #{start}, #{limit};
@@ -165,7 +165,7 @@
     <select id="getCategoryGoodsCount" resultType="int">
         SELECT COUNT(*)
         FROM goods_info
-        JOIN goods_category gc on gc.id = goods_info.goods_category_id
+        JOIN goods_category gc on gc.goods_category_id = goods_info.goods_category_id
         WHERE gc.path LIKE CONCAT(#{path,jdbcType=VARCHAR}, '.%') OR
             gc.path = #{path,jdbcType=VARCHAR};
     </select>
@@ -240,5 +240,69 @@
         ORDER BY FIELD(goods_id, <foreach collection="ids" item="goods_id" separator=",">
         #{goods_id}
     </foreach>)
+    </select>
+
+    <resultMap id="GoodsSearchDTO" type="com.jiezipoi.mall.dto.GoodsSearchDTO">
+        <id column="goods_id" jdbcType="BIGINT" property="goodsId"/>
+        <result column="goods_name" jdbcType="VARCHAR" property="goodsName"/>
+        <result column="selling_price" jdbcType="DECIMAL" property="sellingPrice"/>
+        <result column="goods_cover_img" jdbcType="VARCHAR" property="goodsCoverImg"/>
+        <association property="goodsBrand" javaType="com.jiezipoi.mall.dto.GoodsSearchBrandsDTO">
+            <result column="goods_brand_id" jdbcType="BIGINT" property="goodsBrandId"/>
+            <result column="goods_brand_name" jdbcType="VARCHAR" property="goodsBrandName"/>
+        </association>
+        <association property="goodsCategory" javaType="com.jiezipoi.mall.dto.GoodsSearchCategoryDTO">
+            <result column="goods_category_id" jdbcType="BIGINT" property="goodsCategoryId"/>
+            <result column="category_name" jdbcType="VARCHAR" property="goodsCategoryName"/>
+        </association>
+    </resultMap>
+
+    <!--suppress checkSelectColumnExistInMybatisResultmap -->
+    <select id="selectGoodsByTagContaining" resultMap="GoodsSearchDTO">
+        SELECT goods_info.goods_id,
+        goods_info.goods_name,
+        goods_info.goods_brand_id,
+        goods_brand.goods_brand_name,
+        goods_info.goods_category_id,
+        goods_category.category_name,
+        goods_info.goods_cover_img,
+        goods_info.selling_price,
+        COUNT(goods_info.goods_id) AS 'accuracy'
+        FROM goods_info
+        JOIN goods_has_tag ON goods_info.goods_id = goods_has_tag.goods_id
+        JOIN goods_tag ON goods_has_tag.tag_id = goods_tag.goods_tag_id
+        JOIN goods_brand ON goods_info.goods_brand_id = goods_brand.goods_brand_id
+        JOIN goods_category ON goods_info.goods_category_id = goods_category.goods_category_id
+        <where>
+            <foreach collection="keywordArr" item="keyword" separator=" OR ">
+                goods_tag.tag_name = #{keyword,jdbcType=VARCHAR}
+            </foreach>
+        </where>
+        GROUP BY goods_info.goods_id
+        ORDER BY accuracy DESC;
+    </select>
+    
+    <select id="selectGoodsByCategory" resultMap="GoodsSearchDTO">
+        <bind name="level1path" value="categoryId+'.%'"/>
+        <bind name="level2path" value="'%.'+categoryId + '.%'"/>
+        <bind name="level3path" value="'%.'+categoryId"/>
+
+        SELECT goods_info.goods_id,
+        goods_info.goods_name,
+        goods_info.goods_brand_id,
+        goods_brand.goods_brand_name,
+        goods_info.goods_category_id,
+        goods_category.category_name,
+        goods_info.goods_cover_img,
+        goods_info.selling_price
+        FROM goods_info
+        JOIN goods_has_tag ON goods_info.goods_id = goods_has_tag.goods_id
+        JOIN goods_tag ON goods_has_tag.tag_id = goods_tag.goods_tag_id
+        JOIN goods_brand ON goods_info.goods_brand_id = goods_brand.goods_brand_id
+        JOIN goods_category ON goods_info.goods_category_id = goods_category.goods_category_id
+        WHERE goods_category.path LIKE #{level1path}
+            OR goods_category.path LIKE #{level2path}
+            OR goods_category.path LIKE #{level3path}
+        GROUP BY goods_info.goods_id
     </select>
 </mapper>

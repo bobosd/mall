@@ -2,7 +2,7 @@ package com.jiezipoi.mall.dto;
 
 import com.jiezipoi.mall.entity.GoodsCategory;
 
-public class GoodsCategoryDTO {
+public class CreateGoodsCategoryDTO {
     private GoodsCategory goodsCategory;
     private String parentPath;
 

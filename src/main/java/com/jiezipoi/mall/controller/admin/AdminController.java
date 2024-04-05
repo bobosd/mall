@@ -1,4 +1,4 @@
-package com.jiezipoi.mall.controller;
+package com.jiezipoi.mall.controller.admin;
 
 import com.jiezipoi.mall.enums.IndexConfigEnum;
 import com.jiezipoi.mall.entity.AdminUser;

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jiezipoi.mall.dao.ShoppingCartItemDao">
+    <resultMap id="BaseResultMap" type="com.jiezipoi.mall.entity.ShoppingCartItem">
+        <id column="cart_item_id" jdbcType="BIGINT" property="cartItemId"/>
+        <result column="user_id" jdbcType="BIGINT" property="userId"/>
+        <result column="goods_id" jdbcType="BIGINT" property="goodsId"/>
+        <result column="goods_count" jdbcType="INTEGER" property="goodsCount"/>
+        <result column="is_deleted" jdbcType="TINYINT" property="isDeleted"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        cart_item_id, user_id, goods_id, goods_count, is_deleted, create_time, update_time
+    </sql>
+    
+    <select id="selectByUserIdAndGoodsId" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM shopping_cart_item
+        WHERE user_id = #{mallUserId,jdbcType=BIGINT}
+        AND goods_id = #{mallGoodsId,jdbcType=BIGINT}
+        AND is_deleted = 0
+        LIMIT 1;
+    </select>
+    
+    <select id="selectCountByUserId" resultType="int">
+        SELECT COUNT(*)
+        FROM shopping_cart_item
+        WHERE user_id = #{mallUserId,jdbcType=BIGINT} AND is_deleted = 0
+    </select>
+
+    <insert id="insertSelective" parameterType="com.jiezipoi.mall.entity.ShoppingCartItem">
+        INSERT INTO shopping_cart_item
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="item.cartItemId != null">
+                cart_item_id,
+            </if>
+            <if test="item.userId != null">
+                user_id,
+            </if>
+            <if test="item.goodsId != null">
+                goods_id,
+            </if>
+            <if test="item.goodsCount">
+                goods_count,
+            </if>
+            <if test="item.isDeleted != null">
+                is_deleted,
+            </if>
+            <if test="item.createTime != null">
+                create_time,
+            </if>
+            <if test="item.updateTime != null">
+                update_time,
+            </if>
+        </trim>
+        <trim prefix="VALUES (" suffix=")" suffixOverrides=",">
+            <if test="item.cartItemId != null">
+                #{item.cartItemId,jdbcType=BIGINT},
+            </if>
+            <if test="item.userId != null">
+                #{item.userId,jdbcType=BIGINT},
+            </if>
+            <if test="item.goodsId != null">
+                #{item.goodsId,jdbcType=BIGINT},
+            </if>
+            <if test="item.goodsCount">
+                #{item.goodsCount,jdbcType=INTEGER},
+            </if>
+            <if test="item.isDeleted != null">
+                #{item.isDeleted, jdbcType=TINYINT},
+            </if>
+            <if test="item.createTime != null">
+                #{item.createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="item.updateTime != null">
+                #{item.updateTime,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+    </insert>
+</mapper>

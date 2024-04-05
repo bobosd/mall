@@ -1,4 +1,4 @@
-package com.jiezipoi.mall.controller;
+package com.jiezipoi.mall.controller.admin;
 
 import com.jiezipoi.mall.service.CarouselService;
 import com.jiezipoi.mall.utils.Response;
@@ -15,9 +15,9 @@ import java.util.Map;
 
 @Controller
 @RequestMapping("/admin")
-public class CarouselController {
+public class AdminCarouselController {
     @Resource
-    CarouselService carouselService;
+    CarouselService adminCarouselService;
 
     @RequestMapping(value = "/carousels/list", method = RequestMethod.POST)
     @ResponseBody
@@ -30,7 +30,7 @@ public class CarouselController {
             columnMap.put(4, "create_time");
             orderBy = order.toOrderByString(columnMap);
         }
-        return carouselService.getCarouselPage(request.getStart(), request.getLength(), orderBy);
+        return adminCarouselService.getCarouselPage(request.getStart(), request.getLength(), orderBy);
     }
 
     @RequestMapping(value = "/carousels/save", method = RequestMethod.POST)
@@ -40,7 +40,7 @@ public class CarouselController {
                             @RequestParam("order") Integer order,
                             HttpSession session) {
         int userId = (int) session.getAttribute("userId");
-        return carouselService.saveCarousel(image, redirectUrl, order, userId);
+        return adminCarouselService.saveCarousel(image, redirectUrl, order, userId);
     }
 
     @PostMapping("/carousels/update")
@@ -51,18 +51,18 @@ public class CarouselController {
                               @RequestParam("order") Integer order,
                               HttpSession session) {
         int userId = (int) session.getAttribute("userId");
-        return carouselService.updateCarousel(id, image, redirectUrl, order, userId);
+        return adminCarouselService.updateCarousel(id, image, redirectUrl, order, userId);
     }
 
     @GetMapping("/carousels/info/{id}")
     @ResponseBody
     public Response<?> info(@PathVariable("id") Integer id) {
-        return carouselService.getCarouselById(id);
+        return adminCarouselService.getCarouselById(id);
     }
 
     @PostMapping("/carousels/delete")
     @ResponseBody
     public Response<?> delete(@RequestParam("ids[]") Integer[] ids) {
-        return carouselService.deleteBatch(ids);
+        return adminCarouselService.deleteBatch(ids);
     }
 }

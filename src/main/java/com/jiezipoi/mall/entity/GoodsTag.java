@@ -1,6 +1,8 @@
 package com.jiezipoi.mall.entity;
 
 import java.io.Serializable;
+import java.text.Collator;
+import java.util.Locale;
 import java.util.Objects;
 
 public class GoodsTag implements Serializable {
@@ -28,7 +30,9 @@ public class GoodsTag implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         GoodsTag goodsTag = (GoodsTag) o;
-        return Objects.equals(tagName, goodsTag.tagName);
+        Collator collator = Collator.getInstance(Locale.getDefault());
+        collator.setStrength(Collator.NO_DECOMPOSITION);
+        return collator.compare(goodsTag.tagName, this.tagName) == 0;
     }
 
     @Override

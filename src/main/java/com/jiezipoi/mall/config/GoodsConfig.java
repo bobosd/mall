@@ -27,6 +27,9 @@ public class GoodsConfig {
     @Value("${goods.expose-url}")
     private String exposeUrl;
 
+    @Value("${goods.currency.symbol}")
+    private String currencySymbol;
+
     /**
      * 传递一个文件目录，然后返回该目录的暴露url。
      * 首先获得配置文件中列出的文件储存目录，然后通过relativize()方法获得该文件的相对位置，
@@ -67,6 +70,10 @@ public class GoodsConfig {
     }
 
     public String getUserTempFileName(int userName) {
-        return getUserTempFilePrefix() + userName + "/";
+        return getUserTempFilePrefix() + userName;
+    }
+
+    public String getCurrencySymbol() {
+        return currencySymbol;
     }
 }

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
 <div th:fragment="navbar">
     <link rel="stylesheet" href="/styles/mall/navbar.css">
     <nav>
@@ -15,13 +15,13 @@
                 </div>
             </div>
             <div class="navbar-rgt">
-                <div class="unlogged-options-container">
-                    <a href="/login"><span>Login</span></a>
-                    <a href="/signup"><span>Registrar</span></a>
-                </div>
-                <div class="logged-options-container">
+                <div sec:authorize="isAuthenticated()">
                     <a><i class="fa-solid fa-user"></i><span class="nickname"></span></a>
                     <a class="logout-option"><i class="fa-solid fa-right-from-bracket"></i><span>logout</span></a>
+                </div>
+                <div sec:authorize="!isAuthenticated()">
+                    <a href="/login"><span>Login</span></a>
+                    <a href="/signup"><span>Registrar</span></a>
                 </div>
                 <a class="shopping-cart"><i class="fa-solid fa-cart-shopping"></i> cesta</a>
             </div>
@@ -38,12 +38,8 @@
         if (refreshToken !== null) {
             const mallUser = JSON.parse(localStorage.getItem(MALL_USER_ITEM_NAME));
             $(".nickname").text(mallUser.nickName);
-            $(".unlogged-options-container").hide();
-            $(".logged-options-container").show();
         } else {
             localStorage.removeItem(MALL_USER_ITEM_NAME)
-            $(".unlogged-options-container").show();
-            $(".logged-options-container").hide();
         }
 
         $(".logout-option").click(() => logout());
@@ -89,17 +85,17 @@
             searchGoods(keyWord);
         });
 
-        function searchGoods(keyWord) {
-            keyWord = keyWord.trim();
-            window.location.href = "/search?keyWord=" + keyWord;
+        function searchGoods(keyword) {
+            keyword = keyword.trim();
+            window.location.href = "/search?keyword=" + keyword;
         }
 
         (function () {
             const url = window.location;
             const params = new URLSearchParams(url.search);
-            const keyWord = params.get("keyWord");
-            if (keyWord != null) {
-                $(".search-input").val(keyWord);
+            const keyword = params.get("keyword");
+            if (keyword != null) {
+                $(".search-input").val(keyword);
             }
         })();
     </script>

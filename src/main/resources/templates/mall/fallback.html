@@ -4,8 +4,38 @@
     <meta charset="UTF-8">
     <title>Mall</title>
     <link rel="stylesheet" href="/styles/mall/all.css"/>
+    <link rel="stylesheet" href="/styles/mall/navbar.css">
+    <link rel="stylesheet" href="/styles/mall/fallback.css">
 </head>
 <body>
-FALLBACK PAGE
+
+<nav>
+    <div class="navbar">
+        <div class="navbar-lft">
+            <img class="navbar-mall-icon" src="/assets/img/poi_128x128.png" alt="mall icon">
+            <a class="navbar-admin-panel-button" href="/admin/login">Panel admin</a>
+        </div>
+        <div class="navbar-center">
+            <div class="search-box">
+                <input class="search-input" type="search" placeholder="Buscar">
+                <div class="search-button"><i class="fa-solid fa-magnifying-glass"></i></div>
+            </div>
+        </div>
+    </div>
+</nav>
+<div class="error-container">
+    <div class="error-image">
+        <i class="fa-solid fa-face-frown"></i>
+    </div>
+    <div class="error-title">
+        404
+    </div>
+    <div class="error-message">
+        Página no encontrada
+    </div>
+</div>
+<script>
+    $(".navbar-mall-icon").click(() => window.location.href = getBaseUrl());
+</script>
 </body>
 </html>

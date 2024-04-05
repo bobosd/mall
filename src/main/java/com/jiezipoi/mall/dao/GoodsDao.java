@@ -1,5 +1,6 @@
 package com.jiezipoi.mall.dao;
 
+import com.jiezipoi.mall.dto.GoodsSearchDTO;
 import com.jiezipoi.mall.entity.Goods;
 import org.apache.ibatis.annotations.Param;
 
@@ -30,4 +31,8 @@ public interface GoodsDao {
     List<Goods> selectGoodsByIds(@Param("ids") long[] goodsId);
 
     int updateByPrimaryKeySelective(Goods goods);
+
+    List<GoodsSearchDTO> selectGoodsByTagContaining(@Param("keywordArr") String[] keywordArr);
+
+    List<GoodsSearchDTO> selectGoodsByCategory(@Param("categoryId") Long categoryId);
 }

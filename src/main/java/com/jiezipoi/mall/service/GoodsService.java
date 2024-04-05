@@ -3,6 +3,7 @@ package com.jiezipoi.mall.service;
 import com.jiezipoi.mall.config.GoodsConfig;
 import com.jiezipoi.mall.dao.GoodsCategoryDao;
 import com.jiezipoi.mall.dao.GoodsDao;
+import com.jiezipoi.mall.dto.GoodsSearchDTO;
 import com.jiezipoi.mall.entity.Goods;
 import com.jiezipoi.mall.entity.GoodsTag;
 import com.jiezipoi.mall.utils.CommonResponse;
@@ -192,9 +193,8 @@ public class GoodsService {
     }
 
     private Path getUserTempDir(int userId) {
-        Path uploadDirString = goodsConfig.getGoodsFilePath();
-        return Paths.get(uploadDirString + "/" + goodsConfig.getUserTempFileName(userId));
-        //return: {config_path}/temp_{userid}
+        Path uploadDir = goodsConfig.getGoodsFilePath();
+        return uploadDir.resolve(goodsConfig.getUserTempFileName(userId));
     }
 
     public Goods getUserTempGoods(int userId) {
@@ -234,17 +234,15 @@ public class GoodsService {
         return response;
     }
 
-    public Response<?> getGoodsById(Long id) {
+    public Goods getGoodsById(Long id) {
         if (id == null) {
-            return new Response<>(CommonResponse.INVALID_DATA);
+            throw new NullPointerException();
         }
         Goods goods = goodsDao.selectGoodsById(id);
         if (goods == null) {
-            return new Response<>(CommonResponse.INVALID_DATA);
+            throw new NullPointerException();
         }
-        Response<Goods> response = new Response<>(CommonResponse.SUCCESS);
-        response.setData(goods);
-        return response;
+        return goods;
     }
 
     @Transactional
@@ -302,5 +300,17 @@ public class GoodsService {
 
     private String generateImageFileName() {
         return generateImageFileName(null);
+    }
+
+    public List<GoodsSearchDTO> getGoodsListByKeyword(String keyword) {
+        String[] keywordArray = keyword.split(" ");
+        return goodsDao.selectGoodsByTagContaining(keywordArray);
+    }
+
+    public List<GoodsSearchDTO> getGoodsListByCategory(Long categoryId) {
+        if (categoryId == null) {
+            throw new NullPointerException();
+        }
+        return goodsDao.selectGoodsByCategory(categoryId);
     }
 }

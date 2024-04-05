@@ -151,7 +151,7 @@
 
         const processCategoryResult = (response) => {
             if (response.code === 200) {
-                const options = response.data.map((c) => ({id: c.id, text: c.categoryName}));
+                const options = response.data.map((c) => ({id: c.goodsCategoryId, text: c.categoryName}));
                 return {results: options};
             } else {
                 return {results: []};
@@ -413,9 +413,9 @@
             if (category != null) {
                 category.reverse();
                 category.forEach((c) => {
-                    const {id, categoryLevel, categoryName} = c;
+                    const {goodsCategoryId, categoryLevel, categoryName} = c;
                     const select = categorySelects[categoryLevel - 1];
-                    const option = new Option(categoryName, id, true, true);
+                    const option = new Option(categoryName, goodsCategoryId, true, true);
                     select.prop("disabled", false);
                     select.append(option).trigger("change");
                 });

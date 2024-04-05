@@ -1,4 +1,4 @@
-package com.jiezipoi.mall.controller;
+package com.jiezipoi.mall.controller.admin;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -23,12 +23,12 @@ import java.util.List;
 
 @Controller
 @RequestMapping("/admin")
-public class GoodsController {
+public class AdminGoodsController {
     private final GoodsService goodsService;
     private final GoodsCategoryService categoryService;
     private final GoodsBrandService goodsBrandService;
 
-    public GoodsController(GoodsService goodsService, GoodsCategoryService categoryService, GoodsBrandService goodsBrandService) {
+    public AdminGoodsController(GoodsService goodsService, GoodsCategoryService categoryService, GoodsBrandService goodsBrandService) {
         this.goodsService = goodsService;
         this.categoryService = categoryService;
         this.goodsBrandService = goodsBrandService;
@@ -54,9 +54,8 @@ public class GoodsController {
 
     @GetMapping("/goods/edit/{id}")
     public String goodsEditPage(ModelMap modelMap, @PathVariable Long id) {
-        Response<?> response = goodsService.getGoodsById(id);
-        if (response.getCode() == 200) {
-            Goods goods = (Goods) response.getData();
+        try {
+            Goods goods = goodsService.getGoodsById(id);
             Long categoryId = goods.getGoodsCategoryId();
             List<GoodsCategory> categories = categoryService.getGoodsCategoryAndParent(categoryId);
             GoodsBrand goodsBrand = goodsBrandService.getGoodsBrandById(goods.getGoodsBrandId());
@@ -64,7 +63,7 @@ public class GoodsController {
             modelMap.addAttribute("goods", goods);
             modelMap.addAttribute("category", categories);
             return "admin/goods-edit";
-        } else {
+        } catch (NullPointerException e) {
             return "admin/fallback";
         }
     }

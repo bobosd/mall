@@ -15,8 +15,8 @@
     <select id="findAllGoodsBrand" resultMap="BaseResultMap">
         SELECT *
         FROM goods_brand
-        <if test="keyWord != null and keyWord != ''">
-            WHERE goods_brand_name LIKE #{keyWord,jdbcType=VARCHAR}
+        <if test="keyword != null and keyword != ''">
+            WHERE goods_brand_name LIKE #{keyword,jdbcType=VARCHAR}
         </if>
         LIMIT #{start,jdbcType=INTEGER}, #{limit,jdbcType=INTEGER}
     </select>

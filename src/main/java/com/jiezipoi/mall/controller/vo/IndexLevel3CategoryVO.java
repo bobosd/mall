@@ -9,7 +9,7 @@ public class IndexLevel3CategoryVO {
     private Long parentId;
 
     public IndexLevel3CategoryVO(GoodsCategory goodsCategory) {
-        this.categoryId = goodsCategory.getId();
+        this.categoryId = goodsCategory.getGoodsCategoryId();
         this.categoryLevel = goodsCategory.getCategoryLevel();
         this.categoryName = goodsCategory.getCategoryName();
         this.parentId = goodsCategory.getParentId();

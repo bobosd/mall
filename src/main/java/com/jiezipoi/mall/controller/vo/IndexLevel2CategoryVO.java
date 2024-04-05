@@ -15,7 +15,7 @@ public class IndexLevel2CategoryVO {
 
     }
     public IndexLevel2CategoryVO(GoodsCategory goodsCategory) {
-        this.categoryId = goodsCategory.getId();
+        this.categoryId = goodsCategory.getGoodsCategoryId();
         this.parentId = goodsCategory.getParentId();
         this.categoryLevel = goodsCategory.getCategoryLevel();
         this.categoryName = goodsCategory.getCategoryName();

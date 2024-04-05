@@ -51,6 +51,14 @@ jQuery.fn.setValid = function () {
     this.addClass("is-valid");
 };
 
+function getCurrentUrl() {
+    return window.location.origin + window.location.pathname;
+}
+
+function getBaseUrl() {
+    return window.location.origin;
+}
+
 class Validator {
     constructor(string) {
         this._string = string;

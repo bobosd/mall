@@ -6,17 +6,12 @@
     <link rel="stylesheet" href="/styles/mall/all.css"/>
     <link rel="stylesheet" href="/styles/mall/product-search.css">
 </head>
-<nav th:replace="~{mall/navbar::navbar}"></nav>
 <body>
+<nav th:replace="~{mall/navbar::navbar}"></nav>
 <div class="floor">
-
-    <div class="filter">
-        <div></div>
-    </div>
-    <div class="search-result">
-
-    </div>
+    <div th:replace="~{mall/goods-list-fragment::content}"></div>
 </div>
-</body>
+<script th:replace="~{mall/goods-list-fragment::script}"></script>
 <footer th:replace="~{mall/footer::footer}"></footer>
+</body>
 </html>

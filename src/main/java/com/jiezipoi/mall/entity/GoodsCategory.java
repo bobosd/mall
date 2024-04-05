@@ -9,7 +9,7 @@ public class GoodsCategory {
     /**
      * 分类id
      */
-    private Long id;
+    private Long goodsCategoryId;
 
     /**
      * 分类级别(1-一级分类 2-二级分类 3-三级分类)
@@ -62,12 +62,12 @@ public class GoodsCategory {
 
     private final HashSet<GoodsCategory> children = new HashSet<>();
 
-    public Long getId() {
-        return id;
+    public Long getGoodsCategoryId() {
+        return goodsCategoryId;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setGoodsCategoryId(Long goodsCategoryId) {
+        this.goodsCategoryId = goodsCategoryId;
     }
 
     public Byte getCategoryLevel() {

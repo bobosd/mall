@@ -15,7 +15,7 @@
         <div class="first-screen">
             <div class="category-menu">
                 <th:block th:each="l1category : ${categories}">
-                    <div class="category-level1" th:data-id="${l1category.getCategoryId()}">
+                    <div class="category-level1 category-option" th:attr="category-id=${l1category.getCategoryId()}">
                         <span th:text="${l1category.getCategoryName()}"></span>
                     </div>
                 </th:block>
@@ -45,11 +45,11 @@
     </div>
 
     <!-- best-selling -->
-    <div class="floor floor-dark">
+    <div class="floor">
         <div class="row">
             <div class="col-2">
                 <div class="floor-left-title">
-                    Top Deal
+                    Más Vendidos
                 </div>
             </div>
             <div class="col-10">
@@ -80,7 +80,7 @@
     </div>
 
     <!-- new arrival -->
-    <div class="floor">
+    <div class="floor floor-dark">
         <div class="new-arrival-container">
             <div class="floor-top-title">New Arrival</div>
             <div class="swiper swiper-new-arrival">
@@ -107,7 +107,7 @@
     </div>
 
     <!-- recommend for you -->
-    <div class="floor floor-dark">
+    <div class="floor">
         <div class="row">
             <div class="col-2">
                 <div class="floor-left-title">
@@ -144,7 +144,6 @@
 <footer th:replace="~{/mall/footer::footer}"></footer>
 <script th:inline="javascript">
     const categories = getCategoriesMap();
-    const bestSelling = [[${bestSelling}]];
     const swiper = new Swiper(".carousel", {
         direction: "horizontal",
         loop: true,
@@ -187,18 +186,28 @@
     });
 
     function bindCategoryOptionsEvent() {
-        const options = $(".category-level1");
-        options.mouseenter((event) => {
-            const id = parseInt($(event.target).attr("data-id"));
+        const categoryL1Dom = $(".category-level1");
+        categoryL1Dom.mouseenter((event) => {
+            const id = parseInt($(event.target).attr("category-id"));
             const category = categories.get(id);
             if (category == null)
                 return;
             prepareSubMenu(category);
         });
 
-        options.mouseleave(() => {
+        categoryL1Dom.mouseleave(() => {
             mouseInCategoryOption = false;
         });
+
+        $(".category-option").click((e) => {
+            const categoryId = $(e.target).closest(".category-option").attr("category-id");
+            openSearchByCategoryPage(categoryId);
+        });
+    }
+
+    function openSearchByCategoryPage(id) {
+        const url = getCurrentUrl();
+        window.location.href = url + "category/" + id;
     }
 
     function bindSubMenuEvent() {
@@ -221,14 +230,24 @@
         calcSubMenuSize();
         for (let i = 0; i < l2categories.length; i++) {
             const l2category = l2categories[i];
+            const l2id = l2category.categoryId;
+            const l2name = l2category.categoryName;
             const l2DOM = jQuery.parseHTML(
-                '<div class="category-level2"><div class="category-level2-name">' + l2category.categoryName + '</div></div>');
+                '<div class="category-level2">' +
+                    '<div class="category-level2-name category-option" category-id=' + l2id + '>' + l2name + '</div>' +
+                '</div>');
             const l3categories = l2category.children === null ? [] : l2category.children;
             for (let j = 0; j < l3categories.length; j++) {
                 const l3category = l3categories[j];
-                const l3DOM = jQuery.parseHTML('<div class="category-level3">' + l3category.categoryName + '</div>');
+                const l3id = l3category.categoryId;
+                const l3name = l3category.categoryName;
+                const l3DOM = jQuery.parseHTML('<div class="category-level3 category-option" category-id=' + l3id + '>' + l3name + '</div>');
                 $(l2DOM).append(l3DOM);
             }
+            $(l2DOM).find(".category-option").click((e) => {
+                const categoryId = e.target.getAttribute("category-id");
+                openSearchByCategoryPage(categoryId);
+            })
             subMenu.append(l2DOM);
         }
     }

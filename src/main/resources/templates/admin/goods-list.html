@@ -82,7 +82,7 @@
 
         const processCategoryResult = (response) => {
             if (response.code === 200) {
-                const options = response.data.map((c) => ({id: c.id, text: c.categoryName, path: c.path}));
+                const options = response.data.map((c) => ({id: c.goodsCategoryId, text: c.categoryName, path: c.path}));
                 return {results: options};
             } else {
                 return {results: []};
@@ -149,6 +149,7 @@
                 url: "/admin/goods/list",
                 method: "POST",
                 contentType: "application/json",
+                async: false,
                 data: (data) => {
                     const category = getSelectedCategory();
                     data.parentId = category.id;
