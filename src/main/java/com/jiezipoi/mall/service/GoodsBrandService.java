@@ -59,7 +59,6 @@ public class GoodsBrandService {
 
     public void deleteGoodsBrand(long id) throws ForeignKeyConstraintException {
         int associatedGoodsCount = goodsBrandDao.countAssociatedGoodsByBrandId(id);
-        System.out.println(associatedGoodsCount);
         if (associatedGoodsCount > 0) {
             throw new ForeignKeyConstraintException();
         }

@@ -16,6 +16,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -118,6 +119,7 @@ public class MallUserController {
     }
 
     @PostMapping("/logout")
+    @PreAuthorize("hasAuthority('mallUser')")
     @ResponseBody
     public Response<?> logout(HttpServletRequest request, HttpServletResponse response) {
         Cookie[] cookies = request.getCookies();

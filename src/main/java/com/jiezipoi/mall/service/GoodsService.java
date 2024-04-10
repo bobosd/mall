@@ -6,6 +6,7 @@ import com.jiezipoi.mall.dao.GoodsDao;
 import com.jiezipoi.mall.dto.GoodsSearchDTO;
 import com.jiezipoi.mall.entity.Goods;
 import com.jiezipoi.mall.entity.GoodsTag;
+import com.jiezipoi.mall.exception.NotFoundException;
 import com.jiezipoi.mall.utils.CommonResponse;
 import com.jiezipoi.mall.utils.FileNameGenerator;
 import com.jiezipoi.mall.utils.Response;
@@ -33,6 +34,10 @@ public class GoodsService {
         this.goodsDao = goodsDao;
         this.goodsConfig = goodsConfig;
         this.goodsTagService = goodsTagService;
+    }
+
+    public boolean isGoodsExist(long id) {
+        return goodsDao.selectGoodsById(id) != null;
     }
 
     /**
@@ -223,7 +228,7 @@ public class GoodsService {
             goods = goodsDao.list(start, limit);
             totalCount = goodsDao.getGoodsCount();
         } else {
-            goods = goodsDao.listByCategory(start, limit, categoryPath, level);
+            goods = goodsDao.listGoodsByCategory(start, limit, categoryPath, level);
             totalCount = goodsDao.getCategoryGoodsCount(categoryPath);
         }
 
@@ -234,13 +239,24 @@ public class GoodsService {
         return response;
     }
 
-    public Goods getGoodsById(Long id) {
+    public Goods getGoods(Long id) throws NotFoundException {
         if (id == null) {
             throw new NullPointerException();
         }
         Goods goods = goodsDao.selectGoodsById(id);
         if (goods == null) {
+            throw new NotFoundException();
+        }
+        return goods;
+    }
+
+    public Goods getGoodsWithTagList(Long id) throws NotFoundException {
+        if (id == null) {
             throw new NullPointerException();
+        }
+        Goods goods = goodsDao.selectGoodsWithTagByGoodsId(id);
+        if (goods == null) {
+            throw new NotFoundException();
         }
         return goods;
     }
@@ -312,5 +328,9 @@ public class GoodsService {
             throw new NullPointerException();
         }
         return goodsDao.selectGoodsByCategory(categoryId);
+    }
+
+    public List<Goods> getGoodsListById(long... ids) {
+        return goodsDao.selectGoodsByIds(ids);
     }
 }

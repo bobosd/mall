@@ -5,6 +5,7 @@ import java.util.Objects;
 public class GoodsBrand {
     private Long goodsBrandId;
     private String goodsBrandName;
+    private boolean isDeleted;
 
     public Long getGoodsBrandId() {
         return goodsBrandId;

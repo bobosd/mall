@@ -5,6 +5,7 @@ import com.jiezipoi.mall.dao.GoodsDao;
 import com.jiezipoi.mall.dao.IndexConfigDao;
 import com.jiezipoi.mall.entity.Goods;
 import com.jiezipoi.mall.entity.IndexConfig;
+import com.jiezipoi.mall.exception.NotFoundException;
 import com.jiezipoi.mall.utils.CommonResponse;
 import com.jiezipoi.mall.utils.Response;
 import com.jiezipoi.mall.utils.dataTable.DataTableResult;
@@ -19,14 +20,16 @@ import java.util.Locale;
 @Service
 public class IndexConfigService {
     private final IndexConfigDao indexConfigDao;
-    private final GoodsDao goodsDao;
+    private final GoodsService goodsService;
     private final MessageSource messageSource;
 
-    public IndexConfigService(IndexConfigDao indexConfigDao, GoodsDao goodsDao, MessageSource messageSource) {
+    public IndexConfigService(IndexConfigDao indexConfigDao, GoodsService goodsService, MessageSource messageSource) {
         this.indexConfigDao = indexConfigDao;
-        this.goodsDao = goodsDao;
+        this.goodsService = goodsService;
         this.messageSource = messageSource;
     }
+
+
 
     public Response<?> getIndexConfig(Integer start, Integer limit, Integer configType) {
         if (start == null || limit == null || configType == null) {
@@ -41,54 +44,24 @@ public class IndexConfigService {
         return response;
     }
 
-    public Response<?> saveIndexConfig(IndexConfig indexConfig) {
-        if (indexConfig.getConfigType() == null ||
-                indexConfig.getConfigName().isBlank() ||
-                indexConfig.getConfigRank() == null) {
-            return new Response<>(CommonResponse.INVALID_DATA);
+    public void saveIndexConfig(IndexConfig indexConfig) throws NotFoundException {
+        if (!goodsService.isGoodsExist(indexConfig.getGoodsId())) {
+            throw new NotFoundException();
         }
-
-        if (!hasValidGoodsId(indexConfig)) {
-            Response<Object> response = new Response<>();
-            Locale userLocale = LocaleContextHolder.getLocale();
-            response.setResponse(CommonResponse.INVALID_DATA);
-            response.setMessage(messageSource.getMessage("goods.not.exist", null, userLocale));
-        }
-
-        if (indexConfigDao.insertSelective(indexConfig) > 0) {
-            return new Response<>(CommonResponse.SUCCESS);
-        }
-        return new Response<>(CommonResponse.ERROR);
+        indexConfigDao.insertSelective(indexConfig);
     }
 
-    public Response<?> updateIndexConfig(IndexConfig indexConfig) {
-        if (indexConfig.getConfigType() == null ||
-                indexConfig.getId() == null ||
-                indexConfig.getConfigName().isBlank() ||
-                indexConfig.getConfigRank() == null) {
-            return new Response<>(CommonResponse.INVALID_DATA);
-        }
-
+    public void updateIndexConfig(IndexConfig indexConfig) throws NotFoundException {
         IndexConfig temp = indexConfigDao.selectByPrimaryKey(indexConfig.getId());
         if (temp == null) {
-            return new Response<>(CommonResponse.INVALID_DATA);
+            throw new NotFoundException();
         }
 
-        if (!hasValidGoodsId(indexConfig)) {
-            Response<Object> response = new Response<>();
-            Locale userLocale = LocaleContextHolder.getLocale();
-            response.setResponse(CommonResponse.INVALID_DATA);
-            response.setMessage(messageSource.getMessage("goods.not.exist", null, userLocale));
-            return response;
+        if (goodsService.isGoodsExist(indexConfig.getGoodsId())) {
+            indexConfigDao.updateByPrimaryKeySelective(indexConfig);
+        } else {
+            throw new NotFoundException();
         }
-
-        indexConfigDao.updateByPrimaryKeySelective(indexConfig);
-        return new Response<>(CommonResponse.SUCCESS);
-    }
-
-    private boolean hasValidGoodsId(IndexConfig indexConfig) {
-        Goods goods = goodsDao.selectGoodsById(indexConfig.getGoodsId());
-        return !(goods == null);
     }
 
     public List<IndexConfigGoodsVO> getConfigGoodsForIndex(int configType) {
@@ -105,7 +78,7 @@ public class IndexConfigService {
             idsArray[i] = goodsIds.get(i);
         }
         //goods对象有太多信息，不能暴露给
-        List<Goods> goodsList = goodsDao.selectGoodsByIds(idsArray);
+        List<Goods> goodsList = goodsService.getGoodsListById(idsArray);
         List<IndexConfigGoodsVO> goodsVOS = new ArrayList<>();
         goodsList.forEach(goods -> goodsVOS.add(new IndexConfigGoodsVO(goods)));
         return goodsVOS;

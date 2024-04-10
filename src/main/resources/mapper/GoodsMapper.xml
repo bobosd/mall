@@ -153,7 +153,7 @@
         FROM goods_info;
     </select>
 
-    <select id="listByCategory" resultMap="BaseResultMap">
+    <select id="listGoodsByCategory" resultMap="BaseResultMap">
         SELECT <include refid="base_column_list"/>
         FROM goods_info
         JOIN goods_category gc on gc.goods_category_id = goods_info.goods_category_id
@@ -170,7 +170,13 @@
             gc.path = #{path,jdbcType=VARCHAR};
     </select>
 
-    <select id="selectGoodsById" resultMap="GoodsResultWithTags">
+    <select id="selectGoodsById" resultMap="BaseResultMap">
+        SELECT <include refid="base_column_list"/>
+        FROM goods_info
+        WHERE goods_info.goods_id = #{goodsId,jdbcType=BIGINT}
+    </select>
+
+    <select id="selectGoodsWithTagByGoodsId" resultMap="GoodsResultWithTags">
         SELECT goods_info.*, goods_has_tag.*, goods_tag.*
         FROM goods_info
         LEFT JOIN goods_has_tag ON goods_info.goods_id = goods_has_tag.goods_id

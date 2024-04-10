@@ -5,6 +5,7 @@ import com.jiezipoi.mall.dto.GoodsSearchBrandsDTO;
 import com.jiezipoi.mall.dto.GoodsSearchCategoryDTO;
 import com.jiezipoi.mall.dto.GoodsSearchDTO;
 import com.jiezipoi.mall.entity.Goods;
+import com.jiezipoi.mall.exception.NotFoundException;
 import com.jiezipoi.mall.service.GoodsService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -144,11 +145,11 @@ public class MallGoodsController {
     @GetMapping("/goods/detail/{goodsId}")
     public String goodsDetailPage(ModelMap modelMap, @PathVariable Long goodsId) {
         try {
-            Goods goods = goodsService.getGoodsById(goodsId);
+            Goods goods = goodsService.getGoods(goodsId);
             modelMap.put("goods", goods);
             modelMap.put("currencySymbol", goodsConfig.getCurrencySymbol());
             return "mall/goods-detail";
-        } catch (NullPointerException e) {
+        } catch (NullPointerException | NotFoundException e) {
             return "mall/fallback";
         }
     }

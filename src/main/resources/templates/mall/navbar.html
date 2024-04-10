@@ -18,20 +18,42 @@
                 <div sec:authorize="isAuthenticated()">
                     <a><i class="fa-solid fa-user"></i><span class="nickname"></span></a>
                     <a class="logout-option"><i class="fa-solid fa-right-from-bracket"></i><span>logout</span></a>
+                    <a class="btn-shopping-cart"><i class="fa-solid fa-cart-shopping"></i> cesta</a>
+                    <div>
+                        <div class="shopping-cart-background">
+                        </div>
+                        <div class="shopping-cart">
+                            <div class="shopping-cart-header">
+                                <div class="shopping-cart-title">Mi cesta</div>
+                                <div class="btn-close-shopping-cart"><i class="fa-solid fa-x"></i></div>
+                            </div>
+                            <div class="shopping-cart-body">
+                            </div>
+                            <div class="shopping-cart-spinner">
+                                <div class="spinner-border" role="status"></div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div sec:authorize="!isAuthenticated()">
                     <a href="/login"><span>Login</span></a>
                     <a href="/signup"><span>Registrar</span></a>
                 </div>
-                <a class="shopping-cart"><i class="fa-solid fa-cart-shopping"></i> cesta</a>
             </div>
         </div>
     </nav>
 
     <script>
+        //没有放在 $(document).ready() 里是因为 navbar + 原网页会重叠，并且会定义两个initListener() { }
         $(".navbar-mall-icon").click(() => {
-            window.location.href = "/";
+            window.location.href = getBaseUrl();
         });
+
+        $(".logout-option").click(() => logout());
+
+        $(".btn-shopping-cart").click(() => {
+            loadAndShowShoppingCart();
+        })
 
         const MALL_USER_ITEM_NAME = "mallUser";
         const refreshToken = getCookie("refresh_token");
@@ -41,8 +63,6 @@
         } else {
             localStorage.removeItem(MALL_USER_ITEM_NAME)
         }
-
-        $(".logout-option").click(() => logout());
 
         function getCookie(name) {
             name += "=";
@@ -98,6 +118,92 @@
                 $(".search-input").val(keyword);
             }
         })();
+
+        function loadAndShowShoppingCart() {
+            const backgroundDiv = $(".shopping-cart-background");
+            backgroundDiv.show();
+            backgroundDiv.click(() => hideShoppingCart());
+            $(".shopping-cart").addClass("open");
+            $(".btn-close-shopping-cart").click(() => hideShoppingCart());
+            showShoppingCartLoadingIcon();
+            $.ajax({
+                method: "POST",
+                url: "/shopping-cart/list",
+                success: (res) => {
+                    if (res.code === 200) {
+                        renderShoppingCart(res.data);
+                    }
+                },
+                error: () => showServerErrorSwal(),
+                complete: () => hideShoppingCartLoadingIcon()
+            });
+        }
+
+        function renderShoppingCart(items) {
+            if (items.length < 1) {
+                return;
+            }
+            let itemsDomStr = '';
+            let totalPrice = 0.0;
+            items.forEach((item) => {
+                const {sellingPrice, goodsCount} = item;
+                totalPrice = (sellingPrice * goodsCount * 10 + totalPrice * 10) / 10;
+                itemsDomStr += generateShoppingCartItemsDOM(item);
+            });
+            const summaryDOM = generateSummaryDOM(totalPrice);
+            const btnCashier = `<button class="button button-xl button-orange btn-cashier">Ir a cajero</button>`;
+            const resultDOM = jQuery.parseHTML(itemsDomStr);
+            const cartBody = $(".shopping-cart-body");
+            cartBody.append(resultDOM);
+            cartBody.append(summaryDOM);
+            cartBody.append(btnCashier);
+        }
+
+        function generateSummaryDOM(total) {
+            total = Number.parseFloat(total).toFixed(2);
+            total = total.toString().replace(".", ",");
+            const summaryDOM = `
+                <div class="shopping-cart-summary">
+                    <div>Total:</div>
+                    <div>${total}€</div>
+                </div>`;
+            return jQuery.parseHTML(summaryDOM);
+        }
+
+        function generateShoppingCartItemsDOM(item) {
+            const {goodsCoverImg, goodsName, sellingPrice, goodsCount} = item;
+            const sellingPriceStr = parseNumberToEuro(sellingPrice)
+            return`<div class="shopping-cart-item-container">
+                        <div class="shopping-cart-item-image">
+                            <img src="${goodsCoverImg}" alt="cart item image">
+                        </div>
+                        <div class="shopping-cart-item-info">
+                            <div class="shopping-cart-item-title">${goodsName}</div>
+                            <div class="shopping-cart-item-price">${sellingPriceStr}</div>
+                            <div class="shopping-cart-item-count">unidades: ${goodsCount}</div>
+                        </div>
+                        <div class="shopping-cart-item-delete">
+                            <i class="fa-solid fa-trash"></i>
+                        </div>
+                    </div>`;
+        }
+
+        function hideShoppingCart() {
+            const backgroundDiv = $(".shopping-cart-background");
+            $(".shopping-cart").removeClass("open");
+            backgroundDiv.hide();
+            backgroundDiv.unbind();
+            $(".btn-close-shopping-cart").unbind();
+            $(".shopping-cart-body").empty();
+        }
+
+        function showShoppingCartLoadingIcon() {
+            $(".shopping-cart-spinner").show();
+        }
+
+        function hideShoppingCartLoadingIcon() {
+            $(".shopping-cart-spinner").hide();
+        }
     </script>
 </div>
 </html>

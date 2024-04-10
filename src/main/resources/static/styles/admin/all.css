@@ -7,7 +7,7 @@
 }
 
 body {
-    font-family: sans-serif;
+    font-family: "Open Sans", open-sans, sans-serif;
     min-width: 941px;
 }
 
@@ -39,6 +39,7 @@ div.is-invalid {
     -moz-user-select: none; /* Firefox */
     -ms-user-select: none; /* Internet Explorer/Edge */
     user-select: none; /* Non-prefixed version, currently supported by Chrome and Opera */
+    transition-duration: 0.3s;
 }
 
 .button-blue {

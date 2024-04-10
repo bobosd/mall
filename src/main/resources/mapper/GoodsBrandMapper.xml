@@ -4,6 +4,7 @@
     <resultMap id="BaseResultMap" type="com.jiezipoi.mall.entity.GoodsBrand">
         <id column="goods_brand_id" property="goodsBrandId" jdbcType="BIGINT"/>
         <result column="goods_brand_name" property="goodsBrandName" jdbcType="VARCHAR"/>
+        <result column="is_deleted" property="isDeleted" jdbcType="TINYINT"/>
     </resultMap>
 
     <select id="selectGoodsBrandById" resultMap="BaseResultMap">
@@ -15,8 +16,9 @@
     <select id="findAllGoodsBrand" resultMap="BaseResultMap">
         SELECT *
         FROM goods_brand
+        WHERE is_deleted = 0
         <if test="keyword != null and keyword != ''">
-            WHERE goods_brand_name LIKE #{keyword,jdbcType=VARCHAR}
+            AND goods_brand_name LIKE #{keyword,jdbcType=VARCHAR}
         </if>
         LIMIT #{start,jdbcType=INTEGER}, #{limit,jdbcType=INTEGER}
     </select>
@@ -26,38 +28,43 @@
         SELECT *
         FROM goods_brand
         WHERE goods_brand_name LIKE #{likeKeyword}
+        AND is_deleted = 0;
     </select>
 
     <insert id="insertGoodsBrand">
-        INSERT INTO goods_brand
-        VALUES (NULL, #{brandName,jdbcType=VARCHAR});
+        INSERT INTO goods_brand(goods_brand_name)
+        VALUES #{brandName,jdbcType=VARCHAR};
     </insert>
 
     <update id="updateGoodsBrandById">
         UPDATE goods_brand
         SET goods_brand_name = #{brandName,jdbcType=VARCHAR}
         WHERE goods_brand_id = #{brandId,jdbcType=BIGINT}
+        AND is_deleted = 0;
     </update>
 
     <delete id="deleteGoodsBrandById">
-        DELETE FROM goods_brand
-        WHERE goods_brand_id = #{brandId,jdbcType=BIGINT}
+        UPDATE goods_brand
+        SET is_deleted = 1
+        WHERE goods_brand_id = #{brandId,jdbcType=BIGINT};
     </delete>
 
     <select id="selectGoodsBrandCount" resultType="int">
         SELECT COUNT(goods_brand_id)
-        FROM goods_brand;
+        FROM goods_brand
+        WHERE is_deleted = 0;
     </select>
 
     <select id="selectGoodsBrandByName" resultMap="BaseResultMap">
         SELECT *
         FROM goods_brand
         WHERE goods_brand_name = #{brandName,jdbcType=VARCHAR}
+        AND is_deleted = 0;
     </select>
 
     <select id="countAssociatedGoodsByBrandId" resultType="int">
         SELECT COUNT(goods_id)
         FROM goods_info
-        WHERE goods_brand_id = #{goodsBrandId,jdbcType=BIGINT};
+        WHERE goods_brand_id = #{goodsBrandId,jdbcType=BIGINT}
     </select>
 </mapper>

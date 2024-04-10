@@ -19,14 +19,16 @@ public interface GoodsDao {
      * @param level level of this category
      * @return List of goods
      */
-    List<Goods> listByCategory(@Param("start") int start, @Param("limit") int limit,
-                               @Param("path") String path, @Param("level") int level);
+    List<Goods> listGoodsByCategory(@Param("start") int start, @Param("limit") int limit,
+                                    @Param("path") String path, @Param("level") int level);
 
     int getGoodsCount();
 
     int getCategoryGoodsCount(@Param("path") String categoryPath);
 
     Goods selectGoodsById(@Param("goodsId") long goodsId);
+
+    Goods selectGoodsWithTagByGoodsId(@Param("goodsId") long goodsId);
 
     List<Goods> selectGoodsByIds(@Param("ids") long[] goodsId);
 

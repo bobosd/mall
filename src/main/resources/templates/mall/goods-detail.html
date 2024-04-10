@@ -5,7 +5,6 @@
     <title>Mall</title>
     <link rel="stylesheet" href="/styles/mall/all.css"/>
     <link rel="stylesheet" href="/styles/mall/goods-detail.css"/>
-
 </head>
 <body>
 <nav th:replace="~{mall/navbar::navbar}"></nav>
@@ -62,7 +61,6 @@
 
     function onAmountContainerFocusEvent() {
         $(".choose-amount").focusin(() => {
-            console.log();
         });
     }
 
@@ -92,13 +90,26 @@
 
     function addToCart() {
         const shoppingCartItem = {goodsId: getGoodsId(), goodsCount: getQuantity()};
+        const button = $(".button-add-to-cart");
+        button.addSpinner();
         $.ajax({
             method: "POST",
             url: "/shopping-cart/add",
             data: JSON.stringify(shoppingCartItem),
             contentType: "application/json",
             success: (res) => {
-                console.log(res);
+                if (res.code === 200) {
+                    loadAndShowShoppingCart();
+                } else if (res.message === "total item exceeds") {
+
+                } else if (res.message === "single item exceeds") {
+
+                } else {
+
+                }
+            },
+            complete: () => {
+                button.removeSpinner();
             }
         });
     }

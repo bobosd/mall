@@ -2,17 +2,23 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.jiezipoi.mall.dao.ShoppingCartItemDao">
     <resultMap id="BaseResultMap" type="com.jiezipoi.mall.entity.ShoppingCartItem">
-        <id column="cart_item_id" jdbcType="BIGINT" property="cartItemId"/>
         <result column="user_id" jdbcType="BIGINT" property="userId"/>
         <result column="goods_id" jdbcType="BIGINT" property="goodsId"/>
         <result column="goods_count" jdbcType="INTEGER" property="goodsCount"/>
-        <result column="is_deleted" jdbcType="TINYINT" property="isDeleted"/>
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
         <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
     </resultMap>
 
+    <resultMap id="ShoppingCartItemDTO" type="com.jiezipoi.mall.dto.ShoppingCartItemDTO">
+        <result column="goods_id" jdbcType="BIGINT" property="goodsId"/>
+        <result column="goods_count" jdbcType="INTEGER" property="goodsCount"/>
+        <result column="goods_name" jdbcType="VARCHAR" property="goodsName"/>
+        <result column="goods_cover_img" jdbcType="VARCHAR" property="goodsCoverImg"/>
+        <result column="selling_price" jdbcType="DECIMAL" property="sellingPrice"/>
+    </resultMap>
+
     <sql id="Base_Column_List">
-        cart_item_id, user_id, goods_id, goods_count, is_deleted, create_time, update_time
+        user_id, goods_id, goods_count, create_time, update_time
     </sql>
     
     <select id="selectByUserIdAndGoodsId" resultMap="BaseResultMap">
@@ -21,22 +27,17 @@
         FROM shopping_cart_item
         WHERE user_id = #{mallUserId,jdbcType=BIGINT}
         AND goods_id = #{mallGoodsId,jdbcType=BIGINT}
-        AND is_deleted = 0
         LIMIT 1;
     </select>
     
     <select id="selectCountByUserId" resultType="int">
         SELECT COUNT(*)
         FROM shopping_cart_item
-        WHERE user_id = #{mallUserId,jdbcType=BIGINT} AND is_deleted = 0
     </select>
 
     <insert id="insertSelective" parameterType="com.jiezipoi.mall.entity.ShoppingCartItem">
         INSERT INTO shopping_cart_item
         <trim prefix="(" suffix=")" suffixOverrides=",">
-            <if test="item.cartItemId != null">
-                cart_item_id,
-            </if>
             <if test="item.userId != null">
                 user_id,
             </if>
@@ -46,9 +47,6 @@
             <if test="item.goodsCount">
                 goods_count,
             </if>
-            <if test="item.isDeleted != null">
-                is_deleted,
-            </if>
             <if test="item.createTime != null">
                 create_time,
             </if>
@@ -57,9 +55,6 @@
             </if>
         </trim>
         <trim prefix="VALUES (" suffix=")" suffixOverrides=",">
-            <if test="item.cartItemId != null">
-                #{item.cartItemId,jdbcType=BIGINT},
-            </if>
             <if test="item.userId != null">
                 #{item.userId,jdbcType=BIGINT},
             </if>
@@ -69,9 +64,6 @@
             <if test="item.goodsCount">
                 #{item.goodsCount,jdbcType=INTEGER},
             </if>
-            <if test="item.isDeleted != null">
-                #{item.isDeleted, jdbcType=TINYINT},
-            </if>
             <if test="item.createTime != null">
                 #{item.createTime,jdbcType=TIMESTAMP},
             </if>
@@ -80,4 +72,39 @@
             </if>
         </trim>
     </insert>
+
+    <update id="updateByUserIdAndGoodsIdSelective" parameterType="com.jiezipoi.mall.entity.ShoppingCartItem">
+        UPDATE shopping_cart_item
+        <set>
+            <if test="item.userId != null">
+                user_id = #{item.userId,jdbcType=BIGINT},
+            </if>
+            <if test="item.goodsId != null">
+                goods_id = #{item.goodsId,jdbcType=BIGINT},
+            </if>
+            <if test="item.goodsCount">
+                goods_count = #{item.goodsCount,jdbcType=INTEGER},
+            </if>
+            <if test="item.createTime != null">
+                create_time = #{item.createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="item.updateTime != null">
+                update_time = #{item.updateTime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        WHERE shopping_cart_item.user_id = #{param1.userId,jdbcType=BIGINT}
+        AND shopping_cart_item.goods_id = #{item.goodsId,jdbcType=BIGINT}
+    </update>
+
+    <select id="selectByUserId" resultMap="ShoppingCartItemDTO">
+        SELECT shopping_cart_item.goods_id, goods_count, goods_name, goods_cover_img, selling_price
+        FROM shopping_cart_item
+        JOIN goods_info ON goods_info.goods_id = shopping_cart_item.goods_id
+        WHERE shopping_cart_item.user_id = #{userId,jdbcType=BIGINT}
+    </select>
+
+    <delete id="deleteByPrimaryKeyAndUserId">
+        DELETE FROM shopping_cart_item
+        WHERE goods_id = #{goodsId,jdbcType=BIGINT} AND user_id = #{userId,jdbcType=BIGINT}
+    </delete>
 </mapper>

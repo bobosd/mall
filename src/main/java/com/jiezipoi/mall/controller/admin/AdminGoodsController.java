@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jiezipoi.mall.entity.Goods;
 import com.jiezipoi.mall.entity.GoodsBrand;
 import com.jiezipoi.mall.entity.GoodsCategory;
+import com.jiezipoi.mall.exception.NotFoundException;
 import com.jiezipoi.mall.service.GoodsBrandService;
 import com.jiezipoi.mall.service.GoodsCategoryService;
 import com.jiezipoi.mall.service.GoodsService;
@@ -55,7 +56,7 @@ public class AdminGoodsController {
     @GetMapping("/goods/edit/{id}")
     public String goodsEditPage(ModelMap modelMap, @PathVariable Long id) {
         try {
-            Goods goods = goodsService.getGoodsById(id);
+            Goods goods = goodsService.getGoodsWithTagList(id);
             Long categoryId = goods.getGoodsCategoryId();
             List<GoodsCategory> categories = categoryService.getGoodsCategoryAndParent(categoryId);
             GoodsBrand goodsBrand = goodsBrandService.getGoodsBrandById(goods.getGoodsBrandId());
@@ -63,7 +64,7 @@ public class AdminGoodsController {
             modelMap.addAttribute("goods", goods);
             modelMap.addAttribute("category", categories);
             return "admin/goods-edit";
-        } catch (NullPointerException e) {
+        } catch (NullPointerException | NotFoundException e) {
             return "admin/fallback";
         }
     }

@@ -6,7 +6,7 @@ jQuery.fn.addSpinner = function() {
     this.unbind();
     const size = $(this).height();
     const spinnerSize = Math.sqrt((size * size) / 2);
-    let spinner = $.parseHTML('<div><div class="spinner-border text-light" role="status"></div></div>');
+    let spinner = $.parseHTML('<div><div class="spinner-border text-light" role="status"></div></div>');//bootstrap spinner
     spinner = $(spinner);
     spinner.children().first().height(spinnerSize);
     spinner.children().first().width(spinnerSize);
@@ -57,6 +57,11 @@ function getCurrentUrl() {
 
 function getBaseUrl() {
     return window.location.origin;
+}
+
+function parseNumberToEuro(number) {
+    const fixedNumber = Number.parseFloat(number).toFixed(2);
+    return fixedNumber.replace(".", ",") + '€';
 }
 
 class Validator {
