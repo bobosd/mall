@@ -17,16 +17,16 @@ import java.util.List;
 
 @Service
 public class ShoppingCartItemService {
-    private final MallUserService mallUserService;
+    private final UserService userService;
     private final ShoppingCartItemDao shoppingCartItemDao;
     private final GoodsService goodsService;
     private final ShoppingCartConfig shoppingCartConfig;
     private static final String TOTAL_CART_ITEMS_EXCEEDED_MESSAGE = "total item exceeds";
     private static final String SINGLE_ITEMS_COUNT_EXCEEDED_MESSAGE = "single item exceeds";
 
-    public ShoppingCartItemService(MallUserService mallUserService, ShoppingCartItemDao shoppingCartItemDao,
+    public ShoppingCartItemService(UserService userService, ShoppingCartItemDao shoppingCartItemDao,
                                    GoodsService goodsService, ShoppingCartConfig shoppingCartConfig) {
-        this.mallUserService = mallUserService;
+        this.userService = userService;
         this.shoppingCartItemDao = shoppingCartItemDao;
         this.goodsService = goodsService;
         this.shoppingCartConfig = shoppingCartConfig;
@@ -35,8 +35,8 @@ public class ShoppingCartItemService {
     private Long getUserId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userEmail = authentication.getName();
-        MallUser mallUser = mallUserService.getMallUserByEmail(userEmail);
-        return mallUser.getId();
+        MallUser mallUser = userService.loadUserByUsername(userEmail);
+        return mallUser.getUserId();
     }
 
     /**

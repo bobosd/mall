@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.jiezipoi.mall.dao.MallUserDao">
+<mapper namespace="com.jiezipoi.mall.dao.UserDao">
     <resultMap id="BaseResultMap" type="com.jiezipoi.mall.entity.MallUser" >
-        <id column="id" jdbcType="BIGINT" property="id"/>
+        <id column="user_id" jdbcType="BIGINT" property="userId"/>
         <result column="nick_name" jdbcType="VARCHAR" property="nickName"/>
         <result column="email" jdbcType="VARCHAR" property="email"/>
         <result column="password" jdbcType="VARCHAR" property="password"/>
@@ -13,29 +13,35 @@
         <result column="locked_flag" jdbcType="TINYINT" property="lockedFlag"/>
         <result column="user_status" typeHandler="com.jiezipoi.mall.handler.UserStatusTypeHandler" property="userStatus"/>
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <collection property="permissions" ofType="java.lang.String">
+            <result column="permission_key"/>
+        </collection>
     </resultMap>
 
-    <sql id="Base_Column_List">
-        id, nick_name, email, password, introduce_sign, address, is_deleted, locked_flag, user_status, create_time
-    </sql>
-
     <select id="selectByEmail" resultMap="BaseResultMap">
-        SELECT <include refid="Base_Column_List"/>
-        FROM mall_user
-        WHERE email = #{email,jdbcType=VARCHAR}
+        SELECT user.user_id, nick_name, email, password, introduce_sign, address, is_deleted, locked_flag, user_status, user.create_time, permission_key
+        FROM user
+        JOIN user_has_role ON user_has_role.user_id = user.user_id
+        JOIN role_has_permision ON role_has_permision.role_id = user_has_role.role_id
+        JOIN permission ON role_has_permision.permission_id = permission.permission_id
+        WHERE email = #{email,jdbcType=VARCHAR};
+
     </select>
 
     <select id="selectByEmailAndPassword" resultMap="BaseResultMap">
-        SELECT <include refid="Base_Column_List"/>
-        FROM mall_user
+        SELECT user.user_id, nick_name, email, password, introduce_sign, address, is_deleted, locked_flag, user_status, user.create_time, permission_key
+        FROM user
+        JOIN user_has_role ON user_has_role.user_id = user.user_id
+        JOIN role_has_permision ON role_has_permision.role_id = user_has_role.role_id
+        JOIN permission ON role_has_permision.permission_id = permission.permission_id
         WHERE email = #{email,jdbcType=VARCHAR} AND password = #{password,jdbcType=VARCHAR}
     </select>
 
     <insert id="insertSelective" parameterType="com.jiezipoi.mall.entity.MallUser" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO mall_user
+        INSERT INTO user
         <trim prefix="(" suffix=")" suffixOverrides=",">
-            <if test="id != null">
-                id,
+            <if test="userId != null">
+                user_id,
             </if>
             <if test="nickName != null and nickName != ''">
                 nick_name,
@@ -63,8 +69,8 @@
             </if>
         </trim>
         <trim prefix="VALUES (" suffix=")" suffixOverrides=",">
-            <if test="id != null">
-                #{id,jdbcType=BIGINT},
+            <if test="userId != null">
+                #{userId,jdbcType=BIGINT},
             </if>
             <if test="nickName != null and nickName != ''">
                 #{nickName,jdbcType=VARCHAR},
@@ -93,25 +99,25 @@
         </trim>
     </insert>
 
-    <update id="updateStatusByEmail">
-        UPDATE mall_user
+    <update id="updateStatusByPrimaryKey">
+        UPDATE user
         SET user_status = #{status.code}
-        WHERE email = #{email,jdbcType=VARCHAR};
+        WHERE user_id = #{userId,jdbcType=BIGINT};
     </update>
 
     <insert id="insertVerificationCode">
-        INSERT INTO mall_user_verification_code
+        INSERT INTO user_verification_code
         VALUES (#{email,jdbcType=VARCHAR}, #{verificationCode,jdbcType=VARCHAR}, NULL);
     </insert>
 
     <select id="selectEmailByVerificationCode" resultType="java.lang.String">
         SELECT email
-        FROM mall_user_verification_code
+        FROM user_verification_code
         WHERE verification_code = #{verificationCode,jdbcType=VARCHAR}
     </select>
 
     <delete id="deleteVerificationCodeByEmail">
-        DELETE FROM mall_user_verification_code
+        DELETE FROM user_verification_code
         WHERE email = #{email,jdbcType=VARCHAR}
     </delete>
 </mapper>

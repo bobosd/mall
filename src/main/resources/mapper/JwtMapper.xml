@@ -11,20 +11,20 @@
     </resultMap>
 
     <insert id="insertRefreshToken" parameterType="com.jiezipoi.mall.entity.UserRefreshToken">
-        INSERT INTO mall_user_refresh_token
+        INSERT INTO user_refresh_token
         VALUES (#{uuid,jdbcType=VARCHAR}, #{mallUserEmail,jdbcType=VARCHAR}, #{encodedRefreshToken,jdbcType=VARCHAR},
                 #{createTime,jdbcType=TIMESTAMP}, #{expireTime,jdbcType=TIMESTAMP});
     </insert>
 
     <delete id="deleteRefreshToken">
         DELETE
-        FROM mall_user_refresh_token
+        FROM user_refresh_token
         WHERE uuid = #{uuid,jdbcType=VARCHAR};
     </delete>
 
     <select id="selectRefreshTokenByEmail" resultMap="RefreshTokenResultMap">
         SELECT *
-        FROM mall_user_refresh_token
+        FROM user_refresh_token
         WHERE mall_user_email = #{email,jdbcType=VARCHAR};
     </select>
 </mapper>

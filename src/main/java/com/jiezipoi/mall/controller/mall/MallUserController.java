@@ -8,7 +8,7 @@ import com.jiezipoi.mall.entity.MallUser;
 import com.jiezipoi.mall.enums.UserStatus;
 import com.jiezipoi.mall.exception.VerificationCodeNotFoundException;
 import com.jiezipoi.mall.service.JwtService;
-import com.jiezipoi.mall.service.MallUserService;
+import com.jiezipoi.mall.service.UserService;
 import com.jiezipoi.mall.utils.CommonResponse;
 import com.jiezipoi.mall.utils.Response;
 import jakarta.servlet.http.Cookie;
@@ -31,12 +31,12 @@ import java.util.regex.Pattern;
 @Controller
 @RequestMapping("/user")
 public class MallUserController {
-    private final MallUserService mallUserService;
+    private final UserService userService;
     private final JwtConfig jwtConfig;
     private final JwtService jwtService;
 
-    public MallUserController(MallUserService mallUserService, JwtConfig jwtConfig, JwtService jwtService) {
-        this.mallUserService = mallUserService;
+    public MallUserController(UserService userService, JwtConfig jwtConfig, JwtService jwtService) {
+        this.userService = userService;
         this.jwtConfig = jwtConfig;
         this.jwtService = jwtService;
     }
@@ -44,7 +44,7 @@ public class MallUserController {
     @GetMapping("/activate-account/{token}")
     public String userActivation(@PathVariable String token, HttpServletResponse response, ModelMap modelMap) {
         try {
-            MallUser user = mallUserService.activateUser(token);
+            MallUser user = userService.activateUser(token);
             MallUserDTO mallUserDTO = new MallUserDTO(user);
             setCredentialsCookie(user, response);
             ObjectMapper objectMapper = new ObjectMapper();
@@ -89,11 +89,11 @@ public class MallUserController {
             return response;
         }
 
-        if (mallUserService.isExistingEmail(email)) {
+        if (userService.isExistingEmail(email)) {
             return new Response<>(CommonResponse.DATA_ALREADY_EXISTS);
         }
 
-        mallUserService.userSignUp(nickname, email, password);
+        userService.createUser(nickname, email, password);
         return new Response<>(CommonResponse.SUCCESS);
     }
 
@@ -104,7 +104,7 @@ public class MallUserController {
                              HttpServletResponse httpServletResponse) {
         MallUser mallUser;
         try {
-            mallUser = mallUserService.findUser(email, password);
+            mallUser = userService.findUser(email, password);
             if (mallUser.getUserStatus() == UserStatus.UNACTIVATED) {
                 return new Response<>(CommonResponse.FORBIDDEN);
             }
@@ -128,7 +128,7 @@ public class MallUserController {
                 .findFirst();
         if (optionalCookie.isPresent()) {
             Cookie refreshTokenCookie = optionalCookie.get();
-            mallUserService.logout(refreshTokenCookie.getValue());
+            userService.logout(refreshTokenCookie.getValue());
         }
         ResponseCookie accessCookie = jwtService.createJwtCookie("", jwtConfig.getAccessCookieName(), Duration.ZERO);
         ResponseCookie refreshCookie = jwtService.createJwtCookie("", jwtConfig.getRefreshCookieName(), Duration.ZERO);

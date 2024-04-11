@@ -1,11 +1,11 @@
-package com.jiezipoi.mall.controller;
+package com.jiezipoi.mall.controller.mall;
 
 import com.jiezipoi.mall.dto.ShoppingCartItemDTO;
 import com.jiezipoi.mall.entity.MallUser;
 import com.jiezipoi.mall.entity.ShoppingCartItem;
 import com.jiezipoi.mall.exception.NotFoundException;
 import com.jiezipoi.mall.exception.QuantityExceededException;
-import com.jiezipoi.mall.service.MallUserService;
+import com.jiezipoi.mall.service.UserService;
 import com.jiezipoi.mall.service.ShoppingCartItemService;
 import com.jiezipoi.mall.utils.CommonResponse;
 import com.jiezipoi.mall.utils.Response;
@@ -23,11 +23,11 @@ import java.util.List;
 public class ShoppingCartItemController {
     private final ShoppingCartItemService shoppingCartItemService;
 
-    private final MallUserService mallUserService;
+    private final UserService userService;
 
-    public ShoppingCartItemController(ShoppingCartItemService shoppingCartItemService, MallUserService mallUserService) {
+    public ShoppingCartItemController(ShoppingCartItemService shoppingCartItemService, UserService userService) {
         this.shoppingCartItemService = shoppingCartItemService;
-        this.mallUserService = mallUserService;
+        this.userService = userService;
     }
 
     @PostMapping("/shopping-cart/add")
@@ -35,8 +35,8 @@ public class ShoppingCartItemController {
     @PreAuthorize("hasAuthority('mallUser')")
     public Response<?> saveShoppingCartItem(@RequestBody ShoppingCartItem shoppingCartItem, Principal principal) {
         try {
-            MallUser mallUser = mallUserService.getMallUserByEmail(principal.getName());
-            shoppingCartItemService.saveCartItem(shoppingCartItem, mallUser.getId());
+            MallUser mallUser = userService.loadUserByUsername(principal.getName());
+            shoppingCartItemService.saveCartItem(shoppingCartItem, mallUser.getUserId());
             return new Response<>(CommonResponse.SUCCESS);
         } catch (QuantityExceededException e) {
             Response<String> response = new Response<>();
@@ -52,7 +52,7 @@ public class ShoppingCartItemController {
 
     @PostMapping("/shopping-cart/list")
     @ResponseBody
-    @PreAuthorize("hasAuthority('mallUser')")
+    // @PreAuthorize("hasAuthority('mallUser')")
     public Response<?> listUserShoppingCart() {
         List<ShoppingCartItemDTO> cartContent = shoppingCartItemService.getUserShoppingCart();
         Response<List<ShoppingCartItemDTO>> response = new Response<>(CommonResponse.SUCCESS);

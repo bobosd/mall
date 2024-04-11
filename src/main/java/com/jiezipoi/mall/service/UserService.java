@@ -2,48 +2,55 @@ package com.jiezipoi.mall.service;
 
 import com.amazonaws.services.simpleemail.AmazonSimpleEmailService;
 import com.amazonaws.services.simpleemail.model.*;
-import com.jiezipoi.mall.dao.MallUserDao;
+import com.jiezipoi.mall.dao.UserDao;
 import com.jiezipoi.mall.entity.MallUser;
+import com.jiezipoi.mall.enums.Role;
 import com.jiezipoi.mall.enums.UserStatus;
 import com.jiezipoi.mall.exception.VerificationCodeNotFoundException;
 import com.jiezipoi.mall.security.MallUserDetails;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
 import java.util.UUID;
 
 @Service
-public class MallUserService {
+public class UserService implements UserDetailsService {
     private final AmazonSimpleEmailService emailService;
-    private final MallUserDao mallUserDao;
+    private final UserDao mallUserDao;
     private final TemplateEngine templateEngine;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
+    private final RoleService roleService;
 
     @Value("${mall.domain}")
     private String domain;
 
-    public MallUserService(AmazonSimpleEmailService emailService,
-                           MallUserDao mallUserDao,
-                           TemplateEngine templateEngine,
-                           PasswordEncoder passwordEncoder,
-                           AuthenticationManager authenticationManager, JwtService jwtService) {
+    public UserService(AmazonSimpleEmailService emailService,
+                       UserDao mallUserDao,
+                       TemplateEngine templateEngine,
+                       PasswordEncoder passwordEncoder,
+                       @Lazy AuthenticationManager authenticationManager, JwtService jwtService, RoleService roleService) {
         this.emailService = emailService;
         this.mallUserDao = mallUserDao;
         this.templateEngine = templateEngine;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
         this.jwtService = jwtService;
+        this.roleService = roleService;
     }
 
-    public void userSignUp(String nickname, String email, String password) {
+    public void createUser(String nickname, String email, String password) {
         MallUser unactivatedUser = createUnactivatedUser(nickname, email, password);
         String verificationCode = generateAndStoreVerificationCode(unactivatedUser);
         String verificationUrl = generateUserVerificationUrl(verificationCode);
@@ -103,7 +110,8 @@ public class MallUserService {
         return userDetails.mallUser();
     }
 
-    public MallUser getMallUserByEmail(String email) {
+    @Override
+    public MallUser loadUserByUsername(String email) throws UsernameNotFoundException{
         return mallUserDao.selectByEmail(email);
     }
 
@@ -115,17 +123,21 @@ public class MallUserService {
      * 验证用户是否是激活
      * @param verificationCode 激活码
      */
+    @Transactional
     public MallUser activateUser(String verificationCode) throws VerificationCodeNotFoundException {
         String email = mallUserDao.selectEmailByVerificationCode(verificationCode);
         if (email == null) {
             throw new VerificationCodeNotFoundException();
         }
         mallUserDao.deleteVerificationCodeByEmail(email);
-        setUserStatus(email, UserStatus.ACTIVATED);
-        return mallUserDao.selectByEmail(email);
+        MallUser mallUser = mallUserDao.selectByEmail(email);
+        mallUser.setUserStatus(UserStatus.ACTIVATED);
+        updateUserStatus(mallUser.getUserId(), UserStatus.ACTIVATED);
+        roleService.assignRoleToUser(Role.USER, mallUser.getUserId());
+        return mallUser;
     }
 
-    public void setUserStatus(String email, UserStatus status) {
-        mallUserDao.updateStatusByEmail(email, status);
+    public void updateUserStatus(Long userId, UserStatus status) {
+        mallUserDao.updateStatusByPrimaryKey(userId, status);
     }
 }

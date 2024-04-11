@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.jiezipoi.mall.dao.RoleDao">
+    <insert id="insertUserHasRole">
+        INSERT INTO user_has_role
+        VALUES (#{userId, jdbcType=BIGINT}, #{roleId, jdbcType=BIGINT})
+    </insert>
+</mapper>

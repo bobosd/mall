@@ -2,11 +2,16 @@ package com.jiezipoi.mall.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.jiezipoi.mall.enums.UserStatus;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.List;
 
-public class MallUser {
-    private Long id;
+public class MallUser implements UserDetails, Serializable {
+    private Long UserId;
     private String nickName;
     private String email;
     private String password;
@@ -17,13 +22,14 @@ public class MallUser {
     private UserStatus userStatus;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createTime;
+    private List<String> permissions;
 
-    public Long getId() {
-        return id;
+    public Long getUserId() {
+        return UserId;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setUserId(Long userId) {
+        this.UserId = userId;
     }
 
     public String getNickName() {
@@ -42,8 +48,39 @@ public class MallUser {
         this.email = email == null ? null : email.trim();
     }
 
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of();
+    }
+
+    @Override
     public String getPassword() {
         return password;
+    }
+
+    @Override
+    public String getUsername() {
+        return "";
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return false;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return false;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return false;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return false;
     }
 
     public void setPassword(String password) {
