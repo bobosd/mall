@@ -9,17 +9,28 @@
     <script th:replace="~{common/libraries::swiper-js}"></script>
 </head>
 <body>
-<div class="logo">
-    <img src="/assets/img/poi.png" alt="mall icon">
-</div>
 <div class="login-body">
-    <form>
-        <input class="form-control input-email" placeholder="E-mail" id="input-email">
-        <input class="form-control input-password" placeholder="Password" type="password"
-                   autocomplete="password" id="input-password">
-        <div class="forgot-password"><a>forgot password?</a></div>
-        <button class="button-login" type="submit">Login</button>
-    </form>
+    <div class="background">
+        <div class="login-panel">
+            <div class="login-panel-header">
+                <div class="sign-up-container">
+                    <div class="button-sign-up">Crear cuenta</div>
+                </div>
+                <div class="logo">
+                    <img src="/assets/img/poi.png" alt="mall icon">
+                </div>
+            </div>
+            <div class="login-panel-body">
+                <form>
+                    <input class="form-control input-email" placeholder="E-mail" id="input-email">
+                    <input class="form-control input-password" placeholder="Password" type="password"
+                           autocomplete="password" id="input-password">
+                    <div class="forgot-password"><a>forgot password?</a></div>
+                    <button class="button-login" type="submit">Login</button>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
@@ -28,10 +39,28 @@
     });
 
     function initListener() {
+        blindLoginEvent();
+        blindSignUpEvent();
+        blindGoHomeEvent();
+    }
+
+    function blindGoHomeEvent() {
+        $(".logo img").click(() => {
+            window.location.href = getBaseUrl();
+        })
+    }
+
+    function blindSignUpEvent() {
+        $(".button-sign-up").click(() => {
+            window.location.href = getBaseUrl() + '/signup';
+        });
+    }
+
+    function blindLoginEvent() {
         $("form").submit((e) => {
             e.preventDefault();
             mallUserLogin();
-        })
+        });
     }
 
     function mallUserLogin() {

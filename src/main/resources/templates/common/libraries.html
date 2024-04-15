@@ -45,6 +45,15 @@
             showConfirmButton: false,
         });
     }
+
+    function showAccessDeniedSwal() {
+        Swal.fire({
+            title: "[[#{access.denied.message}]]",
+            icon: "error",
+            showConfirmButton: true,
+            position: "top"
+        });
+    }
 </script>
 
 

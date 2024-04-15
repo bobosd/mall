@@ -11,7 +11,9 @@ import com.jiezipoi.mall.service.GoodsCategoryService;
 import com.jiezipoi.mall.service.GoodsService;
 import com.jiezipoi.mall.utils.CommonResponse;
 import com.jiezipoi.mall.utils.Response;
+import com.jiezipoi.mall.utils.dataTable.DataTableResult;
 import com.jiezipoi.mall.utils.dataTable.request.GoodsCategoryRequest;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
@@ -69,35 +71,38 @@ public class AdminGoodsController {
         }
     }
 
+    @PreAuthorize("hasAuthority('goods:write')")
     @PostMapping("/goods/update")
     @ResponseBody
     public Response<?> updateGoods(@RequestParam("goods") String goodsJsonString,
                                    @RequestParam(value = "coverImage", required = false) MultipartFile file) {
         try {
             Goods goods = new ObjectMapper().readValue(goodsJsonString, Goods.class);
+            if (!isValidGoodsToUpdate(goods)) {
+                return new Response<>(CommonResponse.INVALID_DATA);
+            }
             goodsService.updateGoods(goods, file);
             return new Response<>(CommonResponse.SUCCESS);
         } catch (JsonProcessingException e) {
-            e.printStackTrace();
             return new Response<>(CommonResponse.INVALID_DATA);
         } catch (IOException e) {
-            e.printStackTrace();
             return new Response<>(CommonResponse.INTERNAL_SERVER_ERROR);
         }
     }
 
+    @PreAuthorize("hasAuthority('goods:write')")
     @PostMapping("/goods/create")
     @ResponseBody
     public Response<?> createGoods(@RequestBody Goods goods, HttpSession session) {
         int userId = (int) session.getAttribute("userId");
+        if (!isValidGoodsToCreate(goods)) {
+            return new Response<>(CommonResponse.INVALID_DATA);
+        }
         try {
             goodsService.createGoods(goods, userId);
             return new Response<>(CommonResponse.SUCCESS);
         } catch (IOException e) {
-            e.printStackTrace();
             return new Response<>(CommonResponse.INTERNAL_SERVER_ERROR);
-        } catch (IllegalArgumentException e) {
-            return new Response<>(CommonResponse.INVALID_DATA);
         }
     }
 
@@ -105,20 +110,36 @@ public class AdminGoodsController {
     @ResponseBody
     public Response<?> saveTempGoods(@RequestBody Goods goods, HttpSession session) {
         int userId = (int) session.getAttribute("userId");
-        return goodsService.saveTempGoods(goods, userId);
+        try {
+            goodsService.saveTempGoods(goods, userId);
+            return new Response<>(CommonResponse.SUCCESS);
+        } catch (IOException e) {
+            return new Response<>(CommonResponse.INTERNAL_SERVER_ERROR);
+        }
     }
+
 
     @PostMapping("/goods/temp/upload/cover-image")
     @ResponseBody
     public Response<?> uploadCoverImage(@RequestParam("image") MultipartFile image, HttpSession session) {
         int userId = (int) session.getAttribute("userId");
-        return goodsService.saveTempCoverImage(image, userId);
+        try {
+            String url = goodsService.saveTempCoverImage(image, userId);
+            Response<String> response = new Response<>(CommonResponse.SUCCESS);
+            response.setData(url);
+            return response;
+        } catch (IOException e) {
+            return new Response<>(CommonResponse.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @PostMapping("/goods/list")
     @ResponseBody
     public Response<?> list(@RequestBody GoodsCategoryRequest request) {
-        return goodsService.list(request.getStart(), request.getLength(), request.getPath(), request.getCategoryLevel());
+        DataTableResult result = goodsService.list(request.getStart(), request.getLength(), request.getPath(), request.getCategoryLevel());
+        Response<DataTableResult> response = new Response<>();
+        response.setData(result);
+        return response;
     }
 
     @PostMapping("/goods/temp/upload/details")
@@ -148,5 +169,38 @@ public class AdminGoodsController {
         } catch (IOException e) {
             return new Response<>(CommonResponse.INTERNAL_SERVER_ERROR);
         }
+    }
+
+
+    //-- controller private methods --//
+
+    private boolean isValidGoodsToCreate(Goods goods) {
+        return goods.getGoodsName() != null &&
+                !goods.getGoodsName().isBlank() &&
+                goods.getGoodsIntro() != null &&
+                !goods.getGoodsIntro().isBlank() &&
+                goods.getOriginalPrice() != null &&
+                goods.getGoodsCategoryId() != null &&
+                goods.getSellingPrice() != null &&
+                goods.getStockNum() != null &&
+                goods.getGoodsSellStatus() != null &&
+                goods.getGoodsCoverImg() != null &&
+                !goods.getGoodsCoverImg().isBlank() &&
+                goods.getGoodsDetailContent() != null &&
+                !goods.getGoodsDetailContent().isBlank();
+    }
+
+    private boolean isValidGoodsToUpdate(Goods goods) {
+        return goods.getGoodsName() != null &&
+                !goods.getGoodsName().isBlank() &&
+                goods.getGoodsIntro() != null &&
+                !goods.getGoodsIntro().isBlank() &&
+                goods.getOriginalPrice() != null &&
+                goods.getGoodsCategoryId() != null &&
+                goods.getSellingPrice() != null &&
+                goods.getStockNum() != null &&
+                goods.getGoodsSellStatus() != null &&
+                goods.getGoodsDetailContent() != null &&
+                !goods.getGoodsDetailContent().isBlank();
     }
 }

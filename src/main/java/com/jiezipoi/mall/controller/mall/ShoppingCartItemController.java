@@ -10,6 +10,7 @@ import com.jiezipoi.mall.service.ShoppingCartItemService;
 import com.jiezipoi.mall.utils.CommonResponse;
 import com.jiezipoi.mall.utils.Response;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -52,7 +53,6 @@ public class ShoppingCartItemController {
 
     @PostMapping("/shopping-cart/list")
     @ResponseBody
-    // @PreAuthorize("hasAuthority('mallUser')")
     public Response<?> listUserShoppingCart() {
         List<ShoppingCartItemDTO> cartContent = shoppingCartItemService.getUserShoppingCart();
         Response<List<ShoppingCartItemDTO>> response = new Response<>(CommonResponse.SUCCESS);

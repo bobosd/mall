@@ -1,7 +1,7 @@
 package com.jiezipoi.mall.config;
 
-import com.jiezipoi.mall.interceptor.AdminLoginInterceptor;
 import com.jiezipoi.mall.interceptor.LanguageInterceptor;
+import jakarta.annotation.Nonnull;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
@@ -14,28 +14,21 @@ public class MallWebMvcConfigurer implements WebMvcConfigurer {
     private final CarouselConfig carouselConfig;
     private final GoodsConfig goodsConfig;
 
-    public MallWebMvcConfigurer(LanguageInterceptor languageInterceptor,
-                                AdminLoginInterceptor adminLoginInterceptor,
-                                CarouselConfig carouselConfig, GoodsConfig goodsConfig) {
+    private final LanguageInterceptor languageInterceptor;
+
+    public MallWebMvcConfigurer(CarouselConfig carouselConfig, GoodsConfig goodsConfig, LanguageInterceptor languageInterceptor) {
         this.languageInterceptor = languageInterceptor;
-        this.adminLoginInterceptor = adminLoginInterceptor;
         this.carouselConfig = carouselConfig;
         this.goodsConfig = goodsConfig;
     }
 
-    private final LanguageInterceptor languageInterceptor;
-    private final AdminLoginInterceptor adminLoginInterceptor;
-
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(languageInterceptor);
-        registry.addInterceptor(adminLoginInterceptor)
-                .addPathPatterns("/admin/**")
-                .excludePathPatterns("/admin/login");
     }
 
     @Override
-    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+    public void addResourceHandlers(@Nonnull ResourceHandlerRegistry registry) {
         exposeCarouselDirectory(registry);
         exposeGoodsDirectory(registry);
     }

@@ -8,6 +8,7 @@ import com.jiezipoi.mall.utils.Response;
 import com.jiezipoi.mall.utils.dataTable.request.IndexConfigRequest;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,6 +31,7 @@ public class AdminConfigController {
         return indexConfigService.getIndexConfig(request.getStart(), request.getLength(), request.getConfigType());
     }
 
+    @PreAuthorize("hasAuthority('index-config:write')")
     @PostMapping("/save")
     @ResponseBody
     public Response<?> save(@RequestBody IndexConfig indexConfig) {
@@ -51,6 +53,7 @@ public class AdminConfigController {
         }
     }
 
+    @PreAuthorize("hasAuthority('index-config:write')")
     @PostMapping("/update")
     @ResponseBody
     public Response<?> update(@RequestBody IndexConfig indexConfig) {
@@ -72,6 +75,7 @@ public class AdminConfigController {
         }
     }
 
+    @PreAuthorize("hasAuthority('index-config:write')")
     @PostMapping("/delete")
     @ResponseBody
     public Response<?> delete(@RequestBody long[] ids) {

@@ -1,7 +1,7 @@
 package com.jiezipoi.mall.handler;
 
-import com.jiezipoi.mall.utils.CommonResponse;
 import com.jiezipoi.mall.utils.Response;
+import jakarta.servlet.http.HttpServletResponse;
 import org.apache.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -14,10 +14,12 @@ public class DefaultExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler({Exception.class})
     @ResponseBody
-    public Response<String> handleAuthenticationException(Exception e) {
+    public Response<String> handleAuthenticationException(Exception e, HttpServletResponse response) throws Exception {
+        System.out.println("default exception handling");
         e.printStackTrace();
+        //let AccessDeniedHandler process it
         if (e instanceof AccessDeniedException) {
-            return new Response<>(CommonResponse.FORBIDDEN);
+            throw e;
         }
         return new Response<>("Error interno del servidor", HttpStatus.SC_INTERNAL_SERVER_ERROR, null);
     }

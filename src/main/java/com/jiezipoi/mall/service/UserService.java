@@ -7,7 +7,6 @@ import com.jiezipoi.mall.entity.MallUser;
 import com.jiezipoi.mall.enums.Role;
 import com.jiezipoi.mall.enums.UserStatus;
 import com.jiezipoi.mall.exception.VerificationCodeNotFoundException;
-import com.jiezipoi.mall.security.MallUserDetails;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -24,6 +23,7 @@ import org.thymeleaf.context.Context;
 import java.util.UUID;
 
 @Service
+@Lazy
 public class UserService implements UserDetailsService {
     private final AmazonSimpleEmailService emailService;
     private final UserDao mallUserDao;
@@ -50,6 +50,7 @@ public class UserService implements UserDetailsService {
         this.roleService = roleService;
     }
 
+    @Transactional
     public void createUser(String nickname, String email, String password) {
         MallUser unactivatedUser = createUnactivatedUser(nickname, email, password);
         String verificationCode = generateAndStoreVerificationCode(unactivatedUser);
@@ -103,16 +104,19 @@ public class UserService implements UserDetailsService {
         return mallUserDao.selectByEmail(email) != null;
     }
 
-    public MallUser findUser(String email, String password) {
+    public MallUser getUserByEmailAndPassword(String email, String password) {
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(email, password);
         Authentication authentication = authenticationManager.authenticate(authenticationToken);
-        MallUserDetails userDetails = (MallUserDetails) authentication.getPrincipal();
-        return userDetails.mallUser();
+        return (MallUser) authentication.getPrincipal();
+    }
+
+    public MallUser getUserByEmail(String email) {
+        return mallUserDao.selectByEmail(email);
     }
 
     @Override
     public MallUser loadUserByUsername(String email) throws UsernameNotFoundException{
-        return mallUserDao.selectByEmail(email);
+        return getUserByEmail(email);
     }
 
     public void logout(String refreshToken) {

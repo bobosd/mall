@@ -2,6 +2,7 @@ package com.jiezipoi.mall.service;
 
 import com.jiezipoi.mall.config.JwtConfig;
 import com.jiezipoi.mall.dao.JwtDao;
+import com.jiezipoi.mall.entity.MallUser;
 import com.jiezipoi.mall.entity.UserRefreshToken;
 import io.jsonwebtoken.*;
 import org.springframework.http.ResponseCookie;
@@ -33,22 +34,24 @@ public class JwtService {
         this.jwtDao = jwtDao;
     }
 
-    public String generateAccessToken(String email) {
-        return generateJWT(generateUUID(), email, jwtConfig.getAccessTokenAge());
+    public String generateAccessToken(MallUser user) {
+        return generateJWT(generateUUID(), user.getEmail(), jwtConfig.getAccessTokenAge(), user.getPermissions());
     }
 
     /**
      * 创建一个新的refresh token并且将其存入数据库。
-     * @param email 用户邮箱
+     * @param user MallUser实体对象
      * @return 生成的refresh token
      */
-    public String generateAndStoreRefreshToken(String email) {
+    public String generateAndStoreRefreshToken(MallUser user) {
+        String email = user.getEmail();
+        List<String> permissions = user.getPermissions();
         String uuid = generateUUID();
         long nowMillis = System.currentTimeMillis();
         Date nowDate = new Date(nowMillis);
         long expireMillis = nowMillis + jwtConfig.getRefreshCookieAge().toMillis();
         Date expireDate = new Date(expireMillis);
-        String refreshToken = generateJWT(uuid, email, nowDate, expireDate);
+        String refreshToken = generateJWT(uuid, email, nowDate, expireDate, permissions);
         String encodedRefreshToken = encoder.encode(refreshToken);
         UserRefreshToken mallUserUserRefreshToken = new UserRefreshToken(uuid, email, encodedRefreshToken, nowDate, expireDate);
         jwtDao.insertRefreshToken(mallUserUserRefreshToken);
@@ -64,12 +67,7 @@ public class JwtService {
 
     public void invalidateRefreshToken(String email, String refreshToken) {
         List<UserRefreshToken> userRefreshTokenList = jwtDao.selectRefreshTokenByEmail(email);
-        Optional<UserRefreshToken> optionalUserRefreshToken = userRefreshTokenList.stream()
-                .filter((t) -> {
-                    String encodedRefreshToken = t.getEncodedRefreshToken();
-                    return encoder.matches(refreshToken, encodedRefreshToken);
-                })
-                .findFirst();
+        Optional<UserRefreshToken> optionalUserRefreshToken = findMatchingToken(userRefreshTokenList, refreshToken);
         if (optionalUserRefreshToken.isPresent()) {
             UserRefreshToken userRefreshToken = optionalUserRefreshToken.get();
             jwtDao.deleteRefreshToken(userRefreshToken.getUuid());
@@ -89,28 +87,30 @@ public class JwtService {
         return UUID.randomUUID().toString().replaceAll("-", "");
     }
 
-    private String generateJWT(String jwtId, String subject, Duration timeToLive) {
-        JwtBuilder builder = generateJwtBuilder(jwtId, subject, timeToLive);
+    private String generateJWT(String jwtId, String subject, Duration timeToLive, List<String> permissions) {
+        JwtBuilder builder = generateJwtBuilder(jwtId, subject, timeToLive, permissions);
         return builder.compact();
     }
 
-    private String generateJWT(String jwtId, String subject, Date issueDate, Date expireDate) {
-        JwtBuilder builder = generateJwtBuilder(jwtId, subject, issueDate, expireDate);
+    private String generateJWT(String jwtId, String subject, Date issueDate, Date expireDate, List<String> permissions) {
+        JwtBuilder builder = generateJwtBuilder(jwtId, subject, issueDate, expireDate, permissions);
         return builder.compact();
     }
 
-    private JwtBuilder generateJwtBuilder(String jwtId, String subject, Duration timeToLive) {
+    private JwtBuilder generateJwtBuilder(String jwtId, String subject, Duration timeToLive, List<String> permissions) {
         long nowMillis = System.currentTimeMillis();
         Date nowDate = new Date(nowMillis);
         long expMillis = nowMillis + timeToLive.toMillis();
         Date expDate = new Date(expMillis);
-        return generateJwtBuilder(jwtId, subject, nowDate, expDate);
+        return generateJwtBuilder(jwtId, subject, nowDate, expDate, permissions);
     }
 
-    private JwtBuilder generateJwtBuilder(String jwtId, String subject, Date issueDate, Date expireDate) {
+    private JwtBuilder generateJwtBuilder
+            (String jwtId, String subject, Date issueDate, Date expireDate, List<String> permissions) {
         return Jwts.builder()
                 .setId(jwtId)
                 .setSubject(subject)
+                .claim("permission", permissions)
                 .setIssuer("JieziCloud")
                 .setIssuedAt(issueDate)
                 .setExpiration(expireDate)
@@ -118,13 +118,31 @@ public class JwtService {
     }
 
     public Claims parseJWT(String jwt) {
+        if (jwt == null) {
+            throw new NullPointerException();
+        }
         return Jwts.parser()
                 .setSigningKey(publicKey)
                 .parseClaimsJws(jwt)
                 .getBody();
     }
 
-    public String generateVerificationToken(String email) {
-        return generateJWT(generateUUID(), email, jwtConfig.getVerificationTokenDuration());
+    public String generateVerificationToken(MallUser user) {
+        return generateJWT(generateUUID(), user.getEmail(), jwtConfig.getVerificationTokenDuration(), user.getPermissions());
+    }
+
+    public boolean isRegisteredRefreshToken(String email, String refreshToken) {
+        List<UserRefreshToken> registeredTokenList = jwtDao.selectRefreshTokenByEmail(email);
+        Optional<UserRefreshToken> optional = findMatchingToken(registeredTokenList, refreshToken);
+        return optional.isPresent();
+    }
+
+    private Optional<UserRefreshToken> findMatchingToken(List<UserRefreshToken> list, String refreshToken) {
+        return list.stream()
+                .filter((t) -> {
+                    String encodedRefreshToken = t.getEncodedRefreshToken();
+                    return encoder.matches(refreshToken, encodedRefreshToken);
+                })
+                .findFirst();
     }
 }

@@ -8,32 +8,21 @@ import org.apache.http.HttpStatus;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
-import org.thymeleaf.TemplateEngine;
-import org.thymeleaf.context.Context;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 
 /**
  * 认证异常后应该返回的内容
  */
 @Component
 public class AuthenticationEntryPointImpl implements AuthenticationEntryPoint {
-    private final TemplateEngine templateEngine;
-
-    public AuthenticationEntryPointImpl(TemplateEngine templateEngine) {
-        this.templateEngine = templateEngine;
-    }
 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException)
             throws IOException {
         if (request.getMethod().equals("GET")) {
-            response.setContentType("text/html");
-            Context thymeleafContext = new Context();
-            String page = templateEngine.process("mall/fallback", thymeleafContext);
-            PrintWriter printWriter = response.getWriter();
-            printWriter.println(page);
+            response.setStatus(HttpServletResponse.SC_MOVED_PERMANENTLY);
+            response.setHeader("Location", "/login");
         } else {
             int STATUS_CODE = HttpStatus.SC_UNAUTHORIZED; //401
             Response<String> responseContent = new Response<>("Authentication failed",

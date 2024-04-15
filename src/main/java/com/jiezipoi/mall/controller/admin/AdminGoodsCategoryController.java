@@ -5,6 +5,7 @@ import com.jiezipoi.mall.entity.GoodsCategory;
 import com.jiezipoi.mall.service.GoodsCategoryService;
 import com.jiezipoi.mall.utils.Response;
 import com.jiezipoi.mall.utils.dataTable.request.GoodsCategoryRequest;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,12 +29,14 @@ public class AdminGoodsCategoryController {
         return service.getCategoriesPage(request);
     }
 
-    @PostMapping("/product-category/save")
+    @PreAuthorize("hasAuthority('category:write')")
+    @PostMapping("/product-category/create")
     @ResponseBody
     public Response<?> save(@RequestBody CreateGoodsCategoryDTO createGoodsCategoryDTO) {
         return service.createCategory(createGoodsCategoryDTO);
     }
 
+    @PreAuthorize("hasAuthority('category:write')")
     @PostMapping("/product-category/update")
     @ResponseBody
     public Response<?> update(@RequestBody GoodsCategory category) {
@@ -46,6 +49,7 @@ public class AdminGoodsCategoryController {
         return service.getGoodsCategoryById(id);
     }
 
+    @PreAuthorize("hasAuthority('category:write')")
     @PostMapping("/product-category/delete")
     @ResponseBody
     public Response<?> delete(@RequestParam("ids[]") Integer[] ids) {

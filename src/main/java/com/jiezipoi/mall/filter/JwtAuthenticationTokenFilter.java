@@ -1,7 +1,10 @@
 package com.jiezipoi.mall.filter;
 
 import com.jiezipoi.mall.config.JwtConfig;
+import com.jiezipoi.mall.entity.MallUser;
+import com.jiezipoi.mall.exception.UnregisteredRefreshTokenException;
 import com.jiezipoi.mall.service.JwtService;
+import com.jiezipoi.mall.service.UserService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
@@ -17,25 +20,27 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Optional;
+import java.time.Duration;
+import java.util.*;
 
 @Component
 public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
     private final HashSet<String> resourcePaths;
     private final JwtConfig jwtConfig;
     private final JwtService jwtService;
+    private final UserService userService;
 
-    public JwtAuthenticationTokenFilter(HashSet<String> resourcePaths, JwtConfig jwtConfig, @Lazy JwtService jwtService) {
+    public JwtAuthenticationTokenFilter(HashSet<String> resourcePaths,
+                                        JwtConfig jwtConfig,
+                                        @Lazy JwtService jwtService,
+                                        @Lazy UserService userService) {
         this.resourcePaths = resourcePaths;
         this.jwtConfig = jwtConfig;
         this.jwtService = jwtService;
+        this.userService = userService;
     }
 
     /**
@@ -50,26 +55,32 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
         Cookie[] cookies = request.getCookies();
         String accessToken = findCookieValueByName(cookies, jwtConfig.getAccessCookieName());
         String refreshToken = findCookieValueByName(cookies, jwtConfig.getRefreshCookieName());
-        if (!StringUtils.hasText(refreshToken)) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-
-        if (accessToken == null) {
-            accessToken = regenerateJwtCookie(response, refreshToken);
-        }
 
         try {
-            Claims claims = jwtService.parseJWT(accessToken);
-            String email = claims.getSubject();
+            if (accessToken == null) {
+                Claims rtClaims = jwtService.parseJWT(refreshToken);
+                String email = rtClaims.getSubject();
+                accessToken = regenerateAccessJwtCookie(email, refreshToken); //throw exception if refresh token not valid
+                setAccessTokenCookie(accessToken, response);
+                if (isRefreshTokenNeedToRenew(rtClaims)) {
+                    jwtService.invalidateRefreshToken(email, refreshToken);
+                    MallUser mallUser = userService.loadUserByUsername(email);
+                    String renewRefreshToken = jwtService.generateAndStoreRefreshToken(mallUser);
+                    setRefreshTokenCookie(renewRefreshToken, response);
+                }
+            }
+            //set authentication
+            Claims accessClaims = jwtService.parseJWT(accessToken);
+            String email = accessClaims.getSubject();
             UsernamePasswordAuthenticationToken authenticationToken =
                     new UsernamePasswordAuthenticationToken(email, null, null);
             SecurityContextHolder.getContext().setAuthentication(authenticationToken);
             filterChain.doFilter(request, response);
         } catch (ExpiredJwtException e) { //发送请求没过期，在服务器过期了。
-            regenerateJwtCookie(response, refreshToken);
+            System.err.println("Expired at processing?");
             filterChain.doFilter(request, response);
-        } catch (JwtException e) {
+        } catch (JwtException | UnregisteredRefreshTokenException | NullPointerException e) {
+            resetJwtCookies(response);
             filterChain.doFilter(request, response);
         }
 
@@ -107,37 +118,43 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
     }
 
     /**
-     * 用于更新身份验证token，依赖refresh token是否有效
-     * 如果refresh token没有过期就只更新access token
-     * 如果refresh token即将过期则更新则两者都更新
-     * 如果refresh token已经过期则退出登入
-     *
-     * @param response 用于给请求设置token
+     * 用于更新access token，依赖refresh token是否有效，需要用到email用于在数据库中查询是否有该token
+     * @param email 用户的email
      * @param refreshToken 用户携带的refresh token
      * @return 新的access token
      */
-    private String regenerateJwtCookie(HttpServletResponse response, String refreshToken) {
-        try {
-            Claims claims = jwtService.parseJWT(refreshToken);
-            String email = claims.getSubject();
-            Date expireDate = claims.getExpiration();
-            Date now = new Date();
-            long diff = expireDate.getTime() - now.getTime();
-            //如果refresh token剩余时间不足，废除并且生成一个新的
-            if (diff < jwtConfig.getRefreshCookieResetAge().toMillis()) {
-                jwtService.invalidateRefreshToken(email, refreshToken);
-                String renewRefreshToken = jwtService.generateAndStoreRefreshToken(email);
-                ResponseCookie refreshTokenCookie = jwtService
-                        .createJwtCookie(renewRefreshToken, jwtConfig.getRefreshCookieName(), jwtConfig.getRefreshCookieAge());
-                response.addHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
-            }
-            //生成新的AccessToken
-            String renewAccessToken = jwtService.generateAccessToken(email);
-            ResponseCookie accessTokenCookie = jwtService
-                    .createJwtCookie(renewAccessToken, jwtConfig.getAccessCookieName(), jwtConfig.getAccessTokenAge());
-            response.addHeader(HttpHeaders.SET_COOKIE, accessTokenCookie.toString());
-            return renewAccessToken;
-        } catch (JwtException ignored) {}
-        return null;
+    private String regenerateAccessJwtCookie(String email, String refreshToken) throws UnregisteredRefreshTokenException {
+        if (!jwtService.isRegisteredRefreshToken(email, refreshToken)) {
+            throw new UnregisteredRefreshTokenException();
+        }
+        MallUser mallUser = userService.loadUserByUsername(email);
+        return jwtService.generateAccessToken(mallUser);
+    }
+
+    private void setAccessTokenCookie(String accessToken, HttpServletResponse response) {
+        ResponseCookie accessTokenCookie = jwtService
+                .createJwtCookie(accessToken, jwtConfig.getAccessCookieName(), jwtConfig.getAccessTokenAge());
+        response.addHeader(HttpHeaders.SET_COOKIE, accessTokenCookie.toString());
+    }
+
+    private void setRefreshTokenCookie(String refreshToken, HttpServletResponse response) {
+        ResponseCookie refreshTokenCookie = jwtService
+                .createJwtCookie(refreshToken, jwtConfig.getRefreshCookieName(), jwtConfig.getRefreshCookieAge());
+        response.addHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
+    }
+
+    private boolean isRefreshTokenNeedToRenew(Claims refreshToken) {
+        Date expireDate = refreshToken.getExpiration();
+        Date now = new Date();
+        long diff = expireDate.getTime() - now.getTime();
+        //如果refresh token剩余时间不足，废除并且生成一个新的
+        return diff < jwtConfig.getRefreshCookieResetAge().toMillis();
+    }
+
+    private void resetJwtCookies(HttpServletResponse response) {
+        ResponseCookie accessCookie = jwtService.createJwtCookie("", jwtConfig.getAccessCookieName(), Duration.ZERO);
+        ResponseCookie refreshCookie = jwtService.createJwtCookie("", jwtConfig.getRefreshCookieName(), Duration.ZERO);
+        response.addHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
+        response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
     }
 }

@@ -21,9 +21,9 @@
     <select id="selectByEmail" resultMap="BaseResultMap">
         SELECT user.user_id, nick_name, email, password, introduce_sign, address, is_deleted, locked_flag, user_status, user.create_time, permission_key
         FROM user
-        JOIN user_has_role ON user_has_role.user_id = user.user_id
-        JOIN role_has_permision ON role_has_permision.role_id = user_has_role.role_id
-        JOIN permission ON role_has_permision.permission_id = permission.permission_id
+        LEFT JOIN user_has_role ON user_has_role.user_id = user.user_id
+        LEFT JOIN role_has_permision ON role_has_permision.role_id = user_has_role.role_id
+        LEFT JOIN permission ON role_has_permision.permission_id = permission.permission_id
         WHERE email = #{email,jdbcType=VARCHAR};
 
     </select>
@@ -37,7 +37,7 @@
         WHERE email = #{email,jdbcType=VARCHAR} AND password = #{password,jdbcType=VARCHAR}
     </select>
 
-    <insert id="insertSelective" parameterType="com.jiezipoi.mall.entity.MallUser" useGeneratedKeys="true" keyProperty="id">
+    <insert id="insertSelective" parameterType="com.jiezipoi.mall.entity.MallUser" useGeneratedKeys="true" keyProperty="userId">
         INSERT INTO user
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="userId != null">

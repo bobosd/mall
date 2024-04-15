@@ -7,9 +7,7 @@ import com.jiezipoi.mall.dto.GoodsSearchDTO;
 import com.jiezipoi.mall.entity.Goods;
 import com.jiezipoi.mall.entity.GoodsTag;
 import com.jiezipoi.mall.exception.NotFoundException;
-import com.jiezipoi.mall.utils.CommonResponse;
 import com.jiezipoi.mall.utils.FileNameGenerator;
-import com.jiezipoi.mall.utils.Response;
 import com.jiezipoi.mall.utils.dataTable.DataTableResult;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,10 +45,6 @@ public class GoodsService {
      */
     @Transactional
     public void createGoods(Goods goods, int userId) throws IOException {
-        if (!isValidGoods(goods)) {
-            throw new IllegalArgumentException();
-        }
-
         String tempCoverImgUrl = goods.getGoodsCoverImg();
         goods.setGoodsCoverImg(convertTempUrlToPermanentUrl(tempCoverImgUrl));
         String tempDetail = goods.getGoodsDetailContent();
@@ -107,51 +101,17 @@ public class GoodsService {
         });
     }
 
-    private boolean isValidGoods(Goods goods) {
-        return goods.getGoodsName() != null &&
-                !goods.getGoodsName().isBlank() &&
-                goods.getGoodsIntro() != null &&
-                !goods.getGoodsIntro().isBlank() &&
-                goods.getOriginalPrice() != null &&
-                goods.getGoodsCategoryId() != null &&
-                goods.getSellingPrice() != null &&
-                goods.getStockNum() != null &&
-                goods.getGoodsSellStatus() != null &&
-                goods.getGoodsCoverImg() != null &&
-                !goods.getGoodsCoverImg().isBlank() &&
-                goods.getGoodsDetailContent() != null &&
-                !goods.getGoodsDetailContent().isBlank();
-    }
 
-    private boolean isValidForUpdate(Goods goods) {
-        return goods.getGoodsName() != null &&
-                !goods.getGoodsName().isBlank() &&
-                goods.getGoodsIntro() != null &&
-                !goods.getGoodsIntro().isBlank() &&
-                goods.getOriginalPrice() != null &&
-                goods.getGoodsCategoryId() != null &&
-                goods.getSellingPrice() != null &&
-                goods.getStockNum() != null &&
-                goods.getGoodsSellStatus() != null &&
-                goods.getGoodsDetailContent() != null &&
-                !goods.getGoodsDetailContent().isBlank();
-    }
 
-    public Response<?> saveTempGoods(Goods goods, int userId) {
+    public void saveTempGoods(Goods goods, int userId) throws IOException {
         Path uploadDir = getUserTempDir(userId);
-        String fileDir = uploadDir + File.separator + goodsConfig.getUserTempDataFilename();
-        try {
-            if (!Files.exists(uploadDir)) {
-                Files.createDirectories(uploadDir);
-            }
-            ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(fileDir));
-            outputStream.writeObject(goods);
-            outputStream.close();
-            return new Response<>(CommonResponse.SUCCESS);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return new Response<>(CommonResponse.ERROR);
+        Path fileDir = uploadDir.resolve(goodsConfig.getUserTempDataFilename());
+        if (!Files.exists(uploadDir)) {
+            Files.createDirectories(uploadDir);
         }
+        ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(fileDir.toFile()));
+        outputStream.writeObject(goods);
+        outputStream.close();
     }
 
     /**
@@ -161,19 +121,11 @@ public class GoodsService {
      * @param userId 用户id
      * @return 图片在服务器的地址
      */
-    public Response<?> saveTempCoverImage(MultipartFile file, int userId) {
-        Response<String> response = new Response<>();
+    public String saveTempCoverImage(MultipartFile file, int userId) throws IOException {
         Path uploadDir = getUserTempDir(userId);
         String filename = generateImageFileName();
-        try {
-            Path savedLocation = saveFile(uploadDir, filename, file);
-            String url = goodsConfig.getExposeUrl(savedLocation);
-            response.setResponse(CommonResponse.SUCCESS);
-            response.setData(url);
-        } catch (IOException e) {
-            response.setResponse(CommonResponse.INTERNAL_SERVER_ERROR);
-        }
-        return response;
+        Path savedLocation = saveFile(uploadDir, filename, file);
+        return goodsConfig.getExposeUrl(savedLocation);
     }
 
     /**
@@ -212,16 +164,11 @@ public class GoodsService {
              ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream)) {
             return (Goods) objectInputStream.readObject();
         } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
             return null;
         }
     }
 
-    public Response<?> list(Integer start, Integer limit, String categoryPath, Integer level) {
-        if (start == null || limit == null) {
-            return new Response<>(CommonResponse.INVALID_DATA);
-        }
-
+    public DataTableResult list(int start, int limit, String categoryPath, Integer level) {
         List<Goods> goods;
         int totalCount;
         if (categoryPath == null && level == null) {
@@ -231,12 +178,7 @@ public class GoodsService {
             goods = goodsDao.listGoodsByCategory(start, limit, categoryPath, level);
             totalCount = goodsDao.getCategoryGoodsCount(categoryPath);
         }
-
-
-        DataTableResult dataTableResult = new DataTableResult(goods, totalCount);
-        Response<DataTableResult> response = new Response<>(CommonResponse.SUCCESS);
-        response.setData(dataTableResult);
-        return response;
+        return new DataTableResult(goods, totalCount);
     }
 
     public Goods getGoods(Long id) throws NotFoundException {
@@ -263,9 +205,6 @@ public class GoodsService {
 
     @Transactional
     public void updateGoods(Goods goods, MultipartFile file) throws IOException {
-        if (!isValidForUpdate(goods)) {
-            throw new IllegalArgumentException();
-        }
         if (file != null) {
             //删除旧图片，保存新图片并且修改Goods对象值
             Path uploadDir = goodsConfig.getGoodsFilePath();

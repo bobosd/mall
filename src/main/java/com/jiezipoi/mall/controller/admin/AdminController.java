@@ -10,18 +10,9 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/admin")
 public class AdminController {
 
-    @GetMapping(value = {"/index", "/"})
+    @GetMapping(value = {"/index", "/", ""})
     public String index() {
         return "admin/admin-index";
-    }
-
-    @GetMapping("/login")
-    public String login(HttpServletRequest request) {
-        if (request.getSession().getAttribute("userId") == null) {
-            return "admin/login";
-        } else {
-            return "admin/admin-index";
-        }
     }
 
     @GetMapping("/carousel")

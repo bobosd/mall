@@ -10,11 +10,15 @@
     <script th:replace="~{common/libraries::swal-common-alert}"></script>
     <script th:src="@{/js/generalUtils.js}"></script>
     <script>
+        /**
+         * Global script here
+         */
+
         //异步POST 请求失效后直接重定向
         $(document).ajaxError(function (event, xhr) {
             console.log(xhr);
-            if (xhr.status === 401) {
-                //window.location.href = "/admin/login";
+            if (xhr.status === 403) {
+                showAccessDeniedSwal();
             }
         });
     </script>

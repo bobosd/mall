@@ -1,6 +1,7 @@
 package com.jiezipoi.mall.config;
 
 import com.jiezipoi.mall.filter.JwtAuthenticationTokenFilter;
+import com.jiezipoi.mall.handler.AccessDeniedHandlerImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -23,11 +24,13 @@ public class SecurityConfig {
     private final JwtAuthenticationTokenFilter jwtAuthenticationTokenFilter;
     private final ResourcePathConfig resourcePathConfig;
     private final AuthenticationEntryPoint authenticationEntryPoint;
+    private final AccessDeniedHandlerImpl accessDeniedHandler;
 
-    public SecurityConfig(JwtAuthenticationTokenFilter jwtAuthenticationTokenFilter, ResourcePathConfig resourcePathConfig, AuthenticationEntryPoint authenticationEntryPoint) {
+    public SecurityConfig(JwtAuthenticationTokenFilter jwtAuthenticationTokenFilter, ResourcePathConfig resourcePathConfig, AuthenticationEntryPoint authenticationEntryPoint, AccessDeniedHandlerImpl accessDeniedHandler) {
         this.jwtAuthenticationTokenFilter = jwtAuthenticationTokenFilter;
         this.resourcePathConfig = resourcePathConfig;
         this.authenticationEntryPoint = authenticationEntryPoint;
+        this.accessDeniedHandler = accessDeniedHandler;
     }
 
     @Bean
@@ -48,7 +51,6 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize.requestMatchers(
                                 "/",
                                 "/favicon.ico",
-                                "/admin/**",
                                 "/login",
                                 "/signup",
                                 "/user/login",
@@ -57,7 +59,10 @@ public class SecurityConfig {
                         .requestMatchers(resourcePath).permitAll()
                         .anyRequest().authenticated());
         http.addFilterBefore(jwtAuthenticationTokenFilter, UsernamePasswordAuthenticationFilter.class);
-        http.exceptionHandling(config -> config.authenticationEntryPoint(authenticationEntryPoint));
+        http.exceptionHandling(config -> {
+            config.authenticationEntryPoint(authenticationEntryPoint);
+            config.accessDeniedHandler(accessDeniedHandler);
+        });
         return http.build();
     }
 

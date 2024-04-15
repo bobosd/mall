@@ -3,13 +3,13 @@ package com.jiezipoi.mall.service;
 import com.jiezipoi.mall.config.CarouselConfig;
 import com.jiezipoi.mall.dao.CarouselDao;
 import com.jiezipoi.mall.entity.Carousel;
+import com.jiezipoi.mall.exception.NotFoundException;
 import com.jiezipoi.mall.utils.CommonResponse;
 import com.jiezipoi.mall.utils.FileNameGenerator;
 import com.jiezipoi.mall.utils.Response;
 import com.jiezipoi.mall.utils.dataTable.DataTableResult;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -42,39 +42,24 @@ public class CarouselService {
         return response;
     }
 
-    public Response<?> saveCarousel(MultipartFile file, String redirectUrl, Integer order, int userId) {
-        if (!StringUtils.hasLength(redirectUrl) || order == null) {
-            return new Response<>(CommonResponse.INVALID_DATA);
-        }
+    public void createCarousel(MultipartFile file, String redirectUrl, Integer order, int userId) throws IOException {
         String carouselUrl = saveCarouselImage(file);
-        if (carouselUrl == null)
-            return new Response<>(CommonResponse.INTERNAL_SERVER_ERROR);
         Carousel carousel = new Carousel();
         carousel.setCarouselRank(order);
         carousel.setRedirectUrl(redirectUrl);
         carousel.setCreateUser(userId);
         carousel.setCarouselUrl(carouselUrl);
-        if (carouselDao.insertSelective(carousel) > 0) {
-            return new Response<>(CommonResponse.SUCCESS);
-        } else {
-            return new Response<>(CommonResponse.ERROR);
-        }
     }
 
-    private String saveCarouselImage(MultipartFile file) {
+    private String saveCarouselImage(MultipartFile file) throws IOException {
         String uploadDirString = carouselConfig.getImageDirectory();
         Path uploadDir = Paths.get(uploadDirString);
         String filename = FileNameGenerator.generateFileName() + ".jpg";
         Path imagePath = Paths.get(uploadDirString + filename);
-        try {
-            if (!Files.exists(uploadDir)) {
-                Files.createDirectories(uploadDir);
-            }
-            Files.write(imagePath, file.getBytes());
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
+        if (!Files.exists(uploadDir)) {
+            Files.createDirectories(uploadDir);
         }
+        Files.write(imagePath, file.getBytes());
         return filename;
     }
 
@@ -87,14 +72,11 @@ public class CarouselService {
         }
     }
 
-    public Response<?> updateCarousel(Integer id, MultipartFile image, String redirectUrl, Integer order, Integer userId) {
-        if (id == null || redirectUrl == null || order == null) {
-            return new Response<>(CommonResponse.INVALID_DATA);
-        }
-
+    public void updateCarousel(Integer id, MultipartFile image, String redirectUrl, Integer order, Integer userId)
+            throws NotFoundException, IOException {
         Carousel carousel = carouselDao.selectByPrimaryKey(id);
         if (carousel == null) {
-            return new Response<>(CommonResponse.DATA_NOT_EXIST);
+            throw new NotFoundException();
         }
 
         if (image != null) {
@@ -106,11 +88,7 @@ public class CarouselService {
         carousel.setRedirectUrl(redirectUrl);
         carousel.setUpdateTime(LocalDateTime.now());
         carousel.setUpdateUser(userId);
-        if (carouselDao.updateByPrimaryKeySelective(carousel) > 0) {
-            return new Response<>(CommonResponse.SUCCESS);
-        } else {
-            return new Response<>(CommonResponse.ERROR);
-        }
+        carouselDao.updateByPrimaryKeySelective(carousel);
     }
 
     public Response<?> getCarouselById(Integer id) {

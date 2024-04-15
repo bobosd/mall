@@ -16,7 +16,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -104,7 +103,7 @@ public class MallUserController {
                              HttpServletResponse httpServletResponse) {
         MallUser mallUser;
         try {
-            mallUser = userService.findUser(email, password);
+            mallUser = userService.getUserByEmailAndPassword(email, password);
             if (mallUser.getUserStatus() == UserStatus.UNACTIVATED) {
                 return new Response<>(CommonResponse.FORBIDDEN);
             }
@@ -119,7 +118,6 @@ public class MallUserController {
     }
 
     @PostMapping("/logout")
-    @PreAuthorize("hasAuthority('mallUser')")
     @ResponseBody
     public Response<?> logout(HttpServletRequest request, HttpServletResponse response) {
         Cookie[] cookies = request.getCookies();
@@ -138,8 +136,8 @@ public class MallUserController {
     }
 
     private void setCredentialsCookie(MallUser user, HttpServletResponse response) {
-        String accessToken = jwtService.generateAccessToken(user.getEmail());
-        String refreshToken = jwtService.generateAndStoreRefreshToken(user.getEmail());
+        String accessToken = jwtService.generateAccessToken(user);
+        String refreshToken = jwtService.generateAndStoreRefreshToken(user);
         ResponseCookie accessCookie = jwtService.createJwtCookie(accessToken, jwtConfig.getAccessCookieName(), jwtConfig.getAccessTokenAge());
         ResponseCookie refreshCookie = jwtService.createJwtCookie(refreshToken, jwtConfig.getRefreshCookieName(), jwtConfig.getRefreshCookieAge());
         response.addHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());

@@ -8,6 +8,7 @@ import com.jiezipoi.mall.utils.Response;
 import com.jiezipoi.mall.utils.dataTable.DataTableResult;
 import com.jiezipoi.mall.utils.dataTable.request.DataTableRequest;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -50,6 +51,7 @@ public class AdminGoodsBrandController {
         }
     }
 
+    @PreAuthorize("hasAuthority('goods:write')")
     @PostMapping("/create")
     @ResponseBody
     public Response<?> createBrand(String brandName) {
@@ -64,6 +66,7 @@ public class AdminGoodsBrandController {
         }
     }
 
+    @PreAuthorize("hasAuthority('goods:write')")
     @PostMapping("/update")
     @ResponseBody
     public Response<?> updateBrand(Long id, String brandName) {
@@ -81,6 +84,7 @@ public class AdminGoodsBrandController {
         }
     }
 
+    @PreAuthorize("hasAuthority('goods:write')")
     @PostMapping("/delete")
     @ResponseBody
     public Response<?> deleteBrand(Long id) {
