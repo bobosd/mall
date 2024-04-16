@@ -23,6 +23,7 @@ public class ResourcePathConfig {
         resourcePath.add("/js/");
         resourcePath.add("/styles/");
         resourcePath.add("/assets/");
+        resourcePath.add("/favicon.ico");
         return resourcePath;
     }
 }

@@ -55,11 +55,11 @@
             loadAndShowShoppingCart();
         })
 
-        const MALL_USER_ITEM_NAME = "mallUser";
+        const MALL_USER_ITEM_NAME = "user";
         const refreshToken = getCookie("refresh_token");
         if (refreshToken !== null) {
-            const mallUser = JSON.parse(localStorage.getItem(MALL_USER_ITEM_NAME));
-            $(".nickname").text(mallUser.nickName);
+            const user = JSON.parse(localStorage.getItem(MALL_USER_ITEM_NAME));
+            $(".nickname").text(user.nickName);
         } else {
             localStorage.removeItem(MALL_USER_ITEM_NAME)
         }
@@ -83,7 +83,7 @@
                 method: "POST",
                 success: (res) => {
                     if (res.code === 200) {
-                        localStorage.removeItem("mallUser");
+                        localStorage.removeItem("user");
                         window.location.replace("/");
                     } else {
                         showServerErrorSwal();

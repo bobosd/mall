@@ -35,7 +35,7 @@ public class MallWebMvcConfigurer implements WebMvcConfigurer {
 
     private void exposeCarouselDirectory(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/carousel/img/**")
-                .addResourceLocations("file:" + carouselConfig.getImageDirectory());
+                .addResourceLocations("file:" + carouselConfig.getImageDirectory() + File.separator);
     }
 
     private void exposeGoodsDirectory(ResourceHandlerRegistry registry) {

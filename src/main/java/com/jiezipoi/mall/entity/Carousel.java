@@ -12,10 +12,10 @@ public class Carousel {
     private Byte isDeleted;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createTime;
-    private Integer createUser;
+    private Long createUser;
     @JsonFormat(pattern = "dd-MM-yyyy HH:mm:ss")
     private LocalDateTime updateTime;
-    private Integer updateUser;
+    private Long updateUser;
 
     public Integer getCarouselId() {
         return carouselId;
@@ -66,11 +66,11 @@ public class Carousel {
         this.createTime = createTime;
     }
 
-    public Integer getCreateUser() {
+    public Long getCreateUser() {
         return createUser;
     }
 
-    public void setCreateUser(Integer createUser) {
+    public void setCreateUser(Long createUser) {
         this.createUser = createUser;
     }
 
@@ -82,11 +82,11 @@ public class Carousel {
         this.updateTime = updateTime;
     }
 
-    public Integer getUpdateUser() {
+    public Long getUpdateUser() {
         return updateUser;
     }
 
-    public void setUpdateUser(Integer updateUser) {
+    public void setUpdateUser(Long updateUser) {
         this.updateUser = updateUser;
     }
 }

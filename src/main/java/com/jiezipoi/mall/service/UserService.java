@@ -3,9 +3,10 @@ package com.jiezipoi.mall.service;
 import com.amazonaws.services.simpleemail.AmazonSimpleEmailService;
 import com.amazonaws.services.simpleemail.model.*;
 import com.jiezipoi.mall.dao.UserDao;
-import com.jiezipoi.mall.entity.MallUser;
+import com.jiezipoi.mall.entity.User;
 import com.jiezipoi.mall.enums.Role;
 import com.jiezipoi.mall.enums.UserStatus;
+import com.jiezipoi.mall.exception.NotFoundException;
 import com.jiezipoi.mall.exception.VerificationCodeNotFoundException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
@@ -52,15 +53,15 @@ public class UserService implements UserDetailsService {
 
     @Transactional
     public void createUser(String nickname, String email, String password) {
-        MallUser unactivatedUser = createUnactivatedUser(nickname, email, password);
+        User unactivatedUser = createUnactivatedUser(nickname, email, password);
         String verificationCode = generateAndStoreVerificationCode(unactivatedUser);
         String verificationUrl = generateUserVerificationUrl(verificationCode);
         sendVerificationEmail(email, verificationUrl, nickname);
     }
 
-    private String generateAndStoreVerificationCode(MallUser mallUser) {
+    private String generateAndStoreVerificationCode(User user) {
         String uuid = UUID.randomUUID().toString().replaceAll("-", "");
-        mallUserDao.insertVerificationCode(mallUser.getEmail(), uuid);
+        mallUserDao.insertVerificationCode(user.getEmail(), uuid);
         return uuid;
     }
 
@@ -82,9 +83,9 @@ public class UserService implements UserDetailsService {
         return this.domain + "/user/activate-account/" + verificationCode;
     }
 
-    private MallUser createUnactivatedUser(String nickname, String email, String password) {
+    private User createUnactivatedUser(String nickname, String email, String password) {
         String BCryptPassword = passwordEncoder.encode(password);
-        MallUser user = new MallUser();
+        User user = new User();
         user.setNickName(nickname);
         user.setEmail(email);
         user.setPassword(BCryptPassword);
@@ -100,22 +101,33 @@ public class UserService implements UserDetailsService {
         return new Content(templateEngine.process("email/sign-up-activation.html", thymeleafContext));
     }
 
+    public long getUserIdByEmail(String email) throws NotFoundException {
+        return mallUserDao.selectUserIdByEmail(email);
+    }
+
     public boolean isExistingEmail(String email) {
         return mallUserDao.selectByEmail(email) != null;
     }
 
-    public MallUser getUserByEmailAndPassword(String email, String password) {
+    public User getUserByEmailAndPassword(String email, String password) {
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(email, password);
         Authentication authentication = authenticationManager.authenticate(authenticationToken);
-        return (MallUser) authentication.getPrincipal();
+        return (User) authentication.getPrincipal();
     }
 
-    public MallUser getUserByEmail(String email) {
+    public User getUserByEmail(String email) {
         return mallUserDao.selectByEmail(email);
     }
 
+    /**
+     * UserDetails接口的实现，不要动，该实现需要通过用户登录标识（通常情况下是username）获得用户entity。
+     * 但是商城里是email，
+     * @param email 用户的邮箱
+     * @return 通过数据库映射的User对象
+     * @throws UsernameNotFoundException 没有对应的用户
+     */
     @Override
-    public MallUser loadUserByUsername(String email) throws UsernameNotFoundException{
+    public User loadUserByUsername(String email) throws UsernameNotFoundException{
         return getUserByEmail(email);
     }
 
@@ -128,17 +140,17 @@ public class UserService implements UserDetailsService {
      * @param verificationCode 激活码
      */
     @Transactional
-    public MallUser activateUser(String verificationCode) throws VerificationCodeNotFoundException {
+    public User activateUser(String verificationCode) throws VerificationCodeNotFoundException {
         String email = mallUserDao.selectEmailByVerificationCode(verificationCode);
         if (email == null) {
             throw new VerificationCodeNotFoundException();
         }
         mallUserDao.deleteVerificationCodeByEmail(email);
-        MallUser mallUser = mallUserDao.selectByEmail(email);
-        mallUser.setUserStatus(UserStatus.ACTIVATED);
-        updateUserStatus(mallUser.getUserId(), UserStatus.ACTIVATED);
-        roleService.assignRoleToUser(Role.USER, mallUser.getUserId());
-        return mallUser;
+        User user = mallUserDao.selectByEmail(email);
+        user.setUserStatus(UserStatus.ACTIVATED);
+        updateUserStatus(user.getUserId(), UserStatus.ACTIVATED);
+        roleService.assignRoleToUser(Role.USER, user.getUserId());
+        return user;
     }
 
     public void updateUserStatus(Long userId, UserStatus status) {

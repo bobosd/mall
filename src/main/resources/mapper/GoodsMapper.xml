@@ -36,7 +36,7 @@
         goods_info.update_user, goods_info.update_time
     </sql>
 
-    <insert id="insertSelective" parameterType="com.jiezipoi.mall.entity.Goods" useGeneratedKeys="true" keyProperty="id">
+    <insert id="insertSelective" parameterType="com.jiezipoi.mall.entity.Goods" useGeneratedKeys="true" keyProperty="goodsId">
         INSERT INTO goods_info
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="goodsId != null">

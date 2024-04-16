@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jiezipoi.mall.config.JwtConfig;
 import com.jiezipoi.mall.dto.MallUserDTO;
-import com.jiezipoi.mall.entity.MallUser;
+import com.jiezipoi.mall.entity.User;
 import com.jiezipoi.mall.enums.UserStatus;
 import com.jiezipoi.mall.exception.VerificationCodeNotFoundException;
 import com.jiezipoi.mall.service.JwtService;
@@ -43,7 +43,7 @@ public class MallUserController {
     @GetMapping("/activate-account/{token}")
     public String userActivation(@PathVariable String token, HttpServletResponse response, ModelMap modelMap) {
         try {
-            MallUser user = userService.activateUser(token);
+            User user = userService.activateUser(token);
             MallUserDTO mallUserDTO = new MallUserDTO(user);
             setCredentialsCookie(user, response);
             ObjectMapper objectMapper = new ObjectMapper();
@@ -101,19 +101,19 @@ public class MallUserController {
     public Response<?> login(@RequestParam("email") String email,
                              @RequestParam("password") String password,
                              HttpServletResponse httpServletResponse) {
-        MallUser mallUser;
+        User user;
         try {
-            mallUser = userService.getUserByEmailAndPassword(email, password);
-            if (mallUser.getUserStatus() == UserStatus.UNACTIVATED) {
+            user = userService.getUserByEmailAndPassword(email, password);
+            if (user.getUserStatus() == UserStatus.UNACTIVATED) {
                 return new Response<>(CommonResponse.FORBIDDEN);
             }
         } catch (BadCredentialsException e) {
             return new Response<>(CommonResponse.INVALID_DATA);
         }
-        setCredentialsCookie(mallUser, httpServletResponse);
+        setCredentialsCookie(user, httpServletResponse);
         Response<MallUserDTO> response = new Response<>();
         response.setResponse(CommonResponse.SUCCESS);
-        response.setData(new MallUserDTO(mallUser));
+        response.setData(new MallUserDTO(user));
         return response;
     }
 
@@ -135,7 +135,7 @@ public class MallUserController {
         return new Response<>(CommonResponse.SUCCESS);
     }
 
-    private void setCredentialsCookie(MallUser user, HttpServletResponse response) {
+    private void setCredentialsCookie(User user, HttpServletResponse response) {
         String accessToken = jwtService.generateAccessToken(user);
         String refreshToken = jwtService.generateAndStoreRefreshToken(user);
         ResponseCookie accessCookie = jwtService.createJwtCookie(accessToken, jwtConfig.getAccessCookieName(), jwtConfig.getAccessTokenAge());

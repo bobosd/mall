@@ -2,7 +2,7 @@ package com.jiezipoi.mall.service;
 
 import com.jiezipoi.mall.config.JwtConfig;
 import com.jiezipoi.mall.dao.JwtDao;
-import com.jiezipoi.mall.entity.MallUser;
+import com.jiezipoi.mall.entity.User;
 import com.jiezipoi.mall.entity.UserRefreshToken;
 import io.jsonwebtoken.*;
 import org.springframework.http.ResponseCookie;
@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.time.Duration;
+import java.time.Instant;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -34,7 +35,7 @@ public class JwtService {
         this.jwtDao = jwtDao;
     }
 
-    public String generateAccessToken(MallUser user) {
+    public String generateAccessToken(User user) {
         return generateJWT(generateUUID(), user.getEmail(), jwtConfig.getAccessTokenAge(), user.getPermissions());
     }
 
@@ -43,7 +44,7 @@ public class JwtService {
      * @param user MallUser实体对象
      * @return 生成的refresh token
      */
-    public String generateAndStoreRefreshToken(MallUser user) {
+    public String generateAndStoreRefreshToken(User user) {
         String email = user.getEmail();
         List<String> permissions = user.getPermissions();
         String uuid = generateUUID();
@@ -105,8 +106,10 @@ public class JwtService {
         return generateJwtBuilder(jwtId, subject, nowDate, expDate, permissions);
     }
 
-    private JwtBuilder generateJwtBuilder
-            (String jwtId, String subject, Date issueDate, Date expireDate, List<String> permissions) {
+    private JwtBuilder generateJwtBuilder(String jwtId, String subject, Date issueDate, Date expireDate, List<String> permissions) {
+        Duration clockSkew = jwtConfig.getClockSkew();
+        Instant expireInstant = expireDate.toInstant().plus(clockSkew);
+        expireDate = Date.from(expireInstant);
         return Jwts.builder()
                 .setId(jwtId)
                 .setSubject(subject)
@@ -125,10 +128,6 @@ public class JwtService {
                 .setSigningKey(publicKey)
                 .parseClaimsJws(jwt)
                 .getBody();
-    }
-
-    public String generateVerificationToken(MallUser user) {
-        return generateJWT(generateUUID(), user.getEmail(), jwtConfig.getVerificationTokenDuration(), user.getPermissions());
     }
 
     public boolean isRegisteredRefreshToken(String email, String refreshToken) {

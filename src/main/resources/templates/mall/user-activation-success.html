@@ -22,10 +22,10 @@
 <footer th:replace="~{mall/footer::footer}"></footer>
 
 <script>
-    let mallUser;
-    mallUser = [(${mallUser})];
+    let user;
+    user = [(${user})];
 
-    localStorage.setItem("mallUser", JSON.stringify(mallUser));
+    localStorage.setItem("user", JSON.stringify(user));
 
     $(document).ready(() => {
         $(".button").click(() => replaceToIndex());

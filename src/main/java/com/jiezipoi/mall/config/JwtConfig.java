@@ -50,6 +50,9 @@ public class JwtConfig {
     @Value("${jwt.verify.age}")
     private Duration verificationTokenDuration;
 
+    @Value("${jwt.clock-skew}")
+    private Duration clockSkew;
+
     public JwtConfig(MallConfig mallConfig) {
         this.mallConfig = mallConfig;
     }
@@ -76,6 +79,10 @@ public class JwtConfig {
 
     public Duration getVerificationTokenDuration() {
         return verificationTokenDuration;
+    }
+
+    public Duration getClockSkew() {
+        return clockSkew;
     }
 
     @Bean

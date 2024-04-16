@@ -69,7 +69,7 @@ public class GoodsConfig {
         return userTempFilePrefix;
     }
 
-    public String getUserTempFileName(int userName) {
+    public String getUserTempFileName(long userName) {
         return getUserTempFilePrefix() + userName;
     }
 

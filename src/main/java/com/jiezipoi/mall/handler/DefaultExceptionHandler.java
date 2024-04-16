@@ -15,12 +15,11 @@ public class DefaultExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler({Exception.class})
     @ResponseBody
     public Response<String> handleAuthenticationException(Exception e, HttpServletResponse response) throws Exception {
-        System.out.println("default exception handling");
-        e.printStackTrace();
         //let AccessDeniedHandler process it
         if (e instanceof AccessDeniedException) {
             throw e;
         }
+        e.printStackTrace();
         return new Response<>("Error interno del servidor", HttpStatus.SC_INTERNAL_SERVER_ERROR, null);
     }
 }

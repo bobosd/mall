@@ -75,7 +75,7 @@
             success: (response) => {
                 if (response.code === 200) {
                     window.location.replace("/");
-                    localStorage.setItem("mallUser", JSON.stringify(response.data));
+                    localStorage.setItem("user", JSON.stringify(response.data));
                 } else if (response.code === 403) {
                     Swal.fire({
                         title: "Usuario no verificado",

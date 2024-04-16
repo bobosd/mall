@@ -44,15 +44,17 @@ public class GoodsService {
      * @param userId 用户ID
      */
     @Transactional
-    public void createGoods(Goods goods, int userId) throws IOException {
+    public void createGoods(Goods goods, long userId) throws IOException {
         String tempCoverImgUrl = goods.getGoodsCoverImg();
         goods.setGoodsCoverImg(convertTempUrlToPermanentUrl(tempCoverImgUrl));
         String tempDetail = goods.getGoodsDetailContent();
         goods.setGoodsDetailContent(convertTempUrlToPermanentUrl(tempDetail));
-        walkUserTempFile(userId);
         goodsDao.insertSelective(goods);
-        List<GoodsTag> tagWithId = goodsTagService.getOrCreateGoodsTagByTagName(goods.getTag());
-        goodsTagService.assignTagToGoodsInDB(goods.getGoodsId(), tagWithId);
+        if (goods.getTag() != null && !goods.getTag().isEmpty()) {
+            List<GoodsTag> tagWithId = goodsTagService.getOrCreateGoodsTagByTagName(goods.getTag());
+            goodsTagService.assignTagToGoodsInDB(goods.getGoodsId(), tagWithId);
+        }
+        walkUserTempFile(userId);
     }
 
     /**
@@ -78,7 +80,7 @@ public class GoodsService {
         return stringBuilder.toString();
     }
 
-    private void walkUserTempFile(int userId) throws IOException {
+    private void walkUserTempFile(long userId) throws IOException {
         Path tempDir = getUserTempDir(userId);
         Files.walkFileTree(tempDir, new SimpleFileVisitor<>() {
             @Override
@@ -103,7 +105,7 @@ public class GoodsService {
 
 
 
-    public void saveTempGoods(Goods goods, int userId) throws IOException {
+    public void saveTempGoods(Goods goods, long userId) throws IOException {
         Path uploadDir = getUserTempDir(userId);
         Path fileDir = uploadDir.resolve(goodsConfig.getUserTempDataFilename());
         if (!Files.exists(uploadDir)) {
@@ -121,7 +123,7 @@ public class GoodsService {
      * @param userId 用户id
      * @return 图片在服务器的地址
      */
-    public String saveTempCoverImage(MultipartFile file, int userId) throws IOException {
+    public String saveTempCoverImage(MultipartFile file, long userId) throws IOException {
         Path uploadDir = getUserTempDir(userId);
         String filename = generateImageFileName();
         Path savedLocation = saveFile(uploadDir, filename, file);
@@ -135,7 +137,7 @@ public class GoodsService {
      * @param userId    用户ID
      * @return 对应的地址
      */
-    public String saveTempDetailsFile(MultipartFile file, int userId) throws IOException {
+    public String saveTempDetailsFile(MultipartFile file, long userId) throws IOException {
         Path uploadDir = getUserTempDir(userId);
         String filename = FileNameGenerator.generateFileName() + goodsConfig.getUserTempFilePrefix();
         Path savedLocation = saveFile(uploadDir, filename, file);
@@ -149,23 +151,22 @@ public class GoodsService {
         return goodsConfig.getExposeUrl(savedLocation);
     }
 
-    private Path getUserTempDir(int userId) {
+    private Path getUserTempDir(long userId) {
         Path uploadDir = goodsConfig.getGoodsFilePath();
         return uploadDir.resolve(goodsConfig.getUserTempFileName(userId));
     }
 
-    public Goods getUserTempGoods(int userId) {
+    public Goods getUserTempGoods(long userId) throws IOException, ClassNotFoundException {
         Path userTempFile = getUserTempDir(userId);
         Path serializedGoodsDir = userTempFile.resolve(goodsConfig.getUserTempDataFilename());
         if (!Files.exists(serializedGoodsDir)) {
             return null;
         }
-        try (FileInputStream fileInputStream = new FileInputStream(serializedGoodsDir.toFile());
-             ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream)) {
-            return (Goods) objectInputStream.readObject();
-        } catch (IOException | ClassNotFoundException e) {
-            return null;
-        }
+        FileInputStream fileInputStream = new FileInputStream(serializedGoodsDir.toFile());
+        ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
+        Goods tempGoods = (Goods) objectInputStream.readObject();
+        objectInputStream.close();
+        return tempGoods;
     }
 
     public DataTableResult list(int start, int limit, String categoryPath, Integer level) {

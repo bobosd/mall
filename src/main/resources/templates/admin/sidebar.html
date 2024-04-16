@@ -1,14 +1,14 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
 
 <body th:fragment="sidebar-fragment">
     <div th:replace="~{admin/user-setting-modal::user-settings-modal}"></div>
     <div class="sidebar no-text-select">
-        <div class="logo-content no-text-select">
+        <div class="logo-container no-text-select">
             <div class="logo text-center">
                 <img th:src="@{/assets/img/poi_128x128.png}" alt="mall logo">
             </div>
-            <span class="logo-name">POI商城</span>
+            <span class="logo-name">Mall</span>
         </div>
 
         <div class="sidebar-option-list no-text-select">
@@ -101,10 +101,10 @@
                 </div>
                 <div class="navbar-option dropdown-list">
                     <div class="navbar-option-text">
-                        <span class="nickname" th:text="${#ctx.session.get('nickname')}"></span>
+                        <span class="nickname" sec:authentication="name"></span>
                         <i class="fa-solid fa-user"></i>
                     </div>
-                    <div class="dropdown-content user-dropdown" th:style="'left:calc(100% - '+#{css.admin.user.dropdown.left}+'px);'">
+                    <div class="dropdown-content user-dropdown">
                         <a th:href="@{/admin/user-setting}"><div class="dropdown-option" th:text="#{settings}"></div></a>
                         <a th:href="@{/admin/logout}"><div class="dropdown-option" th:text="#{logout}"></div></a>
                     </div>
@@ -114,11 +114,18 @@
     </div>
     <script>
         $(document).ready(function () {
-            sidebarToggleListener();
-            sidebarOptionListener();
+            blindSidebarToggleEvent();
+            blindSidebarOptionEvent();
+            blindLogoClickEvent();
         });
 
-        function sidebarToggleListener() {
+        function blindLogoClickEvent() {
+            $(".logo-container").click(() => {
+                window.location.href = getBaseUrl();
+            });
+        }
+
+        function blindSidebarToggleEvent() {
             let toggle = () => {
                 $(".sidebar-option-text").toggle();
                 $(".logo-name").toggle();
@@ -136,7 +143,7 @@
             });
         }
 
-        function sidebarOptionListener() {
+        function blindSidebarOptionEvent() {
             $(".sidebar-option").click(function () {
                 if ($(this).attr("option-selected") !== "true") {
                     $(".sidebar-option[option-selected=true]").removeAttr("option-selected");

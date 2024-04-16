@@ -163,14 +163,15 @@
     margin-right: 12px;
 }
 
-.logo-content {
+.logo-container {
     height: 45px;
     display: flex;
     align-items: center;
     justify-content: center;
+    cursor: pointer;
 }
 
-.navbar .logo-content .logo{
+.navbar .logo-container .logo{
     display: flex;
     align-items: center;
 }

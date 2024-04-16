@@ -2,28 +2,32 @@ package com.jiezipoi.mall.controller.admin;
 
 import com.jiezipoi.mall.exception.NotFoundException;
 import com.jiezipoi.mall.service.CarouselService;
+import com.jiezipoi.mall.service.UserService;
 import com.jiezipoi.mall.utils.CommonResponse;
 import com.jiezipoi.mall.utils.Response;
-import com.jiezipoi.mall.utils.dataTable.request.DataTableRequest;
 import com.jiezipoi.mall.utils.dataTable.Order;
+import com.jiezipoi.mall.utils.dataTable.request.DataTableRequest;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import jakarta.annotation.Resource;
-import jakarta.servlet.http.HttpSession;
-
 import java.io.IOException;
+import java.security.Principal;
 import java.util.HashMap;
 import java.util.Map;
 
 @Controller
 @RequestMapping("/admin")
 public class AdminCarouselController {
-    @Resource
-    CarouselService adminCarouselService;
+    private final CarouselService adminCarouselService;
+    private final UserService userService;
+
+    public AdminCarouselController(CarouselService adminCarouselService, UserService userService) {
+        this.adminCarouselService = adminCarouselService;
+        this.userService = userService;
+    }
 
     @RequestMapping(value = "/carousels/list", method = RequestMethod.POST)
     @ResponseBody
@@ -45,15 +49,15 @@ public class AdminCarouselController {
     public Response<?> save(@RequestParam("image") MultipartFile image,
                             @RequestParam("redirectUrl") String redirectUrl,
                             @RequestParam("order") Integer order,
-                            HttpSession session) {
-        int userId = (int) session.getAttribute("userId");
+                            Principal principal) {
         if (!StringUtils.hasLength(redirectUrl) || order == null) {
             return new Response<>(CommonResponse.INVALID_DATA);
         }
         try {
+            long userId = userService.getUserIdByEmail(principal.getName());
             adminCarouselService.createCarousel(image, redirectUrl, order, userId);
             return new Response<>(CommonResponse.SUCCESS);
-        } catch (IOException e) {
+        } catch (IOException | NotFoundException e) {
             return new Response<>(CommonResponse.INTERNAL_SERVER_ERROR);
         }
     }
@@ -65,12 +69,12 @@ public class AdminCarouselController {
                               @RequestParam("id") Integer id,
                               @RequestParam("redirectUrl") String redirectUrl,
                               @RequestParam("order") Integer order,
-                              HttpSession session) {
-        int userId = (int) session.getAttribute("userId");
+                              Principal principal) {
         if (id == null || redirectUrl == null || order == null) {
             return new Response<>(CommonResponse.INVALID_DATA);
         }
         try {
+            Long userId = userService.getUserIdByEmail(principal.getName());
             adminCarouselService.updateCarousel(id, image, redirectUrl, order, userId);
             return new Response<>(CommonResponse.SUCCESS);
         } catch (NotFoundException e) {

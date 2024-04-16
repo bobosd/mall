@@ -3,7 +3,7 @@ package com.jiezipoi.mall.service;
 import com.jiezipoi.mall.config.ShoppingCartConfig;
 import com.jiezipoi.mall.dao.ShoppingCartItemDao;
 import com.jiezipoi.mall.dto.ShoppingCartItemDTO;
-import com.jiezipoi.mall.entity.MallUser;
+import com.jiezipoi.mall.entity.User;
 import com.jiezipoi.mall.entity.ShoppingCartItem;
 import com.jiezipoi.mall.exception.NotFoundException;
 import com.jiezipoi.mall.exception.QuantityExceededException;
@@ -35,8 +35,8 @@ public class ShoppingCartItemService {
     private Long getUserId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userEmail = authentication.getName();
-        MallUser mallUser = userService.loadUserByUsername(userEmail);
-        return mallUser.getUserId();
+        User user = userService.getUserByEmail(userEmail);
+        return user.getUserId();
     }
 
     /**

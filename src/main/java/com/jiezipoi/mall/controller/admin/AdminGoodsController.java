@@ -9,6 +9,7 @@ import com.jiezipoi.mall.exception.NotFoundException;
 import com.jiezipoi.mall.service.GoodsBrandService;
 import com.jiezipoi.mall.service.GoodsCategoryService;
 import com.jiezipoi.mall.service.GoodsService;
+import com.jiezipoi.mall.service.UserService;
 import com.jiezipoi.mall.utils.CommonResponse;
 import com.jiezipoi.mall.utils.Response;
 import com.jiezipoi.mall.utils.dataTable.DataTableResult;
@@ -19,9 +20,8 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import jakarta.servlet.http.HttpSession;
-
 import java.io.IOException;
+import java.security.Principal;
 import java.util.List;
 
 @Controller
@@ -30,11 +30,16 @@ public class AdminGoodsController {
     private final GoodsService goodsService;
     private final GoodsCategoryService categoryService;
     private final GoodsBrandService goodsBrandService;
+    private final UserService userService;
 
-    public AdminGoodsController(GoodsService goodsService, GoodsCategoryService categoryService, GoodsBrandService goodsBrandService) {
+    public AdminGoodsController(GoodsService goodsService,
+                                GoodsCategoryService categoryService,
+                                GoodsBrandService goodsBrandService,
+                                UserService userService) {
         this.goodsService = goodsService;
         this.categoryService = categoryService;
         this.goodsBrandService = goodsBrandService;
+        this.userService = userService;
     }
 
     @GetMapping("/goods")
@@ -43,14 +48,22 @@ public class AdminGoodsController {
     }
 
     @GetMapping("/goods/form")
-    public String createGoodsPage(ModelMap modelMap, HttpSession session) {
-        int userId = (int) session.getAttribute("userId");
-        Goods goods = goodsService.getUserTempGoods(userId);
-        modelMap.addAttribute("goods", goods);
-        if (goods != null && goods.getGoodsCategoryId() != null) {
-            Long categoryId = goods.getGoodsCategoryId();
-            List<GoodsCategory> categories = categoryService.getGoodsCategoryAndParent(categoryId);
-            modelMap.addAttribute("category", categories);
+    public String createGoodsPage(ModelMap modelMap, Principal principal) {
+        try {
+            long userId = userService.getUserIdByEmail(principal.getName());
+            Goods goods = goodsService.getUserTempGoods(userId);
+            modelMap.addAttribute("goods", goods);
+            if (goods != null && goods.getGoodsCategoryId() != null) {
+                Long categoryId = goods.getGoodsCategoryId();
+                List<GoodsCategory> categories = categoryService.getGoodsCategoryAndParent(categoryId);
+                modelMap.addAttribute("category", categories);
+            }
+            if (goods != null && goods.getGoodsBrandId() != null) {
+                Long brandId = goods.getGoodsBrandId();
+                GoodsBrand goodsBrand = goodsBrandService.getGoodsBrandById(brandId);
+                modelMap.addAttribute("goodsBrand", goodsBrand);
+            }
+        } catch (IOException | ClassNotFoundException | NotFoundException ignore) {
         }
         return "admin/goods-create";
     }
@@ -93,42 +106,47 @@ public class AdminGoodsController {
     @PreAuthorize("hasAuthority('goods:write')")
     @PostMapping("/goods/create")
     @ResponseBody
-    public Response<?> createGoods(@RequestBody Goods goods, HttpSession session) {
-        int userId = (int) session.getAttribute("userId");
+    public Response<?> createGoods(@RequestBody Goods goods, Principal principal) {
+
         if (!isValidGoodsToCreate(goods)) {
             return new Response<>(CommonResponse.INVALID_DATA);
         }
         try {
+            long userId = userService.getUserIdByEmail(principal.getName());
             goodsService.createGoods(goods, userId);
             return new Response<>(CommonResponse.SUCCESS);
         } catch (IOException e) {
             return new Response<>(CommonResponse.INTERNAL_SERVER_ERROR);
+        } catch (NotFoundException e) {
+            return new Response<>(CommonResponse.INVALID_DATA);
         }
     }
 
-    @PostMapping("/goods/saveTempGoods")
+    @PostMapping("/goods/temp/upload/sync")
     @ResponseBody
-    public Response<?> saveTempGoods(@RequestBody Goods goods, HttpSession session) {
-        int userId = (int) session.getAttribute("userId");
+    public Response<?> saveTempGoods(@RequestBody Goods goods, Principal principal) {
         try {
+            long userId = userService.getUserIdByEmail(principal.getName());
             goodsService.saveTempGoods(goods, userId);
             return new Response<>(CommonResponse.SUCCESS);
         } catch (IOException e) {
             return new Response<>(CommonResponse.INTERNAL_SERVER_ERROR);
+        } catch (NotFoundException e) {
+            return new Response<>(CommonResponse.INVALID_DATA);
         }
     }
 
 
     @PostMapping("/goods/temp/upload/cover-image")
     @ResponseBody
-    public Response<?> uploadCoverImage(@RequestParam("image") MultipartFile image, HttpSession session) {
-        int userId = (int) session.getAttribute("userId");
+    public Response<?> uploadCoverImage(@RequestParam("image") MultipartFile image, Principal principal) {
         try {
+            long userId = userService.getUserIdByEmail(principal.getName());
             String url = goodsService.saveTempCoverImage(image, userId);
             Response<String> response = new Response<>(CommonResponse.SUCCESS);
             response.setData(url);
             return response;
-        } catch (IOException e) {
+        } catch (IOException | NotFoundException e) {
             return new Response<>(CommonResponse.INTERNAL_SERVER_ERROR);
         }
     }
@@ -137,22 +155,21 @@ public class AdminGoodsController {
     @ResponseBody
     public Response<?> list(@RequestBody GoodsCategoryRequest request) {
         DataTableResult result = goodsService.list(request.getStart(), request.getLength(), request.getPath(), request.getCategoryLevel());
-        Response<DataTableResult> response = new Response<>();
+        Response<DataTableResult> response = new Response<>(CommonResponse.SUCCESS);
         response.setData(result);
         return response;
     }
 
     @PostMapping("/goods/temp/upload/details")
     @ResponseBody
-    public Response<?> uploadTempDetails(@RequestParam("file") MultipartFile file,
-                                         @RequestParam("goodsId") HttpSession session) {
-        int userId = (int) session.getAttribute("userId");
+    public Response<?> uploadTempDetails(@RequestParam("file") MultipartFile file, Principal principal) {
         try {
+            long userId = userService.getUserIdByEmail(principal.getName());
             String url = goodsService.saveTempDetailsFile(file, userId);
             Response<String> response = new Response<>(CommonResponse.SUCCESS);
             response.setData(url);
             return response;
-        } catch (IOException e) {
+        } catch (IOException | NotFoundException e) {
             return new Response<>(CommonResponse.INTERNAL_SERVER_ERROR);
         }
     }
@@ -179,6 +196,7 @@ public class AdminGoodsController {
                 !goods.getGoodsName().isBlank() &&
                 goods.getGoodsIntro() != null &&
                 !goods.getGoodsIntro().isBlank() &&
+                goods.getGoodsBrandId() != null &&
                 goods.getOriginalPrice() != null &&
                 goods.getGoodsCategoryId() != null &&
                 goods.getSellingPrice() != null &&
@@ -195,6 +213,7 @@ public class AdminGoodsController {
                 !goods.getGoodsName().isBlank() &&
                 goods.getGoodsIntro() != null &&
                 !goods.getGoodsIntro().isBlank() &&
+                goods.getGoodsBrandId() != null &&
                 goods.getOriginalPrice() != null &&
                 goods.getGoodsCategoryId() != null &&
                 goods.getSellingPrice() != null &&

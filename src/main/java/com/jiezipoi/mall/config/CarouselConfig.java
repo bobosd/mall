@@ -4,6 +4,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 @Configuration
 @PropertySource("classpath:/config/carousel-config.properties")
 public class CarouselConfig {
@@ -19,8 +22,8 @@ public class CarouselConfig {
         this.mallConfig = mallConfig;
     }
 
-    public String getImageDirectory() {
-        return mallConfig.getUploadDirectory() + imageDirectory;
+    public Path getImageDirectory() {
+        return Paths.get(mallConfig.getUploadDirectory(), imageDirectory);
     }
 
     public String getExposeUrl() {

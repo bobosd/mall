@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
-public class MallUser implements UserDetails, Serializable {
+public class User implements UserDetails, Serializable {
     private Long UserId;
     private String nickName;
     private String email;

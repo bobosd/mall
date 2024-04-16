@@ -42,7 +42,7 @@ public class CarouselService {
         return response;
     }
 
-    public void createCarousel(MultipartFile file, String redirectUrl, Integer order, int userId) throws IOException {
+    public void createCarousel(MultipartFile file, String redirectUrl, Integer order, long userId) throws IOException {
         String carouselUrl = saveCarouselImage(file);
         Carousel carousel = new Carousel();
         carousel.setCarouselRank(order);
@@ -52,10 +52,9 @@ public class CarouselService {
     }
 
     private String saveCarouselImage(MultipartFile file) throws IOException {
-        String uploadDirString = carouselConfig.getImageDirectory();
-        Path uploadDir = Paths.get(uploadDirString);
+        Path uploadDir = carouselConfig.getImageDirectory();
         String filename = FileNameGenerator.generateFileName() + ".jpg";
-        Path imagePath = Paths.get(uploadDirString + filename);
+        Path imagePath = uploadDir.resolve(filename);
         if (!Files.exists(uploadDir)) {
             Files.createDirectories(uploadDir);
         }
@@ -72,7 +71,7 @@ public class CarouselService {
         }
     }
 
-    public void updateCarousel(Integer id, MultipartFile image, String redirectUrl, Integer order, Integer userId)
+    public void updateCarousel(Integer id, MultipartFile image, String redirectUrl, Integer order, Long userId)
             throws NotFoundException, IOException {
         Carousel carousel = carouselDao.selectByPrimaryKey(id);
         if (carousel == null) {

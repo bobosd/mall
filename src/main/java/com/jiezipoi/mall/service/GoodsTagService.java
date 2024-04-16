@@ -22,6 +22,9 @@ public class GoodsTagService {
      * @return 返回已经赋予完ID值的GoodsTag集合
      */
     public List<GoodsTag> getOrCreateGoodsTagByTagName(List<GoodsTag> tagsToCreate) {
+        if (tagsToCreate == null || tagsToCreate.isEmpty()) {
+            return new ArrayList<>();
+        }
         List<GoodsTag> existingTag = getGoodsTagByName(tagsToCreate);
         tagsToCreate.removeAll(existingTag);
         if (!tagsToCreate.isEmpty()) {

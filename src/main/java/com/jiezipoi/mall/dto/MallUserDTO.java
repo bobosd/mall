@@ -1,16 +1,16 @@
 package com.jiezipoi.mall.dto;
 
-import com.jiezipoi.mall.entity.MallUser;
+import com.jiezipoi.mall.entity.User;
 
 public class MallUserDTO {
     private String nickName;
     private String email;
     private String introduceSign;
 
-    public MallUserDTO(MallUser mallUser) {
-        this.nickName = mallUser.getNickName();
-        this.email = mallUser.getEmail();
-        this.introduceSign = mallUser.getIntroduceSign();
+    public MallUserDTO(User user) {
+        this.nickName = user.getNickName();
+        this.email = user.getEmail();
+        this.introduceSign = user.getIntroduceSign();
     }
 
     public String getNickName() {

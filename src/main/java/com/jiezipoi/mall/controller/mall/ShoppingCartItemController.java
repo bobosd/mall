@@ -1,16 +1,14 @@
 package com.jiezipoi.mall.controller.mall;
 
 import com.jiezipoi.mall.dto.ShoppingCartItemDTO;
-import com.jiezipoi.mall.entity.MallUser;
 import com.jiezipoi.mall.entity.ShoppingCartItem;
+import com.jiezipoi.mall.entity.User;
 import com.jiezipoi.mall.exception.NotFoundException;
 import com.jiezipoi.mall.exception.QuantityExceededException;
-import com.jiezipoi.mall.service.UserService;
 import com.jiezipoi.mall.service.ShoppingCartItemService;
+import com.jiezipoi.mall.service.UserService;
 import com.jiezipoi.mall.utils.CommonResponse;
 import com.jiezipoi.mall.utils.Response;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -33,11 +31,10 @@ public class ShoppingCartItemController {
 
     @PostMapping("/shopping-cart/add")
     @ResponseBody
-    @PreAuthorize("hasAuthority('mallUser')")
     public Response<?> saveShoppingCartItem(@RequestBody ShoppingCartItem shoppingCartItem, Principal principal) {
         try {
-            MallUser mallUser = userService.loadUserByUsername(principal.getName());
-            shoppingCartItemService.saveCartItem(shoppingCartItem, mallUser.getUserId());
+            User user = userService.getUserByEmail(principal.getName());
+            shoppingCartItemService.saveCartItem(shoppingCartItem, user.getUserId());
             return new Response<>(CommonResponse.SUCCESS);
         } catch (QuantityExceededException e) {
             Response<String> response = new Response<>();

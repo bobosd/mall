@@ -1,7 +1,7 @@
 package com.jiezipoi.mall.filter;
 
 import com.jiezipoi.mall.config.JwtConfig;
-import com.jiezipoi.mall.entity.MallUser;
+import com.jiezipoi.mall.entity.User;
 import com.jiezipoi.mall.exception.UnregisteredRefreshTokenException;
 import com.jiezipoi.mall.service.JwtService;
 import com.jiezipoi.mall.service.UserService;
@@ -18,6 +18,8 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -25,6 +27,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
@@ -64,16 +67,16 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
                 setAccessTokenCookie(accessToken, response);
                 if (isRefreshTokenNeedToRenew(rtClaims)) {
                     jwtService.invalidateRefreshToken(email, refreshToken);
-                    MallUser mallUser = userService.loadUserByUsername(email);
-                    String renewRefreshToken = jwtService.generateAndStoreRefreshToken(mallUser);
+                    User user = userService.getUserByEmail(email);
+                    String renewRefreshToken = jwtService.generateAndStoreRefreshToken(user);
                     setRefreshTokenCookie(renewRefreshToken, response);
                 }
             }
-            //set authentication
             Claims accessClaims = jwtService.parseJWT(accessToken);
             String email = accessClaims.getSubject();
+            List<GrantedAuthority> authorities = parseAuthorities(accessClaims);
             UsernamePasswordAuthenticationToken authenticationToken =
-                    new UsernamePasswordAuthenticationToken(email, null, null);
+                    new UsernamePasswordAuthenticationToken(email, null, authorities);
             SecurityContextHolder.getContext().setAuthentication(authenticationToken);
             filterChain.doFilter(request, response);
         } catch (ExpiredJwtException e) { //发送请求没过期，在服务器过期了。
@@ -83,7 +86,14 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
             resetJwtCookies(response);
             filterChain.doFilter(request, response);
         }
-
+    }
+    private List<GrantedAuthority> parseAuthorities(Claims claims) {
+        Object o = claims.get("permission");
+        List<?> list = new ArrayList<>((List<?>) o);
+        return list.stream()
+                .map(Object::toString)
+                .map(SimpleGrantedAuthority::new)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -127,8 +137,8 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
         if (!jwtService.isRegisteredRefreshToken(email, refreshToken)) {
             throw new UnregisteredRefreshTokenException();
         }
-        MallUser mallUser = userService.loadUserByUsername(email);
-        return jwtService.generateAccessToken(mallUser);
+        User user = userService.getUserByEmail(email);
+        return jwtService.generateAccessToken(user);
     }
 
     private void setAccessTokenCookie(String accessToken, HttpServletResponse response) {

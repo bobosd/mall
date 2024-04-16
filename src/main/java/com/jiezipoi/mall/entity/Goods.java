@@ -166,6 +166,9 @@ public class Goods implements Serializable {
     }
 
     public BigInteger getSellingPriceDecimalPart() {
+        if (sellingPrice == null) {
+            return null;
+        }
         return sellingPrice.remainder(BigDecimal.ONE).movePointRight(sellingPrice.scale()).abs().toBigInteger();
     }
 
