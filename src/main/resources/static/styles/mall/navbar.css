@@ -110,7 +110,7 @@ input[type="search"]:focus{
 }
 
 .navbar-rgt>div {
-    display: inline-block;
+    display: flex;
 }
 
 .navbar-rgt span {
@@ -118,12 +118,16 @@ input[type="search"]:focus{
     padding: 0 5px;
 }
 
+.navbar-rgt a {
+
+}
+
 
 .logout-option:hover {
     color: #ff0000;
 }
 
-.shopping-cart-background {
+.side-menu-background {
     position: fixed;
     top: 0;
     left: 0;
@@ -136,7 +140,7 @@ input[type="search"]:focus{
     transition-duration: 0.5s;
 }
 
-.shopping-cart {
+.side-menu {
     position: fixed;
     top: 0;
     right: -450px;
@@ -150,28 +154,28 @@ input[type="search"]:focus{
     padding: 25px;
 }
 
-.shopping-cart.open {
+.side-menu.open {
     right: 0;
 }
 
-.shopping-cart-header {
+.side-menu-header {
     display: flex;
     justify-content: space-between;
 }
 
-.shopping-cart-title {
+.side-menu-title {
     cursor: default;
     font-weight: bold;
     font-size: 20px;
 }
 
-.btn-close-shopping-cart {
+.btn-close-side-menu {
     cursor: pointer;
     border-radius: 4px;
     padding: 3px 10px;
 }
 
-.btn-close-shopping-cart:hover {
+.btn-close-side-menu:hover {
     background-color: #d9d9d9;
 }
 

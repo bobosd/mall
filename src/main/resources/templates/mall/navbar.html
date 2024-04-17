@@ -16,18 +16,31 @@
             </div>
             <div class="navbar-rgt">
                 <div sec:authorize="isAuthenticated()">
-                    <a><i class="fa-solid fa-user"></i><span class="nickname"></span></a>
-                    <a class="logout-option"><i class="fa-solid fa-right-from-bracket"></i><span>logout</span></a>
+                    <div class="side-menu-background"></div>
+                    <a class="btn-user-menu"><i class="fa-solid fa-user"></i><span class="nickname" sec:authentication="name"></span></a>
+                    <div>
+                        <div class="side-menu user-menu">
+                            <div class="side-menu-header user-menu-header">
+                                <div class="side-menu-header">Mi cuenta</div>
+                                <div class="btn-close-side-menu"><i class="fa-solid fa-x"></i></div>
+                            </div>
+                            <div class="side-menu-body user-menu-body">
+                                <ul>
+                                    <li>
+                                        Cuenta
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
                     <a class="btn-shopping-cart"><i class="fa-solid fa-cart-shopping"></i> cesta</a>
                     <div>
-                        <div class="shopping-cart-background">
-                        </div>
-                        <div class="shopping-cart">
-                            <div class="shopping-cart-header">
-                                <div class="shopping-cart-title">Mi cesta</div>
-                                <div class="btn-close-shopping-cart"><i class="fa-solid fa-x"></i></div>
+                        <div class="side-menu shopping-cart">
+                            <div class="side-menu-header shopping-cart-header">
+                                <div class="side-menu-title">Mi cesta</div>
+                                <div class="btn-close-side-menu"><i class="fa-solid fa-x"></i></div>
                             </div>
-                            <div class="shopping-cart-body">
+                            <div class="side-menu-body shopping-cart-body">
                             </div>
                             <div class="shopping-cart-spinner">
                                 <div class="spinner-border" role="status"></div>
@@ -45,36 +58,21 @@
 
     <script>
         //没有放在 $(document).ready() 里是因为 navbar + 原网页会重叠，并且会定义两个initListener() { }
-        $(".navbar-mall-icon").click(() => {
-            window.location.href = getBaseUrl();
+        $(document).ready(() => {
+            blindMallLogoClickEvent();
+            blindShoppingCartClickEvent();
         });
 
-        $(".logout-option").click(() => logout());
-
-        $(".btn-shopping-cart").click(() => {
-            loadAndShowShoppingCart();
-        })
-
-        const MALL_USER_ITEM_NAME = "user";
-        const refreshToken = getCookie("refresh_token");
-        if (refreshToken !== null) {
-            const user = JSON.parse(localStorage.getItem(MALL_USER_ITEM_NAME));
-            $(".nickname").text(user.nickName);
-        } else {
-            localStorage.removeItem(MALL_USER_ITEM_NAME)
+        function blindMallLogoClickEvent() {
+            $(".navbar-mall-icon").click(() => {
+                window.location.href = getBaseUrl();
+            });
         }
 
-        function getCookie(name) {
-            name += "=";
-            let decodedCookies = decodeURIComponent(document.cookie);
-            let cookieArray = decodedCookies.split(";");
-            for (let i = 0; i < cookieArray.length; i++) {
-                let cookie = cookieArray[i].trim();
-                if (cookie.indexOf(name) === 0) {
-                    return cookie.substring(name.length, cookie.length);
-                }
-            }
-            return null;
+        function blindShoppingCartClickEvent() {
+            $(".btn-shopping-cart").click(() => {
+                loadAndShowShoppingCart();
+            });
         }
 
         function logout() {
@@ -120,11 +118,11 @@
         })();
 
         function loadAndShowShoppingCart() {
-            const backgroundDiv = $(".shopping-cart-background");
+            const backgroundDiv = $(".side-menu-background");
             backgroundDiv.show();
             backgroundDiv.click(() => hideShoppingCart());
             $(".shopping-cart").addClass("open");
-            $(".btn-close-shopping-cart").click(() => hideShoppingCart());
+            $(".btn-close-side-menu").click(() => hideShoppingCart());
             showShoppingCartLoadingIcon();
             $.ajax({
                 method: "POST",
@@ -189,11 +187,11 @@
         }
 
         function hideShoppingCart() {
-            const backgroundDiv = $(".shopping-cart-background");
-            $(".shopping-cart").removeClass("open");
+            const backgroundDiv = $(".side-menu-background");
+            $(".side-menu.open").removeClass("open");
             backgroundDiv.hide();
             backgroundDiv.unbind();
-            $(".btn-close-shopping-cart").unbind();
+            $(".btn-close-side-menu").unbind();
             $(".shopping-cart-body").empty();
         }
 
