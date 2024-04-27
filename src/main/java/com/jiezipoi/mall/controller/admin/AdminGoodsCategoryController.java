@@ -4,7 +4,7 @@ import com.jiezipoi.mall.dto.CreateGoodsCategoryDTO;
 import com.jiezipoi.mall.entity.GoodsCategory;
 import com.jiezipoi.mall.service.GoodsCategoryService;
 import com.jiezipoi.mall.utils.Response;
-import com.jiezipoi.mall.utils.dataTable.request.GoodsCategoryRequest;
+import com.jiezipoi.mall.utils.dataTable.request.GoodsTableRequest;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -25,7 +25,7 @@ public class AdminGoodsCategoryController {
 
     @PostMapping(value = "/product-category/list")
     @ResponseBody
-    public Response<?> list(@RequestBody GoodsCategoryRequest request) {
+    public Response<?> list(@RequestBody GoodsTableRequest request) {
         return service.getCategoriesPage(request);
     }
 

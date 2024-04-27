@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 public class Carousel {
     private Integer carouselId;
     private String carouselUrl;
-    private String redirectUrl;
+    private Long goodsId;
     private Integer carouselRank;
     private Byte isDeleted;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
@@ -34,12 +34,12 @@ public class Carousel {
 
     }
 
-    public String getRedirectUrl() {
-        return redirectUrl;
+    public Long getGoodsId() {
+        return goodsId;
     }
 
-    public void setRedirectUrl(String redirectUrl) {
-        this.redirectUrl = redirectUrl == null ? null : redirectUrl.trim();
+    public void setGoodsId(Long goodsId) {
+        this.goodsId = goodsId;
     }
 
     public Integer getCarouselRank() {

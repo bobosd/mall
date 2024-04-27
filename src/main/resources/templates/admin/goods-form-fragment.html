@@ -17,14 +17,14 @@
                 <label th:text="#{product_categories}"></label>
                 <select id="slc-category-level-1"
                         class="select2"
-                        th:lang="${#locale.toString() == 'zh_CN' ? 'zh-CN' : #locale.getCountry()}">
+                        th:lang="${#locale.getLanguage()}">
                 </select>
             </div>
             <div class="col-3">
                 <label></label>
                 <select id="slc-category-level-2"
                         class="select2"
-                        th:lang="${#locale.toString() == 'zh_CN' ? 'zh-CN' : #locale.getCountry()}"
+                        th:lang="${#locale.getLanguage()}"
                         disabled>
                 </select>
             </div>
@@ -32,13 +32,14 @@
                 <label></label>
                 <select id="slc-category-level-3"
                         class="select2"
-                        th:lang="${#locale.toString() == 'zh_CN' ? 'zh-CN' : #locale.getCountry()}"
+                        th:lang="${#locale.getLanguage()}"
                         disabled>
                 </select>
             </div>
             <div class="col-3">
                 <label for="slc-goods-brand" th:text="#{product.brand}"></label>
-                <select class="select2" id="slc-goods-brand" th:placeholder="#{product.brand}"></select>
+                <select class="select2" id="slc-goods-brand" th:placeholder="#{product.brand}"
+                        th:lang="${#locale.getLanguage()}"></select>
             </div>
         </div>
 
@@ -286,10 +287,10 @@
             }
         }
 
+        //TODO: check if user can input negative stock number
         function getStockNum() {
             let stock = $("#input-stock").val();
-            const validator = new Validator(stock);
-            if (validator.isInteger()) {
+            if (Validator.isInteger(stock)) {
                 return parseInt(stock);
             } else {
                 return null;
@@ -299,8 +300,7 @@
         function getSellingPrice() {
             let price = $("#input-selling-price").val();
             price = price.replace(",", ".");
-            const validator = new Validator(price);
-            if (!validator.isNumeric()) {
+            if (!Validator.isNumeric(price)) {
                 return null;
             } else {
                 return parseFloat(price);
@@ -310,8 +310,7 @@
         function getOriginalPrice() {
             let price = $("#input-original-price").val();
             price = price.replace(",", ".");
-            const validator = new Validator(price);
-            if (!validator.isNumeric()) {
+            if (!Validator.isNumeric(price)) {
                 return null;
             } else {
                 return parseFloat(price);

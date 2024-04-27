@@ -17,5 +17,5 @@ public interface ShoppingCartItemDao {
 
     List<ShoppingCartItemDTO> selectByUserId(@Param("userId") Long mallUserId);
 
-    int deleteByPrimaryKeyAndUserId(@Param("userId") Long userId, @Param("goodsId") Long goodsId);
+    int deleteByGoodsIdAndUserId(@Param("userId") Long userId, @Param("goodsId") Long goodsId);
 }

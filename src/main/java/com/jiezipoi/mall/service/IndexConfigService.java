@@ -1,32 +1,27 @@
 package com.jiezipoi.mall.service;
 
-import com.jiezipoi.mall.controller.vo.IndexConfigGoodsVO;
-import com.jiezipoi.mall.dao.GoodsDao;
 import com.jiezipoi.mall.dao.IndexConfigDao;
-import com.jiezipoi.mall.entity.Goods;
+import com.jiezipoi.mall.dto.IndexConfigDTO;
+import com.jiezipoi.mall.dto.MallGoodsDTO;
 import com.jiezipoi.mall.entity.IndexConfig;
 import com.jiezipoi.mall.exception.NotFoundException;
 import com.jiezipoi.mall.utils.CommonResponse;
 import com.jiezipoi.mall.utils.Response;
 import com.jiezipoi.mall.utils.dataTable.DataTableResult;
 import org.springframework.context.MessageSource;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 @Service
 public class IndexConfigService {
     private final IndexConfigDao indexConfigDao;
     private final GoodsService goodsService;
-    private final MessageSource messageSource;
 
-    public IndexConfigService(IndexConfigDao indexConfigDao, GoodsService goodsService, MessageSource messageSource) {
+    public IndexConfigService(IndexConfigDao indexConfigDao, GoodsService goodsService) {
         this.indexConfigDao = indexConfigDao;
         this.goodsService = goodsService;
-        this.messageSource = messageSource;
     }
 
 
@@ -36,7 +31,7 @@ public class IndexConfigService {
             return new Response<>(CommonResponse.INVALID_DATA);
         }
 
-        List<IndexConfig> indexConfigs = indexConfigDao.findIndexConfigList(start, limit, configType);
+        List<IndexConfigDTO> indexConfigs = indexConfigDao.findIndexConfigList(start, limit, configType);
         int count = indexConfigDao.getTotalIndexConfigs(configType);
         DataTableResult dataTableResult = new DataTableResult(indexConfigs, count);
         Response<DataTableResult> response = new Response<>(CommonResponse.SUCCESS);
@@ -64,8 +59,8 @@ public class IndexConfigService {
         }
     }
 
-    public List<IndexConfigGoodsVO> getConfigGoodsForIndex(int configType) {
-        List<IndexConfig> indexConfigs = indexConfigDao.findIndexConfigByTypeAndNum(configType);
+    public List<MallGoodsDTO> getConfigGoodsForIndex(int configType) {
+        List<IndexConfig> indexConfigs = indexConfigDao.findIndexConfigByType(configType);
         if (indexConfigs.isEmpty()) {
             return new ArrayList<>();
         }
@@ -77,11 +72,10 @@ public class IndexConfigService {
         for (int i = 0; i < goodsIds.size(); i++) {
             idsArray[i] = goodsIds.get(i);
         }
-        //goods对象有太多信息，不能暴露给
-        List<Goods> goodsList = goodsService.getGoodsListById(idsArray);
-        List<IndexConfigGoodsVO> goodsVOS = new ArrayList<>();
-        goodsList.forEach(goods -> goodsVOS.add(new IndexConfigGoodsVO(goods)));
-        return goodsVOS;
+        return goodsService.getGoodsListById(idsArray)
+                .stream()
+                .map(MallGoodsDTO::new)
+                .toList();
     }
 
     public Response<?> deleteBatch(long[] ids) {

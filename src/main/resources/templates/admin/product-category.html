@@ -3,7 +3,9 @@
 <head th:replace="~{admin/header::general-libraries-and-styles(~{::title}, ~{::link}, ~{::head/script})}">
     <title id="page-title"></title>
     <link rel="stylesheet" href="/styles/admin/product-category.css">
-    <link th:replace="~{admin/header::datatable}"/>
+    <link th:replace="~{common/libraries::datatable-css}"/>
+    <script th:replace="~{common/libraries::datatable-js}"></script>
+    <script th:replace="~{common/libraries::datatable-locale}"></script>
 </head>
 
 <body>
@@ -12,21 +14,21 @@
     <div class="block">
         <div class="block-title" th:text="#{product_categories}"></div>
         <div class="block-content">
-            <div class="category-options">
+            <div class="block-row">
                 <button class="button button-blue" id="btn-back" disabled><i class="fa-solid fa-chevron-left"></i></button>
                 <button class="button button-blue" id="btn-show-category-modal" th:text="#{create.category}"></button>
+                <table>
+                    <thead>
+                    <tr>
+                        <th th:text="#{category.name}"></th>
+                        <th th:text="#{rank.order}"></th>
+                        <th th:text="#{create.date}"></th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                    </thead>
+                </table>
             </div>
-            <table>
-                <thead>
-                <tr>
-                    <th th:text="#{category.name}"></th>
-                    <th th:text="#{rank.order}"></th>
-                    <th th:text="#{create.date}"></th>
-                    <th></th>
-                    <th></th>
-                </tr>
-                </thead>
-            </table>
         </div>
     </div>
 </div>
@@ -299,8 +301,7 @@
         let isValid = true;
         const {categoryRank} = category;
 
-        const validator = new Validator(categoryRank);
-        if (!validator.isInteger()) {
+        if (!Validator.isInteger(categoryRank)) {
             isValid = false;
             $("#input-rank-order").setInvalid();
         }

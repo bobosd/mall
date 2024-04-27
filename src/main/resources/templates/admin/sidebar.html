@@ -15,35 +15,10 @@
             <div class="sidebar-option-list-title" th:text="#{summary}"></div>
             <a th:href="@{/admin/index}">
                 <div class="sidebar-option dashboard">
-                    <i class="fa-solid fa-chart-line"></i>
+                    <div class="sidebar-option-icon">
+                        <i class="fa-solid fa-chart-line"></i>
+                    </div>
                     <span class="sidebar-option-text" th:text="#{dashboard}"></span>
-                </div>
-            </a>
-        </div>
-        <div class="sidebar-option-list no-text-select">
-            <div class="sidebar-option-list-title" th:text="#{index.config}"></div>
-            <a th:href="@{/admin/carousel}">
-                <div class="sidebar-option carousel-setting">
-                    <i class="fa-solid fa-images"></i>
-                    <span class="sidebar-option-text" th:text="#{carousel}"></span>
-                </div>
-            </a>
-            <a th:href="@{/admin/index-config?configType=3}">
-                <div class="sidebar-option best-selling">
-                    <i class="fa-solid fa-fire"></i>
-                    <span class="sidebar-option-text" th:text="#{best.selling}"></span>
-                </div>
-            </a>
-            <a th:href="@{/admin/index-config?configType=4}">
-                <div class="sidebar-option new-arrivals">
-                    <i class="fa-solid fa-star"></i>
-                    <span class="sidebar-option-text" th:text="#{new.arrivals}"></span>
-                </div>
-            </a>
-            <a th:href="@{/admin/index-config?configType=5}">
-                <div class="sidebar-option recommend">
-                    <i class="fa-solid fa-thumbs-up"></i>
-                    <span class="sidebar-option-text" th:text="#{recommend}"></span>
                 </div>
             </a>
         </div>
@@ -51,20 +26,61 @@
             <div class="sidebar-option-list-title" th:text="#{product.config}"></div>
             <a th:href="@{/admin/goods}">
                 <div class="sidebar-option goods-management">
-                    <i class="fa-solid fa-box-open"></i>
+                    <div class="sidebar-option-icon">
+                        <i class="fa-solid fa-box-open"></i>
+                    </div>
                     <span class="sidebar-option-text" th:text="#{product}"></span>
                 </div>
             </a>
             <a th:href="@{/admin/product-category}">
                 <div class="sidebar-option product-category">
-                    <i class="fa-solid fa-tag"></i>
+                    <div class="sidebar-option-icon">
+                        <i class="fa-solid fa-tag"></i>
+                    </div>
                     <span class="sidebar-option-text" th:text="#{product_categories}"></span>
                 </div>
             </a>
             <a th:href="@{/admin/goods-brand}">
                 <div class="sidebar-option goods-brand">
-                    <i class="fa-solid fa-copyright"></i>
+                    <div class="sidebar-option-icon">
+                        <i class="fa-solid fa-copyright"></i>
+                    </div>
                     <span class="sidebar-option-text" th:text="#{product.brand}"></span>
+                </div>
+            </a>
+        </div>
+        <div class="sidebar-option-list no-text-select">
+            <div class="sidebar-option-list-title" th:text="#{index.config}"></div>
+            <a th:href="@{/admin/carousel}">
+                <div class="sidebar-option carousel-setting">
+                    <div class="sidebar-option-icon">
+                        <i class="fa-solid fa-images"></i>
+                    </div>
+                    <span class="sidebar-option-text" th:text="#{carousel}"></span>
+                </div>
+            </a>
+            <a th:href="@{/admin/index-config?configType=3}">
+                <div class="sidebar-option best-selling">
+                    <div class="sidebar-option-icon">
+                        <i class="fa-solid fa-fire"></i>
+                    </div>
+                    <span class="sidebar-option-text" th:text="#{best.selling}"></span>
+                </div>
+            </a>
+            <a th:href="@{/admin/index-config?configType=4}">
+                <div class="sidebar-option new-arrivals">
+                    <div class="sidebar-option-icon">
+                        <i class="fa-solid fa-star"></i>
+                    </div>
+                    <span class="sidebar-option-text" th:text="#{new.arrivals}"></span>
+                </div>
+            </a>
+            <a th:href="@{/admin/index-config?configType=5}">
+                <div class="sidebar-option recommend">
+                    <div class="sidebar-option-icon">
+                        <i class="fa-solid fa-thumbs-up"></i>
+                    </div>
+                    <span class="sidebar-option-text" th:text="#{recommend}"></span>
                 </div>
             </a>
         </div>
@@ -106,7 +122,7 @@
                     </div>
                     <div class="dropdown-content user-dropdown">
                         <a th:href="@{/admin/user-setting}"><div class="dropdown-option" th:text="#{settings}"></div></a>
-                        <a th:href="@{/admin/logout}"><div class="dropdown-option" th:text="#{logout}"></div></a>
+                        <a th:href="@{/user/logout}"><div class="dropdown-option" th:text="#{logout}"></div></a>
                     </div>
                 </div>
             </div>
@@ -114,18 +130,18 @@
     </div>
     <script>
         $(document).ready(function () {
-            blindSidebarToggleEvent();
-            blindSidebarOptionEvent();
-            blindLogoClickEvent();
+            bindSidebarToggleEvent();
+            bindSidebarOptionEvent();
+            bindLogoClickEvent();
         });
 
-        function blindLogoClickEvent() {
+        function bindLogoClickEvent() {
             $(".logo-container").click(() => {
                 window.location.href = getBaseUrl();
             });
         }
 
-        function blindSidebarToggleEvent() {
+        function bindSidebarToggleEvent() {
             let toggle = () => {
                 $(".sidebar-option-text").toggle();
                 $(".logo-name").toggle();
@@ -143,7 +159,7 @@
             });
         }
 
-        function blindSidebarOptionEvent() {
+        function bindSidebarOptionEvent() {
             $(".sidebar-option").click(function () {
                 if ($(this).attr("option-selected") !== "true") {
                     $(".sidebar-option[option-selected=true]").removeAttr("option-selected");

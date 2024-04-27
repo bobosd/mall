@@ -6,6 +6,7 @@ import com.jiezipoi.mall.config.JwtConfig;
 import com.jiezipoi.mall.dto.MallUserDTO;
 import com.jiezipoi.mall.entity.User;
 import com.jiezipoi.mall.enums.UserStatus;
+import com.jiezipoi.mall.exception.UserNotFoundException;
 import com.jiezipoi.mall.exception.VerificationCodeNotFoundException;
 import com.jiezipoi.mall.service.JwtService;
 import com.jiezipoi.mall.service.UserService;
@@ -107,7 +108,7 @@ public class MallUserController {
             if (user.getUserStatus() == UserStatus.UNACTIVATED) {
                 return new Response<>(CommonResponse.FORBIDDEN);
             }
-        } catch (BadCredentialsException e) {
+        } catch (BadCredentialsException | UserNotFoundException e) {
             return new Response<>(CommonResponse.INVALID_DATA);
         }
         setCredentialsCookie(user, httpServletResponse);
@@ -117,9 +118,8 @@ public class MallUserController {
         return response;
     }
 
-    @PostMapping("/logout")
-    @ResponseBody
-    public Response<?> logout(HttpServletRequest request, HttpServletResponse response) {
+    @GetMapping("/logout")
+    public String logout(HttpServletRequest request, HttpServletResponse response) {
         Cookie[] cookies = request.getCookies();
         Optional<Cookie> optionalCookie = Arrays.stream(cookies)
                 .filter(cookie -> cookie.getName().equals(jwtConfig.getRefreshCookieName()))
@@ -132,7 +132,7 @@ public class MallUserController {
         ResponseCookie refreshCookie = jwtService.createJwtCookie("", jwtConfig.getRefreshCookieName(), Duration.ZERO);
         response.addHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
         response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
-        return new Response<>(CommonResponse.SUCCESS);
+        return "redirect:/";
     }
 
     private void setCredentialsCookie(User user, HttpServletResponse response) {

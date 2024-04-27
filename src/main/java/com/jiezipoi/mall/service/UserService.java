@@ -6,7 +6,7 @@ import com.jiezipoi.mall.dao.UserDao;
 import com.jiezipoi.mall.entity.User;
 import com.jiezipoi.mall.enums.Role;
 import com.jiezipoi.mall.enums.UserStatus;
-import com.jiezipoi.mall.exception.NotFoundException;
+import com.jiezipoi.mall.exception.UserNotFoundException;
 import com.jiezipoi.mall.exception.VerificationCodeNotFoundException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
@@ -101,8 +101,12 @@ public class UserService implements UserDetailsService {
         return new Content(templateEngine.process("email/sign-up-activation.html", thymeleafContext));
     }
 
-    public long getUserIdByEmail(String email) throws NotFoundException {
-        return mallUserDao.selectUserIdByEmail(email);
+    public long getUserIdByEmail(String email) throws UserNotFoundException {
+        Long id = mallUserDao.selectUserIdByEmail(email);
+        if (id == null) {
+            throw new UserNotFoundException(email);
+        }
+        return id;
     }
 
     public boolean isExistingEmail(String email) {
@@ -115,6 +119,11 @@ public class UserService implements UserDetailsService {
         return (User) authentication.getPrincipal();
     }
 
+    /**
+     * 通过用户邮箱获得用户实体类
+     * @param email 用户的邮箱
+     * @return 用户实体类或者null
+     */
     public User getUserByEmail(String email) {
         return mallUserDao.selectByEmail(email);
     }
@@ -122,13 +131,18 @@ public class UserService implements UserDetailsService {
     /**
      * UserDetails接口的实现，不要动，该实现需要通过用户登录标识（通常情况下是username）获得用户entity。
      * 但是商城里是email，
+     *
      * @param email 用户的邮箱
      * @return 通过数据库映射的User对象
      * @throws UsernameNotFoundException 没有对应的用户
      */
     @Override
-    public User loadUserByUsername(String email) throws UsernameNotFoundException{
-        return getUserByEmail(email);
+    public User loadUserByUsername(String email) throws UsernameNotFoundException {
+        User user = getUserByEmail(email);
+        if (user == null) {
+            throw new UsernameNotFoundException("user not found for email " + email);
+        }
+        return user;
     }
 
     public void logout(String refreshToken) {

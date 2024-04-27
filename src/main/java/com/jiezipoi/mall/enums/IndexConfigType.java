@@ -1,6 +1,6 @@
 package com.jiezipoi.mall.enums;
 
-public enum IndexConfigEnum {
+public enum IndexConfigType {
 
     DEFAULT(0, "DEFAULT"),
     INDEX_SEARCH_HOTS(1, "INDEX_SEARCH_HOTS"),
@@ -12,13 +12,13 @@ public enum IndexConfigEnum {
     private int type;
     private String name;
 
-    IndexConfigEnum(int type, String name) {
+    IndexConfigType(int type, String name) {
         this.type = type;
         this.name = name;
     }
 
-    public static IndexConfigEnum getIndexConfigEnumByType(int type) {
-        for (IndexConfigEnum configEnum : IndexConfigEnum.values()) {
+    public static IndexConfigType getIndexConfigEnumByType(int type) {
+        for (IndexConfigType configEnum : IndexConfigType.values()) {
             if (configEnum.getType() == type) {
                 return configEnum;
             }

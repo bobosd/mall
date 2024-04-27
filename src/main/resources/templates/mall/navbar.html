@@ -16,41 +16,52 @@
             </div>
             <div class="navbar-rgt">
                 <div sec:authorize="isAuthenticated()">
-                    <div class="side-menu-background"></div>
                     <a class="btn-user-menu"><i class="fa-solid fa-user"></i><span class="nickname" sec:authentication="name"></span></a>
-                    <div>
-                        <div class="side-menu user-menu">
-                            <div class="side-menu-header user-menu-header">
-                                <div class="side-menu-header">Mi cuenta</div>
-                                <div class="btn-close-side-menu"><i class="fa-solid fa-x"></i></div>
-                            </div>
-                            <div class="side-menu-body user-menu-body">
-                                <ul>
-                                    <li>
-                                        Cuenta
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
                     <a class="btn-shopping-cart"><i class="fa-solid fa-cart-shopping"></i> cesta</a>
-                    <div>
-                        <div class="side-menu shopping-cart">
-                            <div class="side-menu-header shopping-cart-header">
-                                <div class="side-menu-title">Mi cesta</div>
-                                <div class="btn-close-side-menu"><i class="fa-solid fa-x"></i></div>
-                            </div>
-                            <div class="side-menu-body shopping-cart-body">
-                            </div>
-                            <div class="shopping-cart-spinner">
-                                <div class="spinner-border" role="status"></div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
                 <div sec:authorize="!isAuthenticated()">
                     <a href="/login"><span>Login</span></a>
                     <a href="/signup"><span>Registrar</span></a>
+                </div>
+            </div>
+        </div>
+
+        <div sec:authorize="isAuthenticated()">
+            <div class="side-menu-background"></div>
+            <div>
+                <div class="side-menu user-menu">
+                    <div class="side-menu-header user-menu-header">
+                        <div class="side-menu-title">Mi cuenta</div>
+                        <div class="btn-close-side-menu"><i class="fa-solid fa-x"></i></div>
+                    </div>
+                    <div class="side-menu-body user-menu-body">
+                        <div class="user-menu-option">
+                            <div class="user-menu-option-icon"><i class="fa-solid fa-user"></i></div>
+                            <div class="user-menu-option-text">Mi cuenta</div>
+                        </div>
+                        <div class="user-menu-option">
+                            <div class="user-menu-option-icon"><i class="fa-solid fa-dolly"></i></div>
+                            <div class="user-menu-option-text">Mis pedidos</div>
+                        </div>
+                        <hr>
+                        <a class="user-menu-option" href="/user/logout">
+                            <div class="user-menu-option-icon"><i class="fa-solid fa-right-from-bracket"></i></div>
+                            <div class="user-menu-option-text">Cerrar sesión</div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div class="side-menu shopping-cart">
+                    <div class="side-menu-header shopping-cart-header">
+                        <div class="side-menu-title">Mi cesta</div>
+                        <div class="btn-close-side-menu"><i class="fa-solid fa-x"></i></div>
+                    </div>
+                    <div class="side-menu-body shopping-cart-body">
+                    </div>
+                    <div class="shopping-cart-spinner">
+                        <div class="spinner-border" role="status"></div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -59,17 +70,32 @@
     <script>
         //没有放在 $(document).ready() 里是因为 navbar + 原网页会重叠，并且会定义两个initListener() { }
         $(document).ready(() => {
-            blindMallLogoClickEvent();
-            blindShoppingCartClickEvent();
+            bindMallLogoClickEvent();
+            bindShoppingCartClickEvent();
+            bindUserEmailClickEvent();
+            bindCloseSideMenuEvent();
         });
 
-        function blindMallLogoClickEvent() {
+        function bindCloseSideMenuEvent() {
+            $(".btn-close-side-menu").click(() => hideSideMenu());
+        }
+
+        function bindUserEmailClickEvent() {
+            $(".btn-user-menu").click(() => showUserMenu());
+        }
+
+        function showUserMenu() {
+            $(".user-menu").addClass("open");
+            showSideMenuBackground();
+        }
+
+        function bindMallLogoClickEvent() {
             $(".navbar-mall-icon").click(() => {
                 window.location.href = getBaseUrl();
             });
         }
 
-        function blindShoppingCartClickEvent() {
+        function bindShoppingCartClickEvent() {
             $(".btn-shopping-cart").click(() => {
                 loadAndShowShoppingCart();
             });
@@ -118,18 +144,16 @@
         })();
 
         function loadAndShowShoppingCart() {
-            const backgroundDiv = $(".side-menu-background");
-            backgroundDiv.show();
-            backgroundDiv.click(() => hideShoppingCart());
+            showSideMenuBackground();
             $(".shopping-cart").addClass("open");
-            $(".btn-close-side-menu").click(() => hideShoppingCart());
             showShoppingCartLoadingIcon();
             $.ajax({
                 method: "POST",
                 url: "/shopping-cart/list",
                 success: (res) => {
                     if (res.code === 200) {
-                        renderShoppingCart(res.data);
+                        renderShoppingCartItems(res.data);
+                        localStorage.setItem("cartItem", JSON.stringify(res.data));
                     }
                 },
                 error: () => showServerErrorSwal(),
@@ -137,41 +161,111 @@
             });
         }
 
-        function renderShoppingCart(items) {
+        function showSideMenuBackground() {
+            const backgroundDiv = $(".side-menu-background");
+            backgroundDiv.show();
+            backgroundDiv.click(() => hideSideMenu());
+        }
+
+        function renderShoppingCartItems(items) {
             if (items.length < 1) {
+                renderEmptyIcon();
                 return;
             }
             let itemsDomStr = '';
             let totalPrice = 0.0;
             items.forEach((item) => {
                 const {sellingPrice, goodsCount} = item;
-                totalPrice = (sellingPrice * goodsCount * 10 + totalPrice * 10) / 10;
+                totalPrice = calcPrice(sellingPrice, goodsCount, totalPrice);
                 itemsDomStr += generateShoppingCartItemsDOM(item);
             });
             const summaryDOM = generateSummaryDOM(totalPrice);
-            const btnCashier = `<button class="button button-xl button-orange btn-cashier">Ir a cajero</button>`;
+            const btnCashier = `<button class="button button-xl button-purple btn-cashier">Ir a cajero</button>`;
             const resultDOM = jQuery.parseHTML(itemsDomStr);
             const cartBody = $(".shopping-cart-body");
-            cartBody.append(resultDOM);
+            cartBody.html(resultDOM);
             cartBody.append(summaryDOM);
             cartBody.append(btnCashier);
+            cartBody.find(".shopping-cart-item-delete").click((e) => removeCartItem(e.target));
+            cartBody.find(".btn-cashier").click(() => window.location.href = getBaseUrl() + "/shopping-cart");
+        }
+
+        function renderEmptyIcon() {
+            const DOM = `
+                <div class="shopping-cart-empty-container">
+                    <div class="shopping-cart-icon">
+                        <i class="fa-solid fa-cart-shopping"></i>
+                        <div class="x-mark">
+                            <i class="fa-regular fa-circle-xmark"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center">
+                    <span>Cesta vacía</span>
+                </div>
+            `;
+            $(".shopping-cart-body").html(DOM);
+        }
+
+        function setShoppingCartSummaryPrice(totalPrice) {
+            const priceStr = parseNumberToEuro(totalPrice);
+            $(".shopping-cart-total-price").text(priceStr);
+        }
+
+        function removeCartItem(target) {
+            const btnRemove = $(target);
+            $(btnRemove).addSpinner();
+            const cartItemDom = $(btnRemove).closest(".shopping-cart-item-container");
+            const goodsId = cartItemDom.attr("item-id");
+            $.ajax({
+                method: "POST",
+                url: "/shopping-cart/delete",
+                data: {goodsId: goodsId},
+                success: (res) => {
+                    if (res.code === 200) {
+                        cartItemDom.remove();
+                        let totalPrice = 0;
+                        let shoppingCart = JSON.parse(localStorage.getItem("cartItem"));
+                        shoppingCart = shoppingCart.filter((o) => {
+                            // noinspection EqualityComparisonWithCoercionJS
+                            if (o.goodsId != goodsId) {
+                                totalPrice = calcPrice(o.sellingPrice, o.goodsCount, totalPrice);
+                                return true;
+                            } else {
+                                return false;
+                            }
+                        });
+                        localStorage.setItem("cartItem", JSON.stringify(shoppingCart));
+                        setShoppingCartSummaryPrice(totalPrice);
+                        if (shoppingCart.length === 0) {
+                            $(".shopping-cart-body").empty();
+                            renderEmptyIcon();
+                        }
+                    } else {
+                        showServerErrorSwal();
+                    }
+                },
+                error: () => {
+                    showServerErrorSwal();
+                    btnRemove.removeSpinner();
+                }
+            });
         }
 
         function generateSummaryDOM(total) {
-            total = Number.parseFloat(total).toFixed(2);
-            total = total.toString().replace(".", ",");
+            total = parseNumberToEuro(total);
             const summaryDOM = `
                 <div class="shopping-cart-summary">
                     <div>Total:</div>
-                    <div>${total}€</div>
+                    <div class="shopping-cart-total-price">${total}</div>
                 </div>`;
             return jQuery.parseHTML(summaryDOM);
         }
 
         function generateShoppingCartItemsDOM(item) {
-            const {goodsCoverImg, goodsName, sellingPrice, goodsCount} = item;
+            const {goodsId,goodsCoverImg, goodsName, sellingPrice, goodsCount} = item;
             const sellingPriceStr = parseNumberToEuro(sellingPrice)
-            return`<div class="shopping-cart-item-container">
+            return`<div class="shopping-cart-item-container" item-id="${goodsId}">
                         <div class="shopping-cart-item-image">
                             <img src="${goodsCoverImg}" alt="cart item image">
                         </div>
@@ -180,18 +274,17 @@
                             <div class="shopping-cart-item-price">${sellingPriceStr}</div>
                             <div class="shopping-cart-item-count">unidades: ${goodsCount}</div>
                         </div>
-                        <div class="shopping-cart-item-delete">
+                        <div class="shopping-cart-item-delete"">
                             <i class="fa-solid fa-trash"></i>
                         </div>
                     </div>`;
         }
 
-        function hideShoppingCart() {
+        function hideSideMenu() {
             const backgroundDiv = $(".side-menu-background");
             $(".side-menu.open").removeClass("open");
             backgroundDiv.hide();
             backgroundDiv.unbind();
-            $(".btn-close-side-menu").unbind();
             $(".shopping-cart-body").empty();
         }
 

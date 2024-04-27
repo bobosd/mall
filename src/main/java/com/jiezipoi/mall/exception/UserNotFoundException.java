@@ -1,6 +1,6 @@
 package com.jiezipoi.mall.exception;
 
-public class UserNotFoundException extends Exception {
+public class UserNotFoundException extends RuntimeException {
     private final String userEmail;
 
     public UserNotFoundException(String userEmail) {

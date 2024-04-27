@@ -1,6 +1,19 @@
 body {
     margin: 0;
     min-width: 940px;
+    font-family: -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif,
+    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}
+
+:root {
+    --swiper-theme-color: #a669e2;
+    --mall-light-color: #ede3f7;
+    --mall-color: #a669e2;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
 }
 
 .floor {
@@ -21,7 +34,7 @@ body {
 }
 
 .floor-dark {
-    background-color: #F2F2F2;
+    background-color: #ede3f7;
 }
 
 .floor-left-title {
@@ -31,13 +44,14 @@ body {
     align-content: center;
     height: 100%;
     font-weight: bold;
-    font-size: 48px;
+    font-size: 42px;
 }
 
 .floor-top-title {
     height: 100%;
     font-weight: bold;
-    font-size: 32px;
+    font-size: 38px;
+    margin-bottom: 20px;
 }
 
 .button {
@@ -53,18 +67,80 @@ body {
     justify-content: center;
     padding: 7px 0;
     font-size: 16px;
-    font-weight: bold;
+    font-weight: 700;
     margin-top: 20px;
     width: 100%;
 }
 
-.button-orange {
+.button-purple {
     color: #ffffff;
-    background: #fc830a;
+    background: var(--mall-color);
 }
 
 .no-text-select {
     -webkit-user-select: none; /* Safari */
     -ms-user-select: none; /* IE 10 and IE 11 */
     user-select: none; /* Standard syntax */
+}
+
+/* hide default arrow button in numeric input */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    /* display: none; <- Crashes Chrome on hover */
+    -webkit-appearance: none;
+    margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
+}
+
+input[type=number] {
+    -moz-appearance:textfield; /* Firefox */
+}
+
+.choose-amount {
+    align-items: center;
+    display: flex;
+    border-radius: 12px;
+    border: 1px solid #DDDDDD;
+    height: 35px;
+    width: max-content;
+}
+
+.choose-amount:focus-within,.choose-amount:focus {
+    border: 1px solid var(--mall-color);
+    box-shadow: 0 0 0 3px var(--mall-light-color);
+}
+
+.amount-options {
+    color: #7e7e7e;
+    cursor: pointer;
+    padding: 2px 10px;
+    transition-duration: 0.3s;
+    border-radius: 12px;
+    margin: 0 4px;
+    font-size: 12px;
+}
+
+.amount-options:hover {
+    background-color: var(--mall-color);
+    color: #ffffff;
+}
+
+.input-buy-amount {
+    border: none;
+    border-radius: inherit;
+    width: 40px;
+    margin: 0;
+    text-align: center;
+}
+
+.input-buy-amount:focus {
+    outline: none;
+}
+
+.input-buy-amount:focus {
+    outline: none;
+}
+
+.form-control:focus {
+    box-shadow: 0 0 0 .25rem var(--mall-light-color);
+    border-color: var(--mall-color);
 }

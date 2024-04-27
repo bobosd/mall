@@ -17,7 +17,7 @@ nav {
 
 nav a {
     font-size: 18px;
-    padding: 10px 20px;
+    padding: 8px 20px;
     cursor: pointer;
     border-radius: 5px;
     transition-duration: 0.3s;
@@ -26,7 +26,7 @@ nav a {
 }
 
 nav a:hover {
-    background-color: #d9d9d9;
+    background-color: var(--mall-light-color);
     text-decoration: none;
     color: #000000;
 }
@@ -44,11 +44,11 @@ nav a:hover {
 
 .navbar-lft .navbar-admin-panel-button {
     font-size: 15px;
-    background-color: #d9d9d9;
+    background-color: var(--mall-light-color);
 }
 
 .navbar-admin-panel-button:hover {
-    background-color: #fc830a;
+    background-color: var(--mall-color);
     color: #ffffff;
 }
 
@@ -58,12 +58,12 @@ nav a:hover {
 }
 
 nav .btn-shopping-cart {
-    background-color: #fc830a;
+    background-color: var(--mall-color);
     color: #FFFFFF;
 }
 
 nav .btn-shopping-cart:hover {
-    background-color: #fc830a;
+    background-color: var(--mall-color);
     color: #FFFFFF;
 }
 
@@ -71,16 +71,12 @@ nav .btn-shopping-cart:hover {
     display: flex;
     height: 40px;
     border-radius: 30px;
-    border: 1px solid #DDDDDD;
+    border: 1px solid var(--mall-color);
     align-items: center;
 }
 
-.search-box:hover {
-    box-shadow: 0 0 5px 0 #DDDDDD;
-}
-
-.search-box:focus-within {
-    box-shadow: 0 0 5px 0 #DDDDDD;
+.search-box:hover, .search-box:focus-within {
+    box-shadow: 0 0 6px 0 var(--mall-light-color);
 }
 
 .search-button {
@@ -92,7 +88,7 @@ nav .btn-shopping-cart:hover {
     height: max-content;
     margin: 0 10px;
     padding: 5px 0;
-    background-color: #fc830a;
+    background-color: var(--mall-color);
     border-radius: 15px;
     color: #FFFFFF;
 }
@@ -119,9 +115,12 @@ input[type="search"]:focus{
 }
 
 .navbar-rgt a {
-
+    margin-left: 10px;
 }
 
+.navbar-rgt a:first-child {
+    margin-left: 0;
+}
 
 .logout-option:hover {
     color: #ff0000;
@@ -143,7 +142,7 @@ input[type="search"]:focus{
 .side-menu {
     position: fixed;
     top: 0;
-    right: -450px;
+    right: -460px;
     width: 450px;
     height: 100%;
     background: #ffffff;
@@ -151,7 +150,7 @@ input[type="search"]:focus{
     transition-duration: 0.5s;
     z-index: 3;
     box-shadow: 0 0 10px 0 rgba(210, 210, 210, 0.8);
-    padding: 25px;
+    padding: 0 25px;
 }
 
 .side-menu.open {
@@ -161,6 +160,7 @@ input[type="search"]:focus{
 .side-menu-header {
     display: flex;
     justify-content: space-between;
+    padding: 20px 0;
 }
 
 .side-menu-title {
@@ -188,6 +188,10 @@ input[type="search"]:focus{
     cursor: pointer;
 }
 
+.shopping-cart-item-container:first-child {
+    margin-top: 0;
+}
+
 .shopping-cart-item-container:hover {
     box-shadow: 0 0 5px 0 rgba(210, 210, 210, 0.8);
 }
@@ -203,6 +207,7 @@ input[type="search"]:focus{
 .shopping-cart-item-info {
     flex-grow: 1;
     padding: 5px;
+    font-weight: 500;
 }
 
 .shopping-cart-item-title {
@@ -211,7 +216,6 @@ input[type="search"]:focus{
 
 .shopping-cart-item-price {
     font-size: 14px;
-    font-weight: bold;
 }
 
 .shopping-cart-item-count {
@@ -231,8 +235,8 @@ input[type="search"]:focus{
     display: flex;
     justify-content: space-between;
     margin-top: 20px;
-    font-size: 14px;
-    font-weight: bold;
+    font-size: 15px;
+    font-weight: 600;
 }
 
 .shopping-cart-item-delete {
@@ -249,4 +253,60 @@ input[type="search"]:focus{
 .shopping-cart-item-delete:hover {
     background-color: #f35858;
     color: #ffffff;
+}
+
+.shopping-cart-empty-container {
+    margin-top: 100px;
+    display: flex;
+    justify-content: center;
+}
+
+.shopping-cart-empty-container .shopping-cart-icon {
+    position: relative;
+    font-size: 48px;
+}
+
+.shopping-cart-empty-container .x-mark {
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    flex-wrap: wrap;
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 2;
+    font-size: 20px;
+    height: 25px;
+    width: 25px;
+    background-color: #ffffff;
+    border-radius: 50%;
+}
+
+.user-menu-body {
+    padding: 0 10px;
+}
+
+.user-menu-body > hr {
+
+}
+
+.user-menu-option {
+    font-size: 16px;
+    display: flex;
+    padding: 6px 0;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.user-menu-option:hover {
+    background-color: var(--mall-color);
+    color: #ffffff;
+}
+
+.user-menu-option-icon {
+    display: flex;
+    width: 25px;
+    justify-content: center;
+    align-content: center;
+    flex-wrap: wrap;
 }

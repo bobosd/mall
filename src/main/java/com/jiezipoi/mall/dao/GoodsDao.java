@@ -1,6 +1,6 @@
 package com.jiezipoi.mall.dao;
 
-import com.jiezipoi.mall.dto.GoodsSearchDTO;
+import com.jiezipoi.mall.dto.MallGoodsDTO;
 import com.jiezipoi.mall.entity.Goods;
 import org.apache.ibatis.annotations.Param;
 
@@ -9,7 +9,15 @@ import java.util.List;
 public interface GoodsDao {
     long insertSelective(Goods goods);
 
-    List<Goods> list(@Param("start") int start, @Param("limit") int limit);
+    List<Goods> list(@Param("start") int start,
+                     @Param("limit") int limit,
+                     @Param("path") String path,
+                     @Param("keyword") String keyword,
+                     @Param("colNumber") Integer colNumber,
+                     @Param("dir") String dir);
+
+    int selectCountTotalOfList(@Param("path") String path,
+                               @Param("keyword") String keyword);
 
     /**
      * get children goods of passed category ID
@@ -34,7 +42,9 @@ public interface GoodsDao {
 
     int updateByPrimaryKeySelective(Goods goods);
 
-    List<GoodsSearchDTO> selectGoodsByTagContaining(@Param("keywordArr") String[] keywordArr);
+    List<MallGoodsDTO> selectGoodsByTagContaining(@Param("keywordArr") String[] keywordArr);
 
-    List<GoodsSearchDTO> selectGoodsByCategory(@Param("categoryId") Long categoryId);
+    List<MallGoodsDTO> selectGoodsByCategory(@Param("categoryId") Long categoryId);
+
+    List<Goods> selectGoodsByNameContaining(@Param("goodsName") String goodsName);
 }

@@ -3,11 +3,10 @@
 
 <mapper namespace="com.jiezipoi.mall.dao.IndexConfigDao">
     <resultMap id="BaseResultMap" type="com.jiezipoi.mall.entity.IndexConfig">
-        <id column="id" jdbcType="BIGINT" property="id"/>
+        <id column="index_config_id" jdbcType="BIGINT" property="id"/>
         <result column="config_name" jdbcType="VARCHAR" property="configName"/>
         <result column="config_type" jdbcType="TINYINT" property="configType"/>
         <result column="goods_id" jdbcType="BIGINT" property="goodsId"/>
-        <result column="redirect_url" jdbcType="VARCHAR" property="redirectUrl"/>
         <result column="config_rank" jdbcType="INTEGER" property="configRank"/>
         <result column="is_deleted" jdbcType="TINYINT" property="isDeleted"/>
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
@@ -16,14 +15,25 @@
         <result column="update_user" jdbcType="INTEGER" property="updateUser"/>
     </resultMap>
 
+    <resultMap id="IndexConfigDtoResultMap" type="com.jiezipoi.mall.dto.IndexConfigDTO">
+        <id column="index_config_id" jdbcType="BIGINT" property="indexConfigId"/>
+        <result column="config_name" jdbcType="VARCHAR" property="configName"/>
+        <result column="goods_id" jdbcType="BIGINT" property="goodsId"/>
+        <result column="goods_name" jdbcType="VARCHAR" property="goodsName"/>
+        <result column="config_rank" jdbcType="INTEGER" property="configRank"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+    </resultMap>
+
     <sql id="Base_Column_List">
-        id, config_name, config_type, goods_id, redirect_url, config_rank, is_deleted, create_time, create_user,
+        index_config_id, config_name, config_type, goods_id, config_rank, is_deleted, create_time, create_user,
         update_time, update_user
     </sql>
 
-    <select id="findIndexConfigList" resultMap="BaseResultMap">
-        SELECT <include refid="Base_Column_List"/>
+
+    <select id="findIndexConfigList" resultMap="IndexConfigDtoResultMap">
+        SELECT index_config_id, config_name, index_config.goods_id, goods_info.goods_name, config_rank, index_config.create_time
         FROM index_config
+        JOIN goods_info ON goods_info.goods_id = index_config.goods_id
         <where>
             <if test="config_type != null || config_type != ''">
                 AND config_type = #{config_type}
@@ -47,7 +57,7 @@
         </where>
     </select>
 
-    <select id="findIndexConfigByTypeAndNum" resultMap="BaseResultMap">
+    <select id="findIndexConfigByType" resultMap="BaseResultMap">
         SELECT <include refid="Base_Column_List"/>
         FROM index_config
         WHERE config_type = #{configType} AND is_deleted = 0
@@ -57,28 +67,28 @@
     <select id="selectByPrimaryKey" parameterType="long" resultMap="BaseResultMap">
         SELECT <include refid="Base_Column_List"/>
         FROM index_config
-        WHERE id = #{configId,jdbcType=BIGINT}
+        WHERE index_config_id = #{configId,jdbcType=BIGINT}
         AND is_deleted = 0
     </select>
 
     <update id="deleteByPrimaryKey" parameterType="long">
         UPDATE index_config
         SET is_deleted = 1
-        WHERE id = #{configId,jdbcType=BIGINT} AND is_deleted = 0
+        WHERE index_config_id = #{configId,jdbcType=BIGINT} AND is_deleted = 0
     </update>
 
     <update id="deleteBatch">
         UPDATE index_config
         SET is_deleted = 1, update_time = NOW()
         WHERE is_deleted = 0 AND
-            id IN <foreach collection="array" item="id" open="(" separator="," close=")">#{id,jdbcType=BIGINT}</foreach>
+            index_config_id IN <foreach collection="array" item="id" open="(" separator="," close=")">#{id,jdbcType=BIGINT}</foreach>
     </update>
 
     <insert id="insert" parameterType="com.jiezipoi.mall.entity.IndexConfig">
-        INSERT INTO index_config (id, config_name, config_type, goods_id, redirect_url, config_rank, is_deleted,
+        INSERT INTO index_config (index_config_id, config_name, config_type, goods_id, config_rank, is_deleted,
                                   create_time, create_user, update_time, update_user)
         VALUES (#{id,jdbcType=BIGINT}, #{configName,jdbcType=VARCHAR}, #{configType,jdbcType=TINYINT},
-                #{goodsId,jdbcType=BIGINT}, #{redirectUrl,jdbcType=VARCHAR}, #{configRank,jdbcType=INTEGER},
+                #{goodsId,jdbcType=BIGINT}, #{configRank,jdbcType=INTEGER},
                 #{isDeleted,jdbcType=TINYINT}, #{createTime,jdbcType=TIMESTAMP}, #{createUser,jdbcType=INTEGER},
                 #{updateTime,jdbcType=TIMESTAMP}, #{updateUser,jdbcType=INTEGER})
     </insert>
@@ -87,7 +97,7 @@
         INSERT INTO index_config
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="id != null">
-                id,
+                index_config_id,
             </if>
             <if test="configName != null">
                 config_name,
@@ -97,9 +107,6 @@
             </if>
             <if test="goodsId != null">
                 goods_id,
-            </if>
-            <if test="redirectUrl != null">
-                redirect_url,
             </if>
             <if test="configRank != null">
                 config_rank,
@@ -132,9 +139,6 @@
             </if>
             <if test="goodsId != null">
                 #{goodsId,jdbcType=BIGINT},
-            </if>
-            <if test="redirectUrl != null">
-                #{redirectUrl,jdbcType=VARCHAR},
             </if>
             <if test="configRank != null">
                 #{configRank,jdbcType=INTEGER},
@@ -169,9 +173,6 @@
             <if test="goodsId != null">
                 goods_id = #{goodsId,jdbcType=BIGINT},
             </if>
-            <if test="redirectUrl != null">
-                redirect_url = #{redirectUrl,jdbcType=VARCHAR},
-            </if>
             <if test="configRank != null">
                 config_rank = #{configRank,jdbcType=INTEGER},
             </if>
@@ -191,7 +192,7 @@
                 update_user = #{updateUser,jdbcType=INTEGER}
             </if>
         </set>
-        WHERE id = #{id,jdbcType=BIGINT}
+        WHERE index_config_id = #{id,jdbcType=BIGINT}
     </update>
 
     <update id="updateByPrimaryKey" parameterType="com.jiezipoi.mall.entity.IndexConfig">
@@ -199,13 +200,12 @@
         SET config_name = #{configName,jdbcType=VARCHAR},
             config_type = #{configType,jdbcType=TINYINT},
             goods_id = #{goodsId,jdbcType=BIGINT},
-            redirect_url = #{redirectUrl,jdbcType=VARCHAR},
             config_rank = #{configRank,jdbcType=INTEGER},
             is_deleted = #{isDeleted,jdbcType=TINYINT},
             create_time = #{createTime,jdbcType=TIMESTAMP},
             create_user = #{createUser,jdbcType=INTEGER},
             update_time = #{updateTime,jdbcType=TIMESTAMP},
             update_user = #{updateUser,jdbcType=INTEGER}
-        WHERE id = #{id,jdbcType=BIGINT}
+        WHERE index_config_id = #{id,jdbcType=BIGINT}
     </update>
 </mapper>

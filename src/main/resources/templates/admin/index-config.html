@@ -3,7 +3,11 @@
 <head th:replace="~{admin/header::general-libraries-and-styles(~{::title}, ~{::link}, ~{::head/script})}">
     <title th:text="#{new.arrivals}"></title>
     <link rel="stylesheet" href="/styles/admin/index-config.css">
-    <link th:insert="~{admin/header::datatable}">
+    <link th:replace="~{common/libraries::datatable-css}">
+    <link th:replace="~{common/libraries::select2-css}">
+    <script th:replace="~{common/libraries::select2-js}"></script>
+    <script th:replace="~{common/libraries::datatable-js}"></script>
+    <script th:replace="~{common/libraries::datatable-locale}"></script>
 </head>
 <body>
 <div th:replace="~{admin/sidebar::sidebar-fragment}"></div>
@@ -23,7 +27,6 @@
                     <tr>
                         <th></th>
                         <th th:text="#{config.name}"></th>
-                        <th th:text="#{redirect.link}"></th>
                         <th th:text="#{rank.order}"></th>
                         <th th:text="#{goods.id}"></th>
                         <th th:text="#{create.date}"></th>
@@ -36,7 +39,7 @@
     </div>
 </div>
 
-<div class="modal fade" id="modal-index-config" tabindex="-1">
+<div class="modal fade" id="modal-index-config">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -47,15 +50,13 @@
                 <div class="image-container">
                     <label th:text="#{config.name}"></label>
                     <input class="form-control form-control-sm input-index-config-name" autocomplete="off">
-                    <label th:text="#{redirect.link}"></label>
-                    <input class="form-control form-control-sm input-redirect-link">
                     <div class="row">
-                        <div class="col-6">
+                        <div class="col-10">
                             <label th:text="#{goods.id}"></label>
-                            <input class="form-control form-control-sm input-goods-id">
+                            <select class="select2 slc-goods"></select>
                         </div>
-                        <div class="col-6">
-                            <label th:text="#{rank.order}"></label>
+                        <div class="col-2">
+                            <label th:text="#{rank.order}"></label> <!-- TODO: must be positive integer -->
                             <input class="form-control form-control-sm input-order" type="number">
                         </div>
                     </div>
@@ -94,19 +95,52 @@
 
     $(document).ready(() => {
         initDataTable();
+        initSelect2();
         initListener();
     });
 
+    function initSelect2() {
+        $(".slc-goods").select2({
+            width: "100%",
+            language: "es",
+            placeholder: " ",
+            minimumInputLength: 3,
+            dropdownParent: $("#modal-index-config"),
+            ajax: {
+                url: "/admin/goods/search",
+                method: "POST",
+                data: (params) => {
+                    return {goodsName: params.term}
+                },
+                processResults: (response) => {
+                    if (response.code === 200) {
+                        const options = response.data.map((g) => ({id: g.goodsId, text: g.goodsName}));
+                        return {results: options};
+                    } else {
+                        return {results: []};
+                    }
+                },
+            }
+        });
+
+        $(".select2").on("select2:open", () => {
+            document.querySelector('.select2-search__field').focus();
+        });
+    }
+
     function initListener() {
-        //menu buttons
+        bindCreateModalEvent();
+    }
+
+    function bindCreateModalEvent() {
         $(".btn-show-create-index-config-modal").click(() => showCreateIndexConfigModal());
-        //modal buttons
         $(".btn-create-index-config").click(() => createIndexConfig());
         $(".btn-update-index-config").click(() => updateIndexConfig());
-        //modal
         $("#modal-index-config").on("hidden.bs.modal", () => {
             $("#modal-index-config").removeAttr("index-config-id");
             $("#modal-index-config input").val(null);
+            $(".slc-goods").val(null).trigger("change");
+            $(".is-invalid").removeClass(".is-invalid");
         });
     }
 
@@ -145,25 +179,19 @@
 
     function isValidIndexConfig(data) {
         let isValid = true;
+        const {configName, goodsId, configRank} = data;
 
-        if (data.configName.length === 0) {
+        if (configName.length === 0) {
             isValid = false;
             $(".input-index-config-name").setInvalid();
         }
 
-        if (data.redirectUrl.length === 0) {
+        if (goodsId.length === 0 || !Validator.isInteger(goodsId)) {
             isValid = false;
-            $(".input-redirect-link").setInvalid();
+            $(".slc-goods").next().setInvalid();
         }
 
-        const idValidator = new Validator(data.goodsId);
-        if (data.goodsId.length === 0 || !idValidator.isInteger()) {
-            isValid = false;
-            $(".input-goods-id").setInvalid();
-        }
-
-        const rankValidator = new Validator(data.configRank);
-        if (data.configRank.length === 0 || !rankValidator.isInteger()) {
+        if (configRank.length === 0 || !Validator.isInteger(configRank) || configRank < 0) {
             isValid = false;
             $(".input-order").setInvalid();
         }
@@ -179,7 +207,7 @@
         }
 
         $.ajax({
-            url: "/admin/index-config/save",
+            url: "/admin/index-config/create",
             method: "POST",
             contentType: "application/json",
             data: JSON.stringify(data),
@@ -203,9 +231,9 @@
     function collectFormData() {
         const data = {};
         data.configName = $(".input-index-config-name").val();
-        data.redirectUrl = $(".input-redirect-link").val();
-        data.goodsId = parseInt($(".input-goods-id").val());
+        data.goodsId = parseInt($(".slc-goods").val());
         data.configRank = parseInt($(".input-order").val());
+        data.configType = getConfigType();
         return data;
     }
 
@@ -238,15 +266,11 @@
             columns: [
                 {
                     visible: false,
-                    data: "id",
+                    data: "indexConfigId",
                     orderable: false
                 },
                 {
                     data: "configName",
-                    orderable: false
-                },
-                {
-                    data: "redirectUrl",
                     orderable: false
                 },
                 {
@@ -280,7 +304,7 @@
                 });
 
                 $(row).find(".btn-delete-index-config").click(() => {
-                    showConfirmDeleteSwal(indexConfig.id);
+                    showConfirmDeleteSwal(indexConfig.indexConfigId);
                 });
             }
         });
@@ -292,14 +316,15 @@
     }
 
     function showUpdateIndexConfigModal(indexConfig) {
-        console.log(indexConfig);
-        $(".input-index-config-name").val(indexConfig.configName);
-        $(".input-redirect-link").val(indexConfig.redirectUrl);
-        $(".input-goods-id").val(indexConfig.goodsId);
-        $(".input-order").val(indexConfig.configRank);
-        $("#modal-index-config").attr("index-config-id", indexConfig.id);
+        const {configName, goodsId, configRank, indexConfigId, goodsName} = indexConfig;
+        $(".input-index-config-name").val(configName);
+        $(".input-goods-id").val(goodsId);
+        $(".input-order").val(configRank);
+        $("#modal-index-config").attr("index-config-id", indexConfigId);
         $(".btn-create-index-config").hide();
         $(".btn-update-index-config").show();
+        const option = new Option(goodsName, goodsId, true, true);
+        $(".slc-goods").append(option).trigger('change');
         indexConfigModal.show();
     }
 

@@ -13,7 +13,7 @@
     display: flex;
     justify-content: center;
     padding: 7px 0;
-    background-color: #FC830AFF;
+    background-color: var(--mall-color);
     font-size: 16px;
     font-weight: bold;
     color: #FFFFFF;
@@ -80,5 +80,5 @@ form input, form .forgot-password{
     font-weight: bold;
     padding: 2px 12px;
     border-radius: 6px;
-    background-color: #e6e6e6;
+    background-color: var(--mall-light-color);
 }

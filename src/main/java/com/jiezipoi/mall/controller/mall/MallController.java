@@ -1,11 +1,11 @@
 package com.jiezipoi.mall.controller.mall;
 
 import com.jiezipoi.mall.config.CarouselConfig;
-import com.jiezipoi.mall.controller.vo.IndexConfigGoodsVO;
-import com.jiezipoi.mall.controller.vo.IndexLevel1CategoryVO;
 import com.jiezipoi.mall.dao.CarouselDao;
+import com.jiezipoi.mall.dto.IndexGoodsCategoryDTO;
+import com.jiezipoi.mall.dto.MallGoodsDTO;
 import com.jiezipoi.mall.entity.Carousel;
-import com.jiezipoi.mall.enums.IndexConfigEnum;
+import com.jiezipoi.mall.enums.IndexConfigType;
 import com.jiezipoi.mall.service.GoodsCategoryService;
 import com.jiezipoi.mall.service.GoodsService;
 import com.jiezipoi.mall.service.IndexConfigService;
@@ -26,30 +26,29 @@ public class MallController {
     private final IndexConfigService indexConfigService;
 
     public MallController(CarouselDao carouselDao, CarouselConfig carouselConfig, GoodsCategoryService categoryService,
-                          IndexConfigService indexConfigService, GoodsService goodsService) {
+                          IndexConfigService indexConfigService) {
         this.carouselDao = carouselDao;
         this.carouselConfig = carouselConfig;
         this.categoryService = categoryService;
         this.indexConfigService = indexConfigService;
     }
 
-
     @GetMapping({"/index", "/", "/index.html"})
     public String indexPage(ModelMap modelMap) {
         List<Carousel> carousels = carouselDao.findAllCarousel();
         String baseExposeUrl = carouselConfig.getExposeUrl();
-        List<IndexLevel1CategoryVO> categories = categoryService.getIndexCategory();
+        List<IndexGoodsCategoryDTO> categories = categoryService.getIndexCategory();
 
         modelMap.put("carousels", carousels);
         modelMap.put("baseUrl", baseExposeUrl);
         modelMap.put("categories", categories);
 
-        List<IndexConfigGoodsVO> bestSelling =
-                indexConfigService.getConfigGoodsForIndex(IndexConfigEnum.INDEX_GOODS_HOT.getType());
-        List<IndexConfigGoodsVO> newArrivals =
-                indexConfigService.getConfigGoodsForIndex(IndexConfigEnum.INDEX_GOODS_NEW.getType());
-        List<IndexConfigGoodsVO> recommend =
-                indexConfigService.getConfigGoodsForIndex(IndexConfigEnum.INDEX_GOODS_RECOMMEND.getType());
+        List<MallGoodsDTO> bestSelling =
+                indexConfigService.getConfigGoodsForIndex(IndexConfigType.INDEX_GOODS_HOT.getType());
+        List<MallGoodsDTO> newArrivals =
+                indexConfigService.getConfigGoodsForIndex(IndexConfigType.INDEX_GOODS_NEW.getType());
+        List<MallGoodsDTO> recommend =
+                indexConfigService.getConfigGoodsForIndex(IndexConfigType.INDEX_GOODS_RECOMMEND.getType());
         modelMap.put("bestSelling", bestSelling);
         modelMap.put("newArrivals", newArrivals);
         modelMap.put("recommend", recommend);

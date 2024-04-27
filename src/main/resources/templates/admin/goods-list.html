@@ -4,8 +4,11 @@
     <meta charset="UTF-8">
     <title th:text="#{create.product}"></title>
     <link rel="stylesheet" href="/styles/admin/goods.css">
-    <script th:replace="~{admin/header::datatable}"></script>
-    <script th:replace="~{admin/header::select2}"></script>
+    <link th:replace="~{common/libraries::select2-css}">
+    <link th:replace="~{common/libraries::datatable-css}">
+    <script th:replace="~{common/libraries::select2-js}"></script>
+    <script th:replace="~{common/libraries::datatable-js}"></script>
+    <script th:replace="~{common/libraries::datatable-locale}"></script>
 </head>
 <body>
 <div th:replace="~{admin/sidebar::sidebar-fragment}"></div>
@@ -13,28 +16,27 @@
     <div class="block">
         <div class="block-title" th:text="#{product}"></div>
         <div class="block-content">
-            <div class="goods-options">
+            <div class="block-row">
                 <button class="button button-blue" id="btn-create-goods" th:text="#{create}"></button>
-            </div>
-            <hr/>
-            <div class="goods-options row">
-                <div class="col-4">
-                    <label for="slc-l1"></label>
-                    <select class="form-control form-control-sm select2" id="slc-l1"
-                            th:lang="${#locale.toString() == 'zh_CN' ? 'zh-CN' : #locale.getCountry()}">
-                    </select>
-                </div>
-                <div class="col-4">
-                    <label for="slc-l2"></label>
-                    <select class="form-control form-control-sm select2" id="slc-l2"
-                            th:lang="${#locale.toString() == 'zh_CN' ? 'zh-CN' : #locale.getCountry()}">>
-                    </select>
-                </div>
-                <div class="col-4">
-                    <label for="slc-l3"></label>
-                    <select class="form-control form-control-sm select2" id="slc-l3"
-                            th:lang="${#locale.toString() == 'zh_CN' ? 'zh-CN' : #locale.getCountry()}">>
-                    </select>
+                <div class="row">
+                    <div class="col-4">
+                        <label for="slc-l1"></label>
+                        <select class="form-control form-control-sm select2" id="slc-l1"
+                                th:lang="${#locale.getLanguage()}">
+                        </select>
+                    </div>
+                    <div class="col-4">
+                        <label for="slc-l2"></label>
+                        <select class="form-control form-control-sm select2" id="slc-l2"
+                                th:lang="${#locale.getLanguage()}">>
+                        </select>
+                    </div>
+                    <div class="col-4">
+                        <label for="slc-l3"></label>
+                        <select class="form-control form-control-sm select2" id="slc-l3"
+                                th:lang="${#locale.getLanguage()}">>
+                        </select>
+                    </div>
                 </div>
             </div>
             <table id="table">
@@ -54,6 +56,7 @@
 <script>
     let table = null;
     sidebarSetSelected($(".goods-management"));
+
     $(document).ready(() => {
         initSelect2();
         initDatatable();
@@ -70,16 +73,33 @@
         slcCategoryL1.change(() => {
             slcCategoryL2.val(null).trigger("change");
             slcCategoryL3.val(null).trigger("change");
+            renderGoodsTable(1);
         });
-        slcCategoryL2.change(() => slcCategoryL3.val(null).trigger("change"));
-        $(".select2").change(() => table.draw());
+
+        slcCategoryL2.change(() => {
+            slcCategoryL3.val(null).trigger("change")
+            renderGoodsTable(2);
+        });
+
+        slcCategoryL3.change(() => {
+            renderGoodsTable(3);
+        })
 
         //create new goods
-        $("#btn-create-goods").click(() => window.location.href = "/admin/goods/form");
+        $("#btn-create-goods").click(() => {
+            window.location.href = "/admin/goods/form";
+            renderGoodsTable(3);
+        });
+    }
+
+    function renderGoodsTable(selectLevel) {
+        if (getSelectedCategory().level < selectLevel) {
+            return;
+        }
+        table.draw();
     }
 
     function initSelect2() {
-
         const processCategoryResult = (response) => {
             if (response.code === 200) {
                 const options = response.data.map((c) => ({id: c.goodsCategoryId, text: c.categoryName, path: c.path}));

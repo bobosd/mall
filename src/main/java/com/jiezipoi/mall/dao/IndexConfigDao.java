@@ -1,5 +1,6 @@
 package com.jiezipoi.mall.dao;
 
+import com.jiezipoi.mall.dto.IndexConfigDTO;
 import com.jiezipoi.mall.entity.IndexConfig;
 import org.apache.ibatis.annotations.Param;
 
@@ -18,13 +19,13 @@ public interface IndexConfigDao {
 
     int updateByPrimaryKey(IndexConfig record);
 
-    List<IndexConfig> findIndexConfigList(@Param("start") int start,
-                                          @Param("limit") int limit,
-                                          @Param("config_type") int configType);
+    List<IndexConfigDTO> findIndexConfigList(@Param("start") int start,
+                                             @Param("limit") int limit,
+                                             @Param("config_type") int configType);
 
     int getTotalIndexConfigs(@Param("config_type") int configType);
 
     int deleteBatch(long[] ids);
 
-    List<IndexConfig> findIndexConfigByTypeAndNum(@Param("configType") int configType);
+    List<IndexConfig> findIndexConfigByType(@Param("configType") int configType);
 }

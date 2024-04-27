@@ -1,5 +1,6 @@
 package com.jiezipoi.mall.dao;
 
+import com.jiezipoi.mall.dto.CarouselDTO;
 import com.jiezipoi.mall.entity.Carousel;
 import org.apache.ibatis.annotations.Param;
 
@@ -12,19 +13,20 @@ public interface CarouselDao {
 
     int insertSelective(Carousel carousel);
 
-    Carousel selectByPrimaryKey(Integer carouselId);
+    Carousel selectByPrimaryKey(Long carouselId);
 
     int updateByPrimaryKeySelective(Carousel record);
 
     int updateByPrimary(Carousel carousel);
 
-    List<Carousel> findCarouselList(@Param("start") Integer start,
-                                    @Param("limit") Integer limit,
-                                    @Param("orderBy") String orderBy);
+    List<CarouselDTO> findCarouselList(@Param("start") Integer start,
+                                       @Param("limit") Integer limit,
+                                       @Param("colNumber") Integer orderBy,
+                                       @Param("dir") String dir);
 
     int getTotalCarousels();
 
-    int deleteBatch(Integer[] ids);
+    int deleteBatch(Long id);
 
     List<Carousel> findCarouselByNum(@Param("number") int number);
 

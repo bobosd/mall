@@ -4,29 +4,29 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.time.LocalDateTime;
 
-public class CarouselDTO {
-    private Long carouselId;
-    private String carouselUrl;
+public class IndexConfigDTO {
+    private Long indexConfigId;
+    private String configName;
     private Long goodsId;
     private String goodsName;
-    private Integer carouselRank;
-    @JsonFormat(pattern = "dd-MM-yyyy HH:mm:ss")
+    private Integer configRank;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createTime;
 
-    public Long getCarouselId() {
-        return carouselId;
+    public Long getIndexConfigId() {
+        return indexConfigId;
     }
 
-    public void setCarouselId(Long carouselId) {
-        this.carouselId = carouselId;
+    public void setIndexConfigId(Long indexConfigId) {
+        this.indexConfigId = indexConfigId;
     }
 
-    public String getCarouselUrl() {
-        return carouselUrl;
+    public String getConfigName() {
+        return configName;
     }
 
-    public void setCarouselUrl(String carouselUrl) {
-        this.carouselUrl = carouselUrl;
+    public void setConfigName(String configName) {
+        this.configName = configName;
     }
 
     public Long getGoodsId() {
@@ -45,12 +45,12 @@ public class CarouselDTO {
         this.goodsName = goodsName;
     }
 
-    public Integer getCarouselRank() {
-        return carouselRank;
+    public Integer getConfigRank() {
+        return configRank;
     }
 
-    public void setCarouselRank(Integer carouselRank) {
-        this.carouselRank = carouselRank;
+    public void setConfigRank(Integer configRank) {
+        this.configRank = configRank;
     }
 
     public LocalDateTime getCreateTime() {

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{mall/header::general-libraries-and-styles(~{::title}, ~{::link}, ~{this::head/script})}">
+    <meta charset="UTF-8">
+    <title>Mall</title>
+    <link th:replace="~{common/libraries::swiper-css}">
+    <link th:replace="~{common/loading-screen::css}">
+    <script th:replace="~{common/libraries::swiper-js}"></script>
+    <link rel="stylesheet" href="/styles/mall/all.css"/>
+    <link rel="stylesheet" href="/styles/mall/shopping-cart.css"/>
+</head>
+<body>
+<div th:replace="~{common/loading-screen::body}"></div>
+<nav>
+    <div class="navbar">
+        <div class="navbar-lft">
+            <a href="/">
+                <img class="navbar-mall-icon" src="/assets/img/poi_128x128.png" alt="mall icon">
+            </a>
+        </div>
+        <div class="navbar-center">
+            Tramitar pedido
+        </div>
+        <div class="navbar-rgt">
+            <a class="btn-cancel" href="/">Cancelar</a>
+        </div>
+    </div>
+</nav>
+<main>
+    <div class="floor">
+        <div>
+            <div class="shopping-cart">
+                <th:block th:each="item : ${cartItems}">
+                    <div class="shopping-cart-item" th:attr="goods-id=${item.getGoodsId()}">
+                        <div class="shopping-cart-item-image">
+                            <img th:src="${item.getGoodsCoverImg()}" alt="goods image">
+                        </div>
+                        <div class="shopping-cart-item-info">
+                            <div class="shopping-cart-item-title" th:text="${item.getGoodsName()}"></div>
+                            <div class="shopping-cart-item-price" th:text="${item.getSellingPriceInEuroFormat()}"></div>
+                            <div class="amount-container no-text-select">
+                                <div class="choose-amount">
+                                    <div class="reduce-buy-amount amount-options"><i class="fa-solid fa-minus"></i></div>
+                                    <input class="input-buy-amount note" th:value="${item.getGoodsCount()}" step="1" type="number" min="1">
+                                    <div class="add-buy-amount amount-options"><i class="fa-solid fa-plus"></i></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </th:block>
+            </div>
+
+            <div class="summary">
+                <div class="summary-title">Resumen de pedido:</div>
+                <div class="summary-body">
+                    <div class="d-flex justify-content-between">
+                        <div>subtotal artículos</div>
+                        <div class="total-price" th:text="${totalPrice}"></div>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between">
+                        <div>Total:</div>
+                        <div class="total-price" th:text="${totalPrice}"></div>
+                    </div>
+
+                </div>
+                <div class="">
+                    <button class="button button-xl button-purple">Realizar pedido</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{mall/footer::footer}"></footer>
+</body>
+<script>
+    $(document).ready(() => {
+        $(".input-buy-amount").each((i, DOM) => {
+            const goodsId = $(DOM).closest(".shopping-cart-item").attr("goods-id");
+            DOM.afterChangeMade = () => {
+                const shoppingCartItem = {
+                    goodsId: goodsId,
+                    goodsCount: $(DOM).val()
+                };
+                updateShoppingCart(shoppingCartItem);
+            };
+        });
+    });
+
+    function updateShoppingCart(shoppingCartItem) {
+        showLoadingScreen();
+        $.ajax({
+            url: "/shopping-cart/update",
+            method: "POST",
+            data: JSON.stringify(shoppingCartItem),
+            contentType: "application/json",
+            async: false,
+            success: (res) => {
+                if (res.code === 200) {
+                    renderPrice(res.data);
+                }
+            },
+            complete: () => hideLoadingScreen()
+        });
+    }
+
+    function renderPrice(data) {
+        let allGoodsValid = true;
+        const map = new Map();
+
+        data.items.forEach((i) => {
+            const {goodsId} = i;
+            map.set(goodsId, i);
+        });
+
+        const cartItems = $(".shopping-cart-item");
+        cartItems.each((i, e) => {
+            const existingId = parseInt($(e).attr("goods-id"));
+            const item = map.get(existingId);
+            if (item != null) {
+                const {sellingPrice, goodsCount} = item;
+                const price = calcPrice(sellingPrice, goodsCount, 0);
+                $(e).find(".shopping-cart-item-price").text(parseNumberToEuro(price));
+                map.delete(existingId);
+            } else {
+                allGoodsValid = false;
+                return false;
+            }
+        });
+
+        if (allGoodsValid && map.size === 0 && cartItems.length === data.items.length) {
+            const {totalPrice} = data;
+            $(".total-price").text(parseNumberToEuro(totalPrice));
+        } else {
+            window.location.reload();
+        }
+    }
+
+    function showLoadingScreen() {
+        $(".loading-background").addClass("d-flex");
+    }
+
+    function hideLoadingScreen() {
+        $(".loading-background").removeClass("d-flex");
+    }
+</script>
+<script src="/js/AmountSelector.js"></script>
+</html>

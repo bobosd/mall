@@ -65,7 +65,7 @@
     height: 30px;
     list-style: none;
     line-height: 30px;
-    display: block;
+    display: flex;
     padding: 0 15px;
     -webkit-touch-callout: none; /* iOS Safari */
     -webkit-user-select: none; /* Safari */
@@ -73,6 +73,14 @@
     -ms-user-select: none; /* Internet Explorer/Edge */
     user-select: none; /* Non-prefixed version, currently supported by Chrome and Opera */
     margin: 2px 0;
+}
+
+.sidebar-option-icon {
+    width: 20px;
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    flex-wrap: wrap;
 }
 
 .sidebar-option-list a {

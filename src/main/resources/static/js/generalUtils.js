@@ -4,14 +4,16 @@ jQuery.fn.addSpinner = function() {
     buttonClone = this.clone(true);
     this.attr("disabled", true);
     this.unbind();
-    const size = $(this).height();
-    const spinnerSize = Math.sqrt((size * size) / 2);
+    const height = this.height();
+    const width = this.width();
+    const maxSize = width < height ? width : height;
+    const spinnerSize = Math.sqrt((maxSize * maxSize) / 2);
     let spinner = $.parseHTML('<div><div class="spinner-border text-light" role="status"></div></div>');//bootstrap spinner
     spinner = $(spinner);
     spinner.children().first().height(spinnerSize);
     spinner.children().first().width(spinnerSize);
-    spinner.height(size);
-    spinner.width(size);
+    //spinner.height(maxSize);
+    //spinner.width(maxSize);
     this.html(spinner);
 };
 
@@ -64,32 +66,28 @@ function parseNumberToEuro(number) {
     return fixedNumber.replace(".", ",") + '€';
 }
 
+function calcPrice(price, count, totalPrice) {
+    return (price * count * 10 + totalPrice * 10) / 10;
+}
+
 class Validator {
-    constructor(string) {
-        this._string = string;
+    static isNumeric(str) {
+        const regEx = new RegExp("^(-)?([0-9])+((.|\,)?[0-9]+)?$");
+        return regEx.test(str);
     }
 
-    get string() {
-        return this._string;
+    static isInteger(str) {
+        const regEx = new RegExp("^(-)?[0-9]+$");
+        return regEx.test(str);
     }
 
-    set string(value) {
-        this._string = value;
-    }
-
-    isNumeric() {
-        const regEx = new RegExp("([0-9])+(.?[0-9]?)");
-        return regEx.test(this._string);
-    }
-
-    isInteger() {
-        const regEx = new RegExp("[0-9]+");
-        return regEx.test(this._string);
+    static isPositiveNumber(str) {
+        return this.isNumeric(str) && !str.startsWith("-");
     }
 
     //allow english letters with accent, chinese characters
-    onlyLetters() {
+    static onlyLetters(str) {
         const regEx = new RegExp("[a-zA-ZÀ-ÿ\u4e00-\u9fa5\\s\\d]+");
-        return regEx.test(this._string);
+        return regEx.test(str);
     }
 }

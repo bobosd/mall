@@ -13,7 +13,7 @@ import com.jiezipoi.mall.service.UserService;
 import com.jiezipoi.mall.utils.CommonResponse;
 import com.jiezipoi.mall.utils.Response;
 import com.jiezipoi.mall.utils.dataTable.DataTableResult;
-import com.jiezipoi.mall.utils.dataTable.request.GoodsCategoryRequest;
+import com.jiezipoi.mall.utils.dataTable.request.GoodsTableRequest;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -63,7 +63,7 @@ public class AdminGoodsController {
                 GoodsBrand goodsBrand = goodsBrandService.getGoodsBrandById(brandId);
                 modelMap.addAttribute("goodsBrand", goodsBrand);
             }
-        } catch (IOException | ClassNotFoundException | NotFoundException ignore) {
+        } catch (IOException | ClassNotFoundException ignore) {
         }
         return "admin/goods-create";
     }
@@ -107,32 +107,27 @@ public class AdminGoodsController {
     @PostMapping("/goods/create")
     @ResponseBody
     public Response<?> createGoods(@RequestBody Goods goods, Principal principal) {
-
         if (!isValidGoodsToCreate(goods)) {
             return new Response<>(CommonResponse.INVALID_DATA);
         }
+        long userId = userService.getUserIdByEmail(principal.getName());
         try {
-            long userId = userService.getUserIdByEmail(principal.getName());
             goodsService.createGoods(goods, userId);
             return new Response<>(CommonResponse.SUCCESS);
         } catch (IOException e) {
             return new Response<>(CommonResponse.INTERNAL_SERVER_ERROR);
-        } catch (NotFoundException e) {
-            return new Response<>(CommonResponse.INVALID_DATA);
         }
     }
 
     @PostMapping("/goods/temp/upload/sync")
     @ResponseBody
     public Response<?> saveTempGoods(@RequestBody Goods goods, Principal principal) {
+        long userId = userService.getUserIdByEmail(principal.getName());
         try {
-            long userId = userService.getUserIdByEmail(principal.getName());
             goodsService.saveTempGoods(goods, userId);
             return new Response<>(CommonResponse.SUCCESS);
         } catch (IOException e) {
             return new Response<>(CommonResponse.INTERNAL_SERVER_ERROR);
-        } catch (NotFoundException e) {
-            return new Response<>(CommonResponse.INVALID_DATA);
         }
     }
 
@@ -146,15 +141,15 @@ public class AdminGoodsController {
             Response<String> response = new Response<>(CommonResponse.SUCCESS);
             response.setData(url);
             return response;
-        } catch (IOException | NotFoundException e) {
+        } catch (IOException e) {
             return new Response<>(CommonResponse.INTERNAL_SERVER_ERROR);
         }
     }
 
     @PostMapping("/goods/list")
     @ResponseBody
-    public Response<?> list(@RequestBody GoodsCategoryRequest request) {
-        DataTableResult result = goodsService.list(request.getStart(), request.getLength(), request.getPath(), request.getCategoryLevel());
+    public Response<?> list(@RequestBody GoodsTableRequest request) {
+        DataTableResult result = goodsService.getGoodsPage(request);
         Response<DataTableResult> response = new Response<>(CommonResponse.SUCCESS);
         response.setData(result);
         return response;
@@ -169,7 +164,7 @@ public class AdminGoodsController {
             Response<String> response = new Response<>(CommonResponse.SUCCESS);
             response.setData(url);
             return response;
-        } catch (IOException | NotFoundException e) {
+        } catch (IOException e) {
             return new Response<>(CommonResponse.INTERNAL_SERVER_ERROR);
         }
     }
@@ -186,6 +181,18 @@ public class AdminGoodsController {
         } catch (IOException e) {
             return new Response<>(CommonResponse.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @PostMapping("/goods/search")
+    @ResponseBody
+    public Response<?> searchGoodsByName(@RequestParam("goodsName") String goodsName) {
+        if (goodsName == null || goodsName.isBlank()) {
+            return new Response<>(CommonResponse.INVALID_DATA);
+        }
+        List<Goods> goods = goodsService.getGoodsListByGoodsName(goodsName);
+        Response<List<Goods>> response = new Response<>(CommonResponse.SUCCESS);
+        response.setData(goods);
+        return response;
     }
 
 

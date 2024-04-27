@@ -16,17 +16,12 @@
             <span class="check-icon"><i class="fa-solid fa-check"></i></span>
             Su cuenta ha sido activada correctamente!
         </div>
-        <div class="button button-orange">Ir a inicio</div>
+        <div class="button button-purple">Ir a inicio</div>
     </div>
 </main>
 <footer th:replace="~{mall/footer::footer}"></footer>
 
 <script>
-    let user;
-    user = [(${user})];
-
-    localStorage.setItem("user", JSON.stringify(user));
-
     $(document).ready(() => {
         $(".button").click(() => replaceToIndex());
     });

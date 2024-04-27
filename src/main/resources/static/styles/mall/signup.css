@@ -106,7 +106,7 @@ form > *:not(:first-child) {
     display: flex;
     justify-content: center;
     padding: 7px 0;
-    background-color: #FC830AFF;
+    background-color: var(--mall-color);
     font-size: 16px;
     font-weight: bold;
     color: #FFFFFF;

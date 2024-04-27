@@ -3,7 +3,9 @@
 <head th:replace="~{admin/header::general-libraries-and-styles(~{::title}, ~{::link}, ~{::head/script})}">
     <title id="page-title"></title>
     <link rel="stylesheet" href="/styles/admin/goods-brand.css">
-    <link th:replace="~{admin/header::datatable}"/>
+    <link th:replace="~{common/libraries::datatable-css}"/>
+    <script th:replace="~{common/libraries::datatable-js}"></script>
+    <script th:replace="~{common/libraries::datatable-locale}"></script>
 </head>
 
 <body>
@@ -12,7 +14,7 @@
     <div class="block">
         <div class="block-title" th:text="#{product.brand}"></div>
         <div class="block-content">
-            <div class="goods-brand-options">
+            <div class="block-row">
                 <button class="button button-blue btn-add-brand" th:text="#{add}"></button>
             </div>
             <table>

@@ -38,7 +38,7 @@ public interface GoodsCategoryDao {
 
     List<GoodsCategory> selectByIds(@Param("ids") long[] ids);
 
-    List<GoodsCategory> selectByCategoryLevel(@Param("level") byte level);
+    List<GoodsCategory> selectByCategoryLevel(@Param("level") int level);
 
     int updatePathById(@Param("id") Long id, @Param("path") String path);
 }

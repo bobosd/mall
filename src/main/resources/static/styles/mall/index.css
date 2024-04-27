@@ -20,12 +20,11 @@
     width: 220px;
     padding: 10px 25px;
     cursor: pointer;
-    font-size: 15px;
     display: block;
 }
 
 .category-level1:hover {
-    background-color: #DDDDDD;
+    background-color: var(--mall-light-color);
 }
 
 .category-level1:hover ~ .category-sub-menu-container {
@@ -67,7 +66,7 @@
 }
 
 .category-level3:hover, .category-level2-name:hover {
-    color: #fc830a;
+    color: var(--mall-color);
 }
 
 .category-level3 {
@@ -104,12 +103,17 @@
 }
 
 .product-name {
+    display: -webkit-box;
     font-size: 14px;
     height: 63px;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    font-weight: 500;
 }
 
 .product-container:hover .product-name {
-    color: #fc830a;
+    color: var(--mall-color);
 }
 
 .product-price {
@@ -129,4 +133,11 @@
     justify-content: center;
     padding: 10px 0;
     border-radius: 10px;
+}
+
+.swiper-slide:nth-child(2n) {
+    width: 40%;
+}
+.swiper-slide:nth-child(3n) {
+    width: 20%;
 }

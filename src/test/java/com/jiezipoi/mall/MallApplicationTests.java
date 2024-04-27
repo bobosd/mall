@@ -9,5 +9,4 @@ class MallApplicationTests {
     @Test
     void contextLoads() {
     }
-
 }

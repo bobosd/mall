@@ -1,21 +1,21 @@
 package com.jiezipoi.mall.service;
 
-import com.jiezipoi.mall.controller.vo.IndexLevel1CategoryVO;
-import com.jiezipoi.mall.controller.vo.IndexLevel2CategoryVO;
-import com.jiezipoi.mall.controller.vo.IndexLevel3CategoryVO;
 import com.jiezipoi.mall.dao.GoodsCategoryDao;
 import com.jiezipoi.mall.dto.CreateGoodsCategoryDTO;
+import com.jiezipoi.mall.dto.IndexGoodsCategoryDTO;
 import com.jiezipoi.mall.entity.GoodsCategory;
 import com.jiezipoi.mall.utils.CommonResponse;
 import com.jiezipoi.mall.utils.Response;
 import com.jiezipoi.mall.utils.dataTable.DataTableResult;
-import com.jiezipoi.mall.utils.dataTable.request.GoodsCategoryRequest;
+import com.jiezipoi.mall.utils.dataTable.request.GoodsTableRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,7 +28,7 @@ public class GoodsCategoryService {
         this.session = httpSession;
     }
 
-    public Response<?> getCategoriesPage(GoodsCategoryRequest request) {
+    public Response<?> getCategoriesPage(GoodsTableRequest request) {
         if (request == null ||
                 request.getStart() == null ||
                 request.getLength() == null ||
@@ -142,43 +142,37 @@ public class GoodsCategoryService {
         return response;
     }
 
-    public List<IndexLevel1CategoryVO> getIndexCategory() {
-        List<IndexLevel1CategoryVO> level1Categories = goodsCategoryDao.selectByCategoryLevel((byte) 1).stream()
-                .map(IndexLevel1CategoryVO::new)
-                .toList();
-        List<IndexLevel2CategoryVO> level2Categories = goodsCategoryDao.selectByCategoryLevel((byte) 2)
+    public List<IndexGoodsCategoryDTO> getIndexCategory() {
+        List<IndexGoodsCategoryDTO> level1Categories = goodsCategoryDao.selectByCategoryLevel(1)
                 .stream()
-                .map(IndexLevel2CategoryVO::new)
+                .map(IndexGoodsCategoryDTO::new)
                 .toList();
-        List<IndexLevel3CategoryVO> level3Categories = goodsCategoryDao.selectByCategoryLevel((byte) 3)
+        List<IndexGoodsCategoryDTO> level2Categories = goodsCategoryDao.selectByCategoryLevel(2)
                 .stream()
-                .map(IndexLevel3CategoryVO::new)
+                .map(IndexGoodsCategoryDTO::new)
+                .toList();
+        List<IndexGoodsCategoryDTO> level3Categories = goodsCategoryDao.selectByCategoryLevel(3)
+                .stream()
+                .map(IndexGoodsCategoryDTO::new)
                 .toList();
 
-        //处理二级和三级的层级关系
-        Map<Long, List<IndexLevel3CategoryVO>> l3CategoriesMap = level3Categories.stream()
-                .collect(Collectors.groupingBy(IndexLevel3CategoryVO::getParentId));
-
-        level2Categories.forEach(category -> {
-            Long id = category.getCategoryId();
-            if (l3CategoriesMap.containsKey(id)) {
-                List<IndexLevel3CategoryVO> children = l3CategoriesMap.get(id);
-                category.setChildren(children);
-            }
-        });
-
-        //处理二级和三级的层级关系
-        Map<Long, List<IndexLevel2CategoryVO>> l2CategoriesMap = level2Categories.stream()
-                .collect(Collectors.groupingBy(IndexLevel2CategoryVO::getParentId));
-
-        level1Categories.forEach(category -> {
-            Long id = category.getCategoryId();
-            if (l2CategoriesMap.containsKey(id)) {
-                List<IndexLevel2CategoryVO> children = l2CategoriesMap.get(id);
-                category.setChildren(children);
-            }
-        });
-
+        linkCategory(level2Categories, level3Categories);
+        //处理一级和二级的层级关系
+        linkCategory(level1Categories, level2Categories);
         return level1Categories;
+    }
+
+    private void linkCategory(List<IndexGoodsCategoryDTO> parentCategory, List<IndexGoodsCategoryDTO> childrenCategory) {
+        //map => {level 2 ID: [CategoryObj...]}
+        Map<Long, List<IndexGoodsCategoryDTO>> parentIdMap = childrenCategory.stream()
+                .collect(Collectors.groupingBy(IndexGoodsCategoryDTO::getParentId));
+
+        parentCategory.forEach(category -> {
+            Long id = category.getCategoryId();
+            if (parentIdMap.containsKey(id)) {
+                List<IndexGoodsCategoryDTO> children = parentIdMap.get(id);
+                category.setChildren(children);
+            }
+        });
     }
 }

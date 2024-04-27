@@ -141,11 +141,49 @@
         </trim>
     </insert>
 
-    <select id="list" resultMap="GoodsResultWithTags">
-        SELECT
-        <include refid="base_column_list"/>
+    <select id="list" resultMap="BaseResultMap">
+        SELECT goods_id, goods_name, goods_info.create_time, goods_sell_status
         FROM goods_info
-        LIMIT #{start}, #{limit};
+        <if test="path != null and path != ''">
+            JOIN goods_category ON goods_category.goods_category_id = goods_info.goods_category_id
+        </if>
+        <where>
+            <bind name="path_like" value="path + '.%'"/>
+            <if test="path != null and path != ''">
+                goods_category.path = #{path,jdbcType=VARCHAR}
+                OR goods_category.path LIKE #{path_like,jdbcType=VARCHAR}
+            </if>
+            <if test="keyword != null and keyword != ''">
+                <bind name="keyword_like" value="'%' + keyword + '%'"/>
+                AND goods_info.goods_name LIKE #{keyword_like,jdbcType=VARCHAR}
+            </if>
+        </where>
+        <if test="colNumber != null and dir != null and dir != ''">
+            ORDER BY #{colNumber,jdbcType=INTEGER}
+            <if test="dir == 'desc'">
+                DESC
+            </if>
+        </if>
+        LIMIT #{start}, #{limit}
+    </select>
+
+    <select id="selectCountTotalOfList" resultType="int">
+        SELECT count(*) as total
+        FROM goods_info
+        <if test="path != null and path != ''">
+            JOIN goods_category ON goods_category.goods_category_id = goods_info.goods_category_id
+        </if>
+        <where>
+            <bind name="path_like" value="path + '.%'"/>
+            <if test="path != null and path != ''">
+                goods_category.path = #{path,jdbcType=VARCHAR}
+                OR goods_category.path LIKE #{path_like,jdbcType=VARCHAR}
+            </if>
+            <if test="keyword != null and keyword != ''">
+                <bind name="keyword_like" value="'%' + keyword + '%'"/>
+                AND goods_info.goods_name LIKE #{keyword_like,jdbcType=VARCHAR}
+            </if>
+        </where>;
     </select>
 
     <select id="getGoodsCount" resultType="int">
@@ -248,7 +286,7 @@
     </foreach>)
     </select>
 
-    <resultMap id="GoodsSearchDTO" type="com.jiezipoi.mall.dto.GoodsSearchDTO">
+    <resultMap id="GoodsSearchDTO" type="com.jiezipoi.mall.dto.MallGoodsDTO">
         <id column="goods_id" jdbcType="BIGINT" property="goodsId"/>
         <result column="goods_name" jdbcType="VARCHAR" property="goodsName"/>
         <result column="selling_price" jdbcType="DECIMAL" property="sellingPrice"/>
@@ -310,5 +348,12 @@
             OR goods_category.path LIKE #{level2path}
             OR goods_category.path LIKE #{level3path}
         GROUP BY goods_info.goods_id
+    </select>
+
+    <select id="selectGoodsByNameContaining" resultMap="BaseResultMap">
+        <bind name="keyword" value="'%' + goodsName + '%'"/>
+        SELECT goods_id, goods_name
+        FROM goods_info
+        WHERE goods_name LIKE #{keyword,jdbcType=VARCHAR}
     </select>
 </mapper>

@@ -2,10 +2,15 @@
 <!--suppress JSUnresolvedVariable -->
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{admin/header::general-libraries-and-styles(~{::title}, ~{::link}, ~{this::head/script})}">
-    <title id="page-title"></title>
-    <link th:insert="~{admin/header::datatable}">
-    <link th:insert="~{admin/header::cropper}">
+    <title>Carousel</title>
+    <link th:replace="~{common/libraries::datatable-css}">
+    <link th:replace="~{common/libraries::cropper-css}">
     <link rel="stylesheet" href="/styles/admin/carousel.css">
+    <link th:replace="~{common/libraries::select2-css}">
+    <script th:replace="~{common/libraries::datatable-js}"></script>
+    <script th:replace="~{common/libraries::cropper-js}"></script>
+    <script th:replace="~{common/libraries::datatable-locale}"></script>
+    <script th:replace="~{common/libraries::select2-js}"></script>
 </head>
 <body>
 <div th:replace="~{admin/sidebar::sidebar-fragment}"></div>
@@ -23,6 +28,7 @@
                         <tr>
                             <th></th>
                             <th th:text="#{carousel}"></th>
+                            <th></th>
                             <th th:text="#{redirect.link}"></th>
                             <th th:text="#{order}"></th>
                             <th th:text="#{create.date}"></th>
@@ -58,11 +64,17 @@
                     <div><i class="fa-regular fa-image fa-4x"></i></div>
                 </div>
                 <input type="file" accept="image/jpeg,image/jpg,image/png" class="input-image" hidden>
-                <label th:text="#{redirect.link}" for="input-redirect-link"></label>
-                <input class="form-control form-control-sm" id="input-redirect-link" type="text">
+                <div class="row">
+                    <div class="col-10">
+                        <label th:text="#{goods}"></label>
+                        <select class="select2 slc-goods"></select>
+                    </div>
+                    <div class="col-2">
+                        <label th:text="#{order}" for="input-rank-order"></label>
+                        <input class="form-control form-control-sm input-order" id="input-rank-order" type="text" >
+                    </div>
+                </div>
 
-                <label th:text="#{order}" for="input-rank-order"></label>
-                <input class="form-control form-control-sm input-order" id="input-rank-order" type="text">
             </div>
             <div class="modal-footer">
                 <button type="button" class="button" data-bs-dismiss="modal" th:text="#{close}"></button>
@@ -84,14 +96,19 @@
     $(document).ready(() => {
         sidebarSetSelected($(".carousel-setting"));
         initListener();
+        initSelect2();
         initDataTable();
     });
 
     function initListener() {
-        //carousel image preview listener
+        bindOnCarouselImageChangeEvent();
+        bindOnModalHideEvent();
+    }
+
+    function bindOnCarouselImageChangeEvent() {
         $(".input-image").change(() => {
             const [file] = $(".input-image").prop("files");
-            if (file !== null) {
+            if (file != null) {
                 const url = URL.createObjectURL(file);
                 const img = new Image();
                 img.src = url;
@@ -110,17 +127,50 @@
                 showPreview(false);
             }
         });
+    }
 
+    function bindOnModalHideEvent() {
         //carousel modal listener
         $("#modal-carousel").on("hidden.bs.modal", () => {
             $(".input-image").val(null);
-            $("#input-redirect-link").val(null);
+            $(".slc-goods").val(null).trigger("change");
             $("#input-rank-order").val(null);
             if (cropper != null) {
                 cropper.destroy();
                 cropper = null;
             }
+            $("#btn-modify-carousel").unbind();
+            $(".is-invalid").removeClass("is-invalid");
             showPreview(false);
+        });
+    }
+
+    function initSelect2() {
+        $(".slc-goods").select2({
+            width: "100%",
+            language: "es",
+            placeholder: " ",
+            minimumInputLength: 3,
+            dropdownParent: $("#modal-carousel"),
+            ajax: {
+                url: "/admin/goods/search",
+                method: "POST",
+                data: (params) => {
+                    return {goodsName: params.term}
+                },
+                processResults: (response) => {
+                    if (response.code === 200) {
+                        const options = response.data.map((g) => ({id: g.goodsId, text: g.goodsName}));
+                        return {results: options};
+                    } else {
+                        return {results: []};
+                    }
+                },
+            }
+        });
+
+        $(".select2").on("select2:open", () => {
+            document.querySelector('.select2-search__field').focus();
         });
     }
 
@@ -191,7 +241,8 @@
         const data = datatable.row(tr).data();
         btnSave.click(() => prepareUpdateData(data.carouselId));
         $("#input-rank-order").val(data.carouselRank);
-        $("#input-redirect-link").val(data.redirectUrl);
+        const option = new Option(data.goodsName, data.goodsId, true, true);
+        $(".slc-goods").append(option).trigger("change");
         $(".image-preview").prop("src", "/carousel/img/" + data.carouselUrl);
         showPreview(true);
         carouselModal.show();
@@ -203,16 +254,16 @@
         }
 
         const formData = new FormData();
-        formData.append("redirectUrl", $("#input-redirect-link").val());
+        formData.append("goodsId", $(".slc-goods").val());
         formData.append("order", $("#input-rank-order").val());
-        formData.append("id", id);
+        formData.append("carouselId", id);
         if (cropper == null) {
             updateCarousel(formData);
         } else {
             cropper.getCroppedCanvas().toBlob((blob) => {
                 formData.append("image", blob);
                 updateCarousel(formData);
-            }, "image/jpeg", 0.7);
+            }, "image/jpeg");
         }
     }
 
@@ -244,19 +295,18 @@
 
     function validateUpdateCarouselForm() {
         let isValid = true;
-        const inputRedirect = $("#input-redirect-link");
+        const selectGoods = $(".slc-goods");
         const inputOrder = $("#input-rank-order");
 
-        const redirectUrl = inputRedirect.val();
+        const goodsId = selectGoods.val();
         const order = inputOrder.val();
 
-        if (redirectUrl.length === 0) {
-            inputRedirect.setInvalid();
+        if (goodsId == null) {
+            selectGoods.next().setInvalid();
             isValid = false;
         }
 
-        const validator = new Validator(order);
-        if (!validator.isInteger()) {
+        if (!Validator.isInteger(order) || !Validator.isPositiveNumber(order)) {
             inputOrder.setInvalid();
             isValid = false;
         }
@@ -269,6 +319,8 @@
             autoWidth: false,
             processing: true,
             serverSide: true,
+            searching: false,
+            language: dataTableLocale,
             order: [3, 'asc'],
             ajax: {
                 url: "/admin/carousels/list",
@@ -288,8 +340,8 @@
             },
             columns: [
                 {
-                    visible: false,
                     data: "carouselId",
+                    visible: false,
                 },
                 {
                     data: "carouselUrl",
@@ -300,15 +352,18 @@
                     orderable: false
                 },
                 {
-                    data: "redirectUrl",
+                    data: "goodsId",
+                    visible: false
+                },
+                {
+                    data: "goodsName",
+                    width: "30%",
                     render: data => {
                         if (data.length > 30) {
                             return data.substring(0, 30) + "...";
                         }
                         return data;
                     },
-                    width: "30%",
-                    orderable: false
                 },
                 {
                     data: "carouselRank",
@@ -347,19 +402,17 @@
 
     function validateCreateCarouselForm() {
         let isValid = true;
-        const inputRedirect = $("#input-redirect-link");
+        const selectGoods = $(".slc-goods");
         const inputOrder = $("#input-rank-order");
 
-        const redirectUrl = inputRedirect.val();
-        const order = inputOrder.val();
+        const goodsId = selectGoods.val();
 
-        if (redirectUrl.length === 0) {
-            inputRedirect.setInvalid();
+        if (goodsId == null) {
+            selectGoods.next().setInvalid();
             isValid = false;
         }
 
-        const validator = new Validator(order);
-        if (!validator.isInteger()) {
+        if (!validator.isInteger() || !validator.isPositiveNumber()) {
             inputOrder.setInvalid();
             isValid = false;
         }
@@ -381,7 +434,7 @@
         cropper.getCroppedCanvas().toBlob((blob) => {
             const formData = new FormData();
             formData.append("image", blob);
-            formData.append("redirectUrl", $("#input-redirect-link").val());
+            formData.append("goodsId", $(".slc-goods").val());
             formData.append("order", $("#input-rank-order").val());
             $.ajax({
                 url: "/admin/carousels/save",
@@ -419,7 +472,7 @@
                     btnCreate.removeSpinner();
                 }
             });
-        }, "image/jpeg", 0.7);
+        }, "image/jpeg");
     }
 
     function showDeleteConfirmation(id) {

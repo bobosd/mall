@@ -10,13 +10,15 @@ import com.jiezipoi.mall.service.UserService;
 import com.jiezipoi.mall.utils.CommonResponse;
 import com.jiezipoi.mall.utils.Response;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.security.Principal;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 public class ShoppingCartItemController {
@@ -29,12 +31,28 @@ public class ShoppingCartItemController {
         this.userService = userService;
     }
 
+    @GetMapping("/shopping-cart")
+    public String shoppingCartPage(Principal principal, ModelMap modelMap) {
+        Long userId = userService.getUserIdByEmail(principal.getName());
+        List<ShoppingCartItemDTO> itemList = shoppingCartItemService.getUserShoppingCart(userId);
+        BigDecimal totalPrice = calcTotalPrice(itemList);
+        String priceString = totalPrice.toString().replaceAll("\\.", ",") + "€";
+        modelMap.put("totalPrice", priceString);
+        modelMap.put("cartItems", itemList);
+        return "mall/shopping-cart";
+    }
+
     @PostMapping("/shopping-cart/add")
     @ResponseBody
     public Response<?> saveShoppingCartItem(@RequestBody ShoppingCartItem shoppingCartItem, Principal principal) {
+        if (shoppingCartItem.getGoodsCount() == null ||
+                shoppingCartItem.getGoodsCount() < 1 ||
+                shoppingCartItem.getGoodsId() == null) {
+            return new Response<>(CommonResponse.INVALID_DATA);
+        }
         try {
             User user = userService.getUserByEmail(principal.getName());
-            shoppingCartItemService.saveCartItem(shoppingCartItem, user.getUserId());
+            shoppingCartItemService.addCartItem(shoppingCartItem, user.getUserId());
             return new Response<>(CommonResponse.SUCCESS);
         } catch (QuantityExceededException e) {
             Response<String> response = new Response<>();
@@ -50,8 +68,9 @@ public class ShoppingCartItemController {
 
     @PostMapping("/shopping-cart/list")
     @ResponseBody
-    public Response<?> listUserShoppingCart() {
-        List<ShoppingCartItemDTO> cartContent = shoppingCartItemService.getUserShoppingCart();
+    public Response<?> listUserShoppingCart(Principal principal) {
+        Long userId = userService.getUserIdByEmail(principal.getName());
+        List<ShoppingCartItemDTO> cartContent = shoppingCartItemService.getUserShoppingCart(userId);
         Response<List<ShoppingCartItemDTO>> response = new Response<>(CommonResponse.SUCCESS);
         response.setData(cartContent);
         return response;
@@ -59,7 +78,50 @@ public class ShoppingCartItemController {
 
     @PostMapping("/shopping-cart/delete")
     @ResponseBody
-    public Response<?> deleteShoppingCartItem() {
-        return new Response<>();
+    public Response<?> deleteShoppingCartItem(@RequestParam("goodsId") Long goodsId, Principal principal) {
+        if (goodsId == null) {
+            return new Response<>(CommonResponse.INVALID_DATA);
+        }
+        long userId = userService.getUserIdByEmail(principal.getName());
+        shoppingCartItemService.removeCartItem(userId, goodsId);
+        return new Response<>(CommonResponse.SUCCESS);
+    }
+
+    @PostMapping("/shopping-cart/update")
+    @ResponseBody
+    public Response<?> updateShoppingCartItem(@RequestBody ShoppingCartItem shoppingCartItem, Principal principal) {
+        long userId = userService.getUserIdByEmail(principal.getName());
+        shoppingCartItem.setUserId(userId);
+        if (isNotValidShoppingCartItem(shoppingCartItem)) {
+            return new Response<>(CommonResponse.INVALID_DATA);
+        }
+        try {
+            shoppingCartItemService.updateShoppingCartItem(shoppingCartItem);
+            List<ShoppingCartItemDTO> cartItems = shoppingCartItemService.getUserShoppingCart(userId);
+            Map<String, Object> data = new HashMap<>();
+            data.put("items", cartItems);
+            data.put("totalPrice", calcTotalPrice(cartItems));
+            Response<Map<String, Object>> response = new Response<>(CommonResponse.SUCCESS);
+            response.setData(data);
+            return response;
+        } catch (NotFoundException e) { //userId and goodsId not match
+            return new Response<>(CommonResponse.INVALID_DATA);
+        }
+    }
+
+
+    // --- private methods --- //
+
+    private boolean isNotValidShoppingCartItem(ShoppingCartItem item) {
+        return item.getGoodsId() == null ||
+                item.getGoodsCount() == null ||
+                item.getGoodsCount() < 0 ||
+                item.getGoodsCount() > 9;
+    }
+
+    private BigDecimal calcTotalPrice(List<ShoppingCartItemDTO> itemList) {
+        return itemList.stream()
+                .map((item) -> item.getSellingPrice().multiply(BigDecimal.valueOf(item.getGoodsCount())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 }

@@ -25,7 +25,7 @@
                     <input class="form-control input-email" placeholder="E-mail" id="input-email">
                     <input class="form-control input-password" placeholder="Password" type="password"
                            autocomplete="password" id="input-password">
-                    <div class="forgot-password"><a>forgot password?</a></div>
+                    <div class="forgot-password"><a>¿Has olvidado la contraseña?</a></div>
                     <button class="button-login" type="submit">Login</button>
                 </form>
             </div>
@@ -39,24 +39,24 @@
     });
 
     function initListener() {
-        blindLoginEvent();
-        blindSignUpEvent();
-        blindGoHomeEvent();
+        bindLoginEvent();
+        bindSignUpEvent();
+        bindGoHomeEvent();
     }
 
-    function blindGoHomeEvent() {
+    function bindGoHomeEvent() {
         $(".logo img").click(() => {
             window.location.href = getBaseUrl();
         })
     }
 
-    function blindSignUpEvent() {
+    function bindSignUpEvent() {
         $(".button-sign-up").click(() => {
             window.location.href = getBaseUrl() + '/signup';
         });
     }
 
-    function blindLoginEvent() {
+    function bindLoginEvent() {
         $("form").submit((e) => {
             e.preventDefault();
             mallUserLogin();
@@ -86,7 +86,7 @@
                     });
                 } else {
                     Swal.fire({
-                        title: "Invalid email or password",
+                        title: "E-mail o contraseña incorrecto",
                         text: " ",
                         showDenyButton: false,
                         showConfirmButton: true,

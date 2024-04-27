@@ -9,7 +9,6 @@ public class IndexConfig {
     private String configName;
     private Byte configType;
     private Long goodsId;
-    private String redirectUrl;
     private Integer configRank;
     private Byte isDeleted;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
@@ -49,14 +48,6 @@ public class IndexConfig {
 
     public void setGoodsId(Long goodsId) {
         this.goodsId = goodsId;
-    }
-
-    public String getRedirectUrl() {
-        return redirectUrl;
-    }
-
-    public void setRedirectUrl(String redirectUrl) {
-        this.redirectUrl = redirectUrl == null ? null : redirectUrl.trim();
     }
 
     public Integer getConfigRank() {
@@ -114,7 +105,6 @@ public class IndexConfig {
                 ", configName='" + configName + '\'' +
                 ", configType=" + configType +
                 ", goodsId=" + goodsId +
-                ", redirectUrl='" + redirectUrl + '\'' +
                 ", configRank=" + configRank +
                 ", isDeleted=" + isDeleted +
                 ", createTime=" + createTime +

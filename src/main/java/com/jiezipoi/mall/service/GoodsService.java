@@ -3,12 +3,14 @@ package com.jiezipoi.mall.service;
 import com.jiezipoi.mall.config.GoodsConfig;
 import com.jiezipoi.mall.dao.GoodsCategoryDao;
 import com.jiezipoi.mall.dao.GoodsDao;
-import com.jiezipoi.mall.dto.GoodsSearchDTO;
+import com.jiezipoi.mall.dto.MallGoodsDTO;
 import com.jiezipoi.mall.entity.Goods;
 import com.jiezipoi.mall.entity.GoodsTag;
 import com.jiezipoi.mall.exception.NotFoundException;
 import com.jiezipoi.mall.utils.FileNameGenerator;
 import com.jiezipoi.mall.utils.dataTable.DataTableResult;
+import com.jiezipoi.mall.utils.dataTable.Order;
+import com.jiezipoi.mall.utils.dataTable.request.GoodsTableRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -169,16 +171,16 @@ public class GoodsService {
         return tempGoods;
     }
 
-    public DataTableResult list(int start, int limit, String categoryPath, Integer level) {
-        List<Goods> goods;
-        int totalCount;
-        if (categoryPath == null && level == null) {
-            goods = goodsDao.list(start, limit);
-            totalCount = goodsDao.getGoodsCount();
-        } else {
-            goods = goodsDao.listGoodsByCategory(start, limit, categoryPath, level);
-            totalCount = goodsDao.getCategoryGoodsCount(categoryPath);
-        }
+    public DataTableResult getGoodsPage(GoodsTableRequest request) {
+        Integer start = request.getStart();
+        Integer limit = request.getLength();
+        String path = request.getPath();
+        String keyword = request.getSearch().getValue();
+        Order order = request.getOrder().get(0);
+        Integer colNumber = order.getColumn() + 1;
+        String dir = order.getDir();
+        List<Goods> goods = goodsDao.list(start, limit, path, keyword, colNumber, dir);
+        int totalCount = goodsDao.selectCountTotalOfList(path, keyword);
         return new DataTableResult(goods, totalCount);
     }
 
@@ -258,12 +260,12 @@ public class GoodsService {
         return generateImageFileName(null);
     }
 
-    public List<GoodsSearchDTO> getGoodsListByKeyword(String keyword) {
+    public List<MallGoodsDTO> getGoodsListByTag(String keyword) {
         String[] keywordArray = keyword.split(" ");
         return goodsDao.selectGoodsByTagContaining(keywordArray);
     }
 
-    public List<GoodsSearchDTO> getGoodsListByCategory(Long categoryId) {
+    public List<MallGoodsDTO> getGoodsListByCategory(Long categoryId) {
         if (categoryId == null) {
             throw new NullPointerException();
         }
@@ -272,5 +274,9 @@ public class GoodsService {
 
     public List<Goods> getGoodsListById(long... ids) {
         return goodsDao.selectGoodsByIds(ids);
+    }
+
+    public List<Goods> getGoodsListByGoodsName(String keyword) {
+        return goodsDao.selectGoodsByNameContaining(keyword);
     }
 }

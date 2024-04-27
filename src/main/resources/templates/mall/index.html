@@ -29,7 +29,9 @@
                 <div class="swiper-wrapper">
                     <th:block th:each="carousel : ${carousels}">
                         <div class="swiper-slide">
-                            <img th:src="${baseUrl} + ${carousel.getCarouselUrl()}" alt="carousel image">
+                            <a th:href="'/goods/detail/' + ${carousel.getGoodsId()}">
+                                <img th:src="${baseUrl} + ${carousel.getCarouselUrl()}" alt="carousel image">
+                            </a>
                         </div>
                     </th:block>
                 </div>
@@ -59,13 +61,15 @@
                             <th:block th:unless="${#lists.isEmpty(bestSelling)}">
                                 <th:block th:each="product : ${bestSelling}">
                                     <div class="swiper-slide">
-                                        <div class="product-container">
-                                            <div class="product-image-container">
-                                                <img th:src="${product.getGoodsCoverImg()}" alt="product image">
+                                        <a th:href="${'/goods/detail/' + product.getGoodsId()}">
+                                            <div class="product-container">
+                                                <div class="product-image-container">
+                                                    <img th:src="${product.getGoodsCoverImg()}" alt="product image">
+                                                </div>
+                                                <div class="product-name" th:text="${product.getGoodsName()}"></div>
+                                                <div class="product-price" th:text="${product.getSellingPrice() + '￥'}"></div>
                                             </div>
-                                            <div class="product-name" th:text="${product.getGoodsName()}"></div>
-                                            <div class="product-price" th:text="${product.getSellingPrice() + '￥'}"></div>
-                                        </div>
+                                        </a>
                                     </div>
                                 </th:block>
                             </th:block>
@@ -82,19 +86,21 @@
     <!-- new arrival -->
     <div class="floor floor-dark">
         <div class="new-arrival-container">
-            <div class="floor-top-title">New Arrival</div>
+            <div class="floor-top-title">Novedades</div>
             <div class="swiper swiper-new-arrival">
                 <div class="swiper-wrapper">
                     <th:block th:unless="${#lists.isEmpty(newArrivals)}">
                         <th:block th:each="product : ${newArrivals}">
                             <div class="swiper-slide">
-                                <div class="product-container">
-                                    <div class="product-image-container">
-                                        <img th:src="${product.getGoodsCoverImg()}" alt="product image">
+                                <a th:href="${'/goods/detail/' + product.getGoodsId()}">
+                                    <div class="product-container">
+                                        <div class="product-image-container">
+                                            <img th:src="${product.getGoodsCoverImg()}" alt="product image">
+                                        </div>
+                                        <div class="product-name" th:text="${product.getGoodsName()}"></div>
+                                        <div class="product-price" th:text="${product.getSellingPrice() + '￥'}"></div>
                                     </div>
-                                    <div class="product-name" th:text="${product.getGoodsName()}"></div>
-                                    <div class="product-price" th:text="${product.getSellingPrice() + '￥'}"></div>
-                                </div>
+                                </a>
                             </div>
                         </th:block>
                     </th:block>
@@ -111,7 +117,7 @@
         <div class="row">
             <div class="col-2">
                 <div class="floor-left-title">
-                    Last Viewed
+                    En Tendencia
                 </div>
             </div>
             <div class="col-10">
@@ -121,13 +127,15 @@
                             <th:block th:unless="${#lists.isEmpty(recommend)}">
                                 <th:block th:each="product : ${recommend}">
                                     <div class="swiper-slide">
-                                        <div class="product-container">
-                                            <div class="product-image-container">
-                                                <img th:src="${product.getGoodsCoverImg()}" alt="product image">
+                                        <a th:href="${'/goods/detail/' + product.getGoodsId()}">
+                                            <div class="product-container">
+                                                <div class="product-image-container">
+                                                    <img th:src="${product.getGoodsCoverImg()}" alt="product image">
+                                                </div>
+                                                <div class="product-name" th:text="${product.getGoodsName()}"></div>
+                                                <div class="product-price" th:text="${product.getSellingPrice() + '￥'}"></div>
                                             </div>
-                                            <div class="product-name" th:text="${product.getGoodsName()}"></div>
-                                            <div class="product-price" th:text="${product.getSellingPrice() + '￥'}"></div>
-                                        </div>
+                                        </a>
                                     </div>
                                 </th:block>
                             </th:block>
@@ -147,17 +155,21 @@
     const swiper = new Swiper(".carousel", {
         direction: "horizontal",
         loop: true,
+        autoplay: {
+            delay: 5000
+        },
         pagination: {el: ".carousel-pagination"},
         navigation: {
             nextEl: '.carousel-button-next',
             prevEl: '.carousel-button-prev',
         },
         scrollbar: {el: ".carousel-scrollbar"},
+
     });
 
     const swiperBestSelling = new Swiper(".swiper-best-selling", {
         direction: "horizontal",
-        slidesPerView: 4,
+        slidesPerView: "5",
         loop: true,
         navigation: {
             nextEl: '.best-selling-next',

@@ -9,7 +9,13 @@
 <body>
 <nav th:replace="~{mall/navbar::navbar}"></nav>
 <div class="floor">
-    <div th:replace="~{mall/goods-list-fragment::content}"></div>
+    <th:block th:if="${goodsList.isEmpty()}">
+        <div class="empty-result-text" th:text="'No hay resultado para ' + ${keyword}">
+        </div>
+    </th:block>
+    <th:block th:unless="${goodsList.isEmpty()}">
+        <div th:case="${false}" th:replace="~{mall/goods-list-fragment::content}"></div>
+    </th:block>
 </div>
 <script th:replace="~{mall/goods-list-fragment::script}"></script>
 <footer th:replace="~{mall/footer::footer}"></footer>

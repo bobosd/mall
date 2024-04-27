@@ -1,6 +1,87 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 
+<!-- CKEditor -->
+<th:block>
+    <link th:fragment="CKEditor-css" rel="stylesheet" th:href="@{/styles/admin/CKEditor.css}">
+    <script th:fragment="CKEditor-js" src="https://cdn.ckeditor.com/ckeditor5/36.0.1/classic/ckeditor.js"></script>
+</th:block>
+
+<!-- cropper -->
+<th:block>
+    <link th:fragment="cropper-css"
+          rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css"
+          integrity="sha512-cyzxRvewl+FOKTtpBzYjW6x6IAYUCZy3sGP40hn+DQkqeluGRCax7qztK2ImL64SA+C7kVWdLI6wvdlStawhyw=="
+          crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script th:fragment="cropper-js" src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"
+            integrity="sha512-6lplKUSl86rUVprDIjiW8DuOniNX8UDoRATqZSds/7t6zCQZfaCe3e5zcGaQwxa8Kpn5RTM9Fvl3X2lLV4grPQ=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+</th:block>
+
+<!-- Select2 -->
+<th:block>
+    <link th:fragment="select2-css" rel="stylesheet" th:href="@{/styles/common/select2.css}">
+    <script th:fragment="select2-js" th:src="@{/js/select2.js}"></script>
+</th:block>
+
+<!-- Datatable -->
+<th:block>
+    <link th:fragment="datatable-css" rel="stylesheet" type="text/css"
+          href="https://cdn.datatables.net/v/bs5/dt-1.13.2/datatables.min.css"/>
+    <script th:fragment="datatable-js" type="text/javascript"
+            src="https://cdn.datatables.net/v/bs5/dt-1.13.2/datatables.min.js"></script>
+
+    <th:block th:fragment="datatable-locale" th:switch="__${#locale.toString()}__">
+        <th:block th:case="zh_CN">
+            <script th:replace="~{common/datatable-locale::zh_CN}"></script>
+        </th:block>
+        <th:block th:case="es_ES">
+            <script th:replace="~{common/datatable-locale::es_ES}"></script>
+        </th:block>
+        <th:block th:case="en_US">
+            <script th:replace="~{common/datatable-locale::en_US}"></script>
+        </th:block>
+    </th:block>
+</th:block>
+
+
+<!-- Bootstrap 5.3.2 -->
+<th:block>
+    <link th:fragment="bootstrap-css" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+          rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
+          crossorigin="anonymous">
+    <script th:fragment="bootstrap-js"
+            src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+            crossorigin="anonymous"></script>
+</th:block>
+
+
+<!-- JQuery -->
+<script th:fragment="jQuery" src="https://code.jquery.com/jquery-3.6.0.min.js"
+        integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+
+
+<!-- FontAwesome -->
+<th:block>
+    <link th:fragment="fontawsome-css" rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css"
+          integrity="sha512-MV7K8+y+gLIBoVD59lQIYicR65iaqukzvf/nwasF0nqhPay5w/9lJmVM2hMDcnK1OnMGCdVK+iQrJ7lzPJQd1w=="
+          crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <script th:fragment="fontawsome-js" src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/js/all.min.js"
+            integrity="sha512-rpLlll167T5LJHwp0waJCh3ZRf7pO6IT1+LZOhAyP6phAirwchClbTZV3iqL3BMrVxIYRbzGTpli4rfxsCK6Vw=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+</th:block>
+
+
+<!-- Swiper -->
+<th:block>
+    <link th:fragment="swiper-css" rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
+    <script th:fragment="swiper-js" src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+</th:block>
+
+
 <!-- Sweet Alert 2 -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" th:fragment="swal"></script>
 <script th:fragment="swal-common-alert">
@@ -56,40 +137,4 @@
     }
 </script>
 
-
-<!-- Bootstrap 5.3.2 -->
-<th:block>
-    <link th:fragment="bootstrap-css" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
-          rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
-          crossorigin="anonymous">
-    <script th:fragment="bootstrap-js"
-            src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
-            integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
-            crossorigin="anonymous"></script>
-</th:block>
-
-
-<!-- JQuery -->
-<script th:fragment="jQuery" src="https://code.jquery.com/jquery-3.6.0.min.js"
-        integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
-
-
-<!-- FontAwesome -->
-<th:block>
-    <link th:fragment="fontawsome-css" rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css"
-          integrity="sha512-MV7K8+y+gLIBoVD59lQIYicR65iaqukzvf/nwasF0nqhPay5w/9lJmVM2hMDcnK1OnMGCdVK+iQrJ7lzPJQd1w=="
-          crossorigin="anonymous" referrerpolicy="no-referrer" />
-
-    <script th:fragment="fontawsome-js" src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/js/all.min.js"
-            integrity="sha512-rpLlll167T5LJHwp0waJCh3ZRf7pO6IT1+LZOhAyP6phAirwchClbTZV3iqL3BMrVxIYRbzGTpli4rfxsCK6Vw=="
-            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-</th:block>
-
-
-<!-- Swiper -->
-<th:block>
-    <link th:fragment="swiper-css" rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css"/>
-    <script th:fragment="swiper-js" src="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.js"></script>
-</th:block>
 </html>

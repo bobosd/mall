@@ -3,9 +3,9 @@
 
 <mapper namespace="com.jiezipoi.mall.dao.CarouselDao">
     <resultMap id="BaseResultMap" type="com.jiezipoi.mall.entity.Carousel">
-        <id column="id" jdbcType="INTEGER" property="carouselId"/>
+        <id column="carousel_id" jdbcType="INTEGER" property="carouselId"/>
         <result column="carousel_url" jdbcType="VARCHAR" property="carouselUrl"/>
-        <result column="redirect_url" jdbcType="VARCHAR" property="redirectUrl"/>
+        <result column="goods_id" jdbcType="BIGINT" property="goodsId"/>
         <result column="carousel_rank" jdbcType="INTEGER" property="carouselRank"/>
         <result column="is_deleted" jdbcType="TINYINT" property="isDeleted"/>
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
@@ -13,16 +13,30 @@
         <result column="update_user" jdbcType="INTEGER" property="updateUser"/>
     </resultMap>
 
+    <resultMap id="CarouselDtoMap" type="com.jiezipoi.mall.dto.CarouselDTO">
+        <id column="carousel_id" jdbcType="INTEGER" property="carouselId"/>
+        <result column="carousel_url" jdbcType="VARCHAR" property="carouselUrl"/>
+        <result column="goods_id" jdbcType="BIGINT" property="goodsId"/>
+        <result column="goods_name" jdbcType="VARCHAR" property="goodsName"/>
+        <result column="carousel_rank" jdbcType="INTEGER" property="carouselRank"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+    </resultMap>
+
     <sql id="base_column_list">
-        id, carousel_url, redirect_url, carousel_rank, is_deleted, create_time, create_user, update_time, update_user
+        carousel_id, carousel_url, goods_id, carousel_rank, is_deleted, create_time, create_user, update_time, update_user
     </sql>
 
-    <select id="findCarouselList" resultMap="BaseResultMap">
-        SELECT
-        <include refid="base_column_list"/>
+    <select id="findCarouselList" resultMap="CarouselDtoMap">
+        SELECT carousel_id, carousel_url, carousel.goods_id, goods_name, carousel_rank, carousel.create_time
         FROM carousel
+        JOIN goods_info ON goods_info.goods_id = carousel.goods_id
         WHERE is_deleted = 0
-        ORDER BY ${orderBy}
+        <if test="colNumber != null and dir != null and dir != ''">
+            ORDER BY #{colNumber,jdbcType=INTEGER}
+            <if test="dir == 'desc'">
+                DESC
+            </if>
+        </if>
         <if test="start != null and limit != null">
             LIMIT #{start}, #{limit}
         </if>
@@ -34,11 +48,10 @@
         WHERE is_deleted = 0;
     </select>
 
-    <select id="selectByPrimaryKey" parameterType="int" resultMap="BaseResultMap">
-        SELECT
-        <include refid="base_column_list"/>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap">
+        SELECT <include refid="base_column_list"/>
         FROM carousel
-        WHERE id = #{carouselId}
+        WHERE carousel_id = #{carouselId,jdbcType=BIGINT}
     </select>
 
     <select id="findCarouselByNum" parameterType="int" resultMap="BaseResultMap">
@@ -54,12 +67,12 @@
     <delete id="deleteByPrimaryKey" parameterType="int">
         DELETE
         FROM carousel
-        WHERE id = #{carouselId,jdbcType=INTEGER};
+        WHERE carousel_id = #{carouselId,jdbcType=BIGINT};
     </delete>
 
     <insert id="insert" parameterType="com.jiezipoi.mall.entity.Carousel">
         INSERT INTO carousel(<include refid="base_column_list"/>)
-        VALUES (#{carouselId,jdbcType=INTEGER}, #{carouselUrl,jdbcType=VARCHAR}, #{redirectUrl,jdbcType=VARCHAR},
+        VALUES (#{carouselId,jdbcType=INTEGER}, #{carouselUrl,jdbcType=VARCHAR}, #{goodsId,jdbcType=BIGINT},
         #{carouselRank,jdbcType=INTEGER}, #{isDeleted,jdbcType=TINYINT}, #{createTime,jdbcType=TIMESTAMP},
         #{createUser,jdbcType=INTEGER}, #{updateTime,jdbcType=TIMESTAMP}, #{updateUser,jdbcType=INTEGER});
     </insert>
@@ -68,13 +81,13 @@
         INSERT INTO carousel
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="carouselId != null">
-                id,
+                carousel_id,
             </if>
             <if test="carouselUrl != null">
                 carousel_url,
             </if>
-            <if test="redirectUrl != null">
-                redirect_url,
+            <if test="goodsId != null">
+                goods_id,
             </if>
             <if test="carouselRank != null">
                 carousel_rank,
@@ -102,8 +115,8 @@
             <if test="carouselUrl != null">
                 #{carouselUrl,jdbcType=VARCHAR},
             </if>
-            <if test="redirectUrl != null">
-                #{redirectUrl,jdbcType=VARCHAR},
+            <if test="goodsId != null">
+                #{goodsId,jdbcType=BIGINT},
             </if>
             <if test="carouselRank != null">
                 #{carouselRank,jdbcType=INTEGER},
@@ -132,8 +145,8 @@
             <if test="carouselUrl != null">
                 carousel_url = #{carouselUrl,jdbcType=VARCHAR},
             </if>
-            <if test="redirectUrl != null">
-                redirect_url = #{redirectUrl,jdbcType=VARCHAR},
+            <if test="goodsId != null">
+                goods_id = #{goodsId,jdbcType=BIGINT},
             </if>
             <if test="carouselRank != null">
                 carousel_rank = #{carouselRank,jdbcType=INTEGER},
@@ -154,30 +167,27 @@
                 update_user =  #{updateUser,jdbcType=INTEGER},
             </if>
         </set>
-        WHERE id = #{carouselId}
+        WHERE carousel_id = #{carouselId}
     </update>
 
     <update id="updateByPrimary" parameterType="com.jiezipoi.mall.entity.Carousel">
         UPDATE carousel
         SET
         carousel_url = #{carouselUrl,jdbcType=VARCHAR},
-        redirect_url = #{redirectUrl,jdbcType=VARCHAR},
+        goods_id = #{goodsId,jdbcType=BIGINT},
         carousel_rank = #{carouselRank,jdbcType=INTEGER},
         is_deleted = #{isDeleted,jdbcType=TINYINT},
         create_time = #{createTime,jdbcType=TIMESTAMP},
         create_user = #{createUser,jdbcType=INTEGER},
         update_time = #{updateTime,jdbcType=TIMESTAMP},
         update_user =  #{updateUser,jdbcType=INTEGER}
-        WHERE id = #{carouselId}
+        WHERE carousel_id = #{carouselId}
     </update>
 
     <update id="deleteBatch">
         UPDATE carousel
         SET is_deleted = 1, update_time = NOW()
-        WHERE id IN
-        <foreach collection="array" item="id" open="(" separator="," close=")">
-            #{id}
-        </foreach>
+        WHERE carousel_id = #{id,jdbcType=BIGINT}
     </update>
 
     <select id="findAllCarousel" resultMap="BaseResultMap">

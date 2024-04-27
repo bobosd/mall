@@ -36,7 +36,7 @@
 
 .filter-option {
     padding: 4px 14px;
-    background-color: #ebebeb;
+    background-color: var(--mall-light-color);
     border-radius: 8px;
     cursor: pointer;
     transition-duration: 0.2s;
@@ -45,7 +45,7 @@
 }
 
 .filter-option.selected {
-    background-color: #0078ff;
+    background-color: var(--mall-color);
     color: #ffffff;
 }
 
@@ -107,6 +107,13 @@
 
 .goods-image-container img {
     width: 100%;
+}
+
+.empty-result-text {
+    font-size: 36px;
+    display: flex;
+    justify-content: center;
+    font-weight: 700;
 }
 
 @media screen and (max-width: 1800px) {

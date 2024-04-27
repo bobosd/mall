@@ -3,7 +3,7 @@ package com.jiezipoi.mall.controller.mall;
 import com.jiezipoi.mall.config.GoodsConfig;
 import com.jiezipoi.mall.dto.GoodsSearchBrandsDTO;
 import com.jiezipoi.mall.dto.GoodsSearchCategoryDTO;
-import com.jiezipoi.mall.dto.GoodsSearchDTO;
+import com.jiezipoi.mall.dto.MallGoodsDTO;
 import com.jiezipoi.mall.entity.Goods;
 import com.jiezipoi.mall.exception.NotFoundException;
 import com.jiezipoi.mall.service.GoodsService;
@@ -36,13 +36,17 @@ public class MallGoodsController {
                              @RequestParam(value = "category", required = false) Long[] requiredCategoryIds,
                              @RequestParam(value = "priceFrom", required = false) Integer priceFrom,
                              @RequestParam(value = "priceTo", required = false) Integer priceTo) {
-        List<GoodsSearchDTO> goodsList = goodsService.getGoodsListByKeyword(keyword);
+        if (keyword.isBlank()) {
+            return "redirect:/";
+        }
+        List<MallGoodsDTO> goodsList = goodsService.getGoodsListByTag(keyword);
         processSearchData(modelMap, goodsList, requiredBrandIds, requiredCategoryIds, priceFrom, priceTo);
+        modelMap.put("keyword", keyword);
         return "mall/goods-search";
     }
 
     private void processSearchData(ModelMap modelMap,
-                                   List<GoodsSearchDTO> goodsList,
+                                   List<MallGoodsDTO> goodsList,
                                    Long[] requiredBrandIds,
                                    Long[] requiredCategoryIds,
                                    Integer priceFrom,
@@ -59,13 +63,13 @@ public class MallGoodsController {
 
         //initialize max and min value
         if (goodsList.size() > 0) {
-            GoodsSearchDTO firstGoods = goodsList.get(0);
+            MallGoodsDTO firstGoods = goodsList.get(0);
             minPrice.set(firstGoods.getSellingPrice());
             maxPrice.set(firstGoods.getSellingPrice());
         }
 
         //filtering & generate filter options
-        List<GoodsSearchDTO> filteredList = goodsList.stream().filter((goods -> {
+        List<MallGoodsDTO> filteredList = goodsList.stream().filter((goods -> {
             GoodsSearchBrandsDTO brand = goods.getGoodsBrand();
             GoodsSearchCategoryDTO category = goods.getGoodsCategory();
             BigDecimal price = goods.getSellingPrice();
@@ -90,7 +94,7 @@ public class MallGoodsController {
         modelMap.put("priceTo", priceTo == null ? maxPrice.get().intValue() : priceTo);
     }
 
-    private boolean doGoodsSearchFilter(GoodsSearchDTO goods,
+    private boolean doGoodsSearchFilter(MallGoodsDTO goods,
                                         HashSet<Long> requiredBrandIdSet,
                                         HashSet<Long> requiredCategoryIdSet,
                                         Integer priceFrom,
@@ -137,7 +141,7 @@ public class MallGoodsController {
                                @RequestParam(value = "category", required = false) Long[] requiredCategoryIds,
                                @RequestParam(value = "priceFrom", required = false) Integer priceFrom,
                                @RequestParam(value = "priceTo", required = false) Integer priceTo) {
-        List<GoodsSearchDTO> list = goodsService.getGoodsListByCategory(categoryId);
+        List<MallGoodsDTO> list = goodsService.getGoodsListByCategory(categoryId);
         processSearchData(modelMap, list, requiredBrandIds, requiredCategoryIds, priceFrom, priceTo);
         return "mall/goods-category";
     }

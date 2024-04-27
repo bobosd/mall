@@ -3,12 +3,10 @@ package com.jiezipoi.mall.service;
 import com.jiezipoi.mall.config.ShoppingCartConfig;
 import com.jiezipoi.mall.dao.ShoppingCartItemDao;
 import com.jiezipoi.mall.dto.ShoppingCartItemDTO;
-import com.jiezipoi.mall.entity.User;
+import com.jiezipoi.mall.entity.Goods;
 import com.jiezipoi.mall.entity.ShoppingCartItem;
 import com.jiezipoi.mall.exception.NotFoundException;
 import com.jiezipoi.mall.exception.QuantityExceededException;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.sql.SQLException;
@@ -32,13 +30,6 @@ public class ShoppingCartItemService {
         this.shoppingCartConfig = shoppingCartConfig;
     }
 
-    private Long getUserId() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String userEmail = authentication.getName();
-        User user = userService.getUserByEmail(userEmail);
-        return user.getUserId();
-    }
-
     /**
      * 传递进需要添加的商品，如果购物车里有相同的商品则增加数量，不存在则新建数据。
      *
@@ -47,10 +38,11 @@ public class ShoppingCartItemService {
      * @throws SQLException              没有成功添加
      * @throws NotFoundException         不存在该商品
      */
-    public void saveCartItem(ShoppingCartItem shoppingCartItem, long userId)
+    public void addCartItem(ShoppingCartItem shoppingCartItem, long userId)
             throws QuantityExceededException, SQLException, NotFoundException {
         shoppingCartItem.setUserId(userId);
-        if (!goodsService.isGoodsExist(shoppingCartItem.getGoodsId())) {
+        Goods goodsToAdd = goodsService.getGoods(shoppingCartItem.getGoodsId());
+        if (goodsToAdd == null || !goodsToAdd.getGoodsSellStatus()) {
             throw new NotFoundException();
         }
         ShoppingCartItem existingCartItem = shoppingCartItemDao.selectByUserIdAndGoodsId(shoppingCartItem.getUserId(), shoppingCartItem.getGoodsId());
@@ -77,8 +69,9 @@ public class ShoppingCartItemService {
     }
 
     private void addNewCartItem(ShoppingCartItem shoppingCartItem) throws QuantityExceededException {
-        int totalCartItemCount = getCartItemCount(shoppingCartItem.getUserId()) + shoppingCartItem.getGoodsCount();
-        if (totalCartItemCount > shoppingCartConfig.getItemLimit()) {
+        int totalCartItemCount = getCartItemCount(shoppingCartItem.getUserId());
+        totalCartItemCount += shoppingCartItem.getGoodsCount();
+        if (totalCartItemCount > shoppingCartConfig.getShoppingCartTotalLimit()) {
             throw new QuantityExceededException(TOTAL_CART_ITEMS_EXCEEDED_MESSAGE);
         }
         if (shoppingCartItem.getGoodsCount() > shoppingCartConfig.getItemLimit()) {
@@ -91,11 +84,21 @@ public class ShoppingCartItemService {
         return shoppingCartItemDao.selectCountByUserId(userId);
     }
 
-    public List<ShoppingCartItemDTO> getUserShoppingCart() {
-        return shoppingCartItemDao.selectByUserId(getUserId());
+    public void removeCartItem(Long userId, Long goodsId) {
+        if (goodsId == null) {
+            throw new NullPointerException();
+        }
+        shoppingCartItemDao.deleteByGoodsIdAndUserId(userId, goodsId);
     }
 
-    public void removeCartItem(Long goodsId) {
-        getUserId();
+    public List<ShoppingCartItemDTO> getUserShoppingCart(Long userId) {
+        return shoppingCartItemDao.selectByUserId(userId);
+    }
+
+    public void updateShoppingCartItem(ShoppingCartItem shoppingCartItem) throws NotFoundException {
+        int affectedRow = shoppingCartItemDao.updateByUserIdAndGoodsIdSelective(shoppingCartItem);
+        if (affectedRow == 0) {
+            throw new NotFoundException();
+        }
     }
 }

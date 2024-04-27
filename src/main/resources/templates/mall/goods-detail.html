@@ -51,33 +51,10 @@
     });
 
     function initListener() {
-        blindGoodsAmountOptionsEvent();
-        blindAddToCartEvent();
+        bindAddToCartEvent();
     }
-
-    function blindAddToCartEvent() {
+    function bindAddToCartEvent() {
         $(".button-add-to-cart").click(() => addToCart());
-    }
-
-    function onAmountContainerFocusEvent() {
-        $(".choose-amount").focusin(() => {
-        });
-    }
-
-    function blindGoodsAmountOptionsEvent() {
-        const input = $(".input-buy-amount");
-        $(".add-buy-amount").click(() => {
-            const amount = parseInt(input.val()) + 1;
-            input.val(amount);
-        });
-
-        $(".reduce-buy-amount").click(() => {
-            const amount = parseInt(input.val()) - 1;
-            if (amount === 0) {
-                return;
-            }
-            input.val(amount);
-        });
     }
 
     function getGoodsId() {
@@ -98,12 +75,25 @@
             data: JSON.stringify(shoppingCartItem),
             contentType: "application/json",
             success: (res) => {
+                console.log(res);
                 if (res.code === 200) {
                     loadAndShowShoppingCart();
                 } else if (res.message === "total item exceeds") {
-
+                    Swal.fire({
+                        title: "¡Ha superado el límite!",
+                        text: "La cesta permite agrear un máximo de 99 artículos en total.",
+                        showDenyButton: false,
+                        showConfirmButton: true,
+                        icon: "error"
+                    });
                 } else if (res.message === "single item exceeds") {
-
+                    Swal.fire({
+                        title: "¡Ha superado el límite!",
+                        text: "El artículo seleccionado ha superado el límite de compra (9 unidades máximas)",
+                        showDenyButton: false,
+                        showConfirmButton: true,
+                        icon: "error"
+                    });
                 } else {
 
                 }
@@ -114,5 +104,7 @@
         });
     }
 </script>
+
+<script src="/js/AmountSelector.js"></script>
 </body>
 </html>

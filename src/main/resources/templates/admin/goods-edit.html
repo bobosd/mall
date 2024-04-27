@@ -3,11 +3,14 @@
 <head th:replace="~{admin/header::general-libraries-and-styles(~{::title}, ~{::link}, ~{::head/script})}">
     <meta charset="UTF-8">
     <title th:text="#{create.product}"></title>
-    <script th:replace="~{admin/header::select2}"></script>
-    <script th:replace="~{admin/header::cropper}"></script>
-    <script th:replace="~{admin/header::CKEditor}"></script>
     <link rel="stylesheet" href="/styles/admin/goods-create.css">
     <link rel="stylesheet" th:replace="~{admin/goods-form-fragment::goods-form-style}">
+    <link th:replace="~{common/libraries::select2-css}">
+    <link th:replace="~{common/libraries::cropper-css}">
+    <link th:replace="~{common/libraries::CKEditor-css}">
+    <script th:replace="~{common/libraries::select2-js}"></script>
+    <script th:replace="~{common/libraries::cropper-js}"></script>
+    <script th:replace="~{common/libraries::CKEditor-js}"></script>
 </head>
 <body>
 <div th:replace="~{admin/sidebar::sidebar-fragment}"></div>
