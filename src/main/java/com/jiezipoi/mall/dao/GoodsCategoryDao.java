@@ -14,8 +14,7 @@ public interface GoodsCategoryDao {
 
     GoodsCategory selectByPrimaryKey(Long id);
 
-    GoodsCategory selectByParentIdAndName(@Param("parentId") Long parentId,
-                                          @Param("categoryName") String categoryName);
+    GoodsCategory selectByCategoryName(@Param("categoryName") String categoryName);
 
     int updateByPrimaryKeySelective(GoodsCategory category);
 
@@ -23,7 +22,8 @@ public interface GoodsCategoryDao {
 
     List<GoodsCategory> findGoodsCategoryList(@Param("categoryLevel") Integer categoryLevel,
                                               @Param("parentId") Long parentId,
-                                              @Param("orderDir") String orderDir);
+                                              @Param("colNumber") Integer orderBy,
+                                              @Param("dir") String dir);
 
     List<GoodsCategory> selectAllCategory();
 

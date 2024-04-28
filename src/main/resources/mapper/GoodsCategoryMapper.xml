@@ -41,7 +41,12 @@
             </if>
             AND is_deleted = 0
         </where>
-        ORDER BY category_rank ${orderDir};
+        <if test="colNumber != null and dir != null and dir != ''">
+            ORDER BY #{colNumber,jdbcType=INTEGER}
+            <if test="dir == 'desc'">
+                DESC
+            </if>
+        </if>
     </select>
 
     <select id="getTotalGoodsCategories" resultType="int">
@@ -62,12 +67,10 @@
         WHERE goods_category_id = #{id}
     </select>
     
-    <select id="selectByParentIdAndName" resultMap="BaseResultMap">
+    <select id="selectByCategoryName" resultMap="BaseResultMap">
         SELECT
         <include refid="Base_column_list"/>
-        FROM goods_category
-        WHERE parent_id = #{parentId,jdbcType=BIGINT}
-        AND category_name = #{categoryName,jdbcType=VARCHAR};
+        FROM goods_category WHERE category_name = #{categoryName,jdbcType=VARCHAR};
     </select>
 
     <select id="selectByLevelAndParentIdsAndNumber" resultMap="BaseResultMap">

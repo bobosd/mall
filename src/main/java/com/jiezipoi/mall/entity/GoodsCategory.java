@@ -15,10 +15,10 @@ public class GoodsCategory {
     private Byte isDeleted;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createTime;
-    private Integer createUser;
+    private Long createUser;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime updateTime;
-    private Integer updateUser;
+    private Long updateUser;
 
     public Long getGoodsCategoryId() {
         return goodsCategoryId;
@@ -84,11 +84,11 @@ public class GoodsCategory {
         this.createTime = createTime;
     }
 
-    public Integer getCreateUser() {
+    public Long getCreateUser() {
         return createUser;
     }
 
-    public void setCreateUser(Integer createUser) {
+    public void setCreateUser(Long createUser) {
         this.createUser = createUser;
     }
 
@@ -100,11 +100,11 @@ public class GoodsCategory {
         this.updateTime = updateTime;
     }
 
-    public Integer getUpdateUser() {
+    public Long getUpdateUser() {
         return updateUser;
     }
 
-    public void setUpdateUser(Integer updateUser) {
+    public void setUpdateUser(Long updateUser) {
         this.updateUser = updateUser;
     }
 

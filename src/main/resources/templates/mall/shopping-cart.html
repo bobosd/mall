@@ -65,7 +65,7 @@
 
                 </div>
                 <div class="">
-                    <button class="button button-xl button-purple">Realizar pedido</button>
+                    <button class="button button-xl button-purple btn-create-order">Realizar pedido</button>
                 </div>
             </div>
         </div>
@@ -76,6 +76,25 @@
 </body>
 <script>
     $(document).ready(() => {
+
+    });
+
+    function initListener() {
+        bindAmountSelectorEvent();
+    }
+
+    function bindCreateOrderEvent() {
+        $(".btn-create-order").click((e) => {
+            $(e.target).addSpinner();
+            Swal.fire({
+                position: "top",
+                title: "Función en desarrollo",
+
+            });
+        });
+    }
+
+    function bindAmountSelectorEvent() {
         $(".input-buy-amount").each((i, DOM) => {
             const goodsId = $(DOM).closest(".shopping-cart-item").attr("goods-id");
             DOM.afterChangeMade = () => {
@@ -86,7 +105,7 @@
                 updateShoppingCart(shoppingCartItem);
             };
         });
-    });
+    }
 
     function updateShoppingCart(shoppingCartItem) {
         showLoadingScreen();
