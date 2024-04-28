@@ -70,9 +70,12 @@ public class ShoppingCartItemController {
     @ResponseBody
     public Response<?> listUserShoppingCart(Principal principal) {
         Long userId = userService.getUserIdByEmail(principal.getName());
-        List<ShoppingCartItemDTO> cartContent = shoppingCartItemService.getUserShoppingCart(userId);
-        Response<List<ShoppingCartItemDTO>> response = new Response<>(CommonResponse.SUCCESS);
-        response.setData(cartContent);
+        List<ShoppingCartItemDTO> cartItems = shoppingCartItemService.getUserShoppingCart(userId);
+        Map<String, Object> data = new HashMap<>();
+        data.put("items", cartItems);
+        data.put("totalPrice", calcTotalPrice(cartItems));
+        Response<Map<String, Object>> response = new Response<>(CommonResponse.SUCCESS);
+        response.setData(data);
         return response;
     }
 
@@ -84,7 +87,7 @@ public class ShoppingCartItemController {
         }
         long userId = userService.getUserIdByEmail(principal.getName());
         shoppingCartItemService.removeCartItem(userId, goodsId);
-        return new Response<>(CommonResponse.SUCCESS);
+        return new Response<>(CommonResponse.DELETE_SUCCESS);
     }
 
     @PostMapping("/shopping-cart/update")
@@ -97,13 +100,7 @@ public class ShoppingCartItemController {
         }
         try {
             shoppingCartItemService.updateShoppingCartItem(shoppingCartItem);
-            List<ShoppingCartItemDTO> cartItems = shoppingCartItemService.getUserShoppingCart(userId);
-            Map<String, Object> data = new HashMap<>();
-            data.put("items", cartItems);
-            data.put("totalPrice", calcTotalPrice(cartItems));
-            Response<Map<String, Object>> response = new Response<>(CommonResponse.SUCCESS);
-            response.setData(data);
-            return response;
+            return new Response<>(CommonResponse.SUCCESS);
         } catch (NotFoundException e) { //userId and goodsId not match
             return new Response<>(CommonResponse.INVALID_DATA);
         }

@@ -77,6 +77,16 @@ a {
     background: var(--mall-color);
 }
 
+.button-red {
+    color: white;
+    background-color: #e53b1b;
+}
+
+.button-red:hover {
+    background-color: #f36042;
+}
+
+
 .no-text-select {
     -webkit-user-select: none; /* Safari */
     -ms-user-select: none; /* IE 10 and IE 11 */

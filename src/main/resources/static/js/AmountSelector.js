@@ -64,7 +64,6 @@ function bindGoodsAmountOptionsEvent() {
             return;
         }
         input.val(amount);
-        console.log(input.get(0), input.val());
         changeMadeCallBack(input.get(0));
     });
 

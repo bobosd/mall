@@ -114,3 +114,43 @@ nav a {
 .input-buy-amount {
     width: 20px;
 }
+
+.shopping-cart-item-right {
+    display: flex;
+    flex-grow: 1;
+    flex-direction: row-reverse;
+}
+
+.shopping-cart-empty-container {
+    padding-top: 70px;
+    display: flex;
+    justify-content: center;
+}
+
+.shopping-cart-empty-container .shopping-cart-icon {
+    position: relative;
+    font-size: 72px;
+}
+
+.shopping-cart-empty-container .x-mark {
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    flex-wrap: wrap;
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 2;
+    font-size: 32px;
+    height: 38px;
+    width: 38px;
+    background-color: #ffffff;
+    border-radius: 50%;
+}
+
+.shopping-cart-empty-message {
+    display: flex;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 32px;
+}

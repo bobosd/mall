@@ -153,7 +153,7 @@
                 success: (res) => {
                     if (res.code === 200) {
                         renderShoppingCartItems(res.data);
-                        localStorage.setItem("cartItem", JSON.stringify(res.data));
+                        localStorage.setItem("cartItem", JSON.stringify(res.data.items));
                     }
                 },
                 error: () => showServerErrorSwal(),
@@ -167,16 +167,14 @@
             backgroundDiv.click(() => hideSideMenu());
         }
 
-        function renderShoppingCartItems(items) {
+        function renderShoppingCartItems(data) {
+            const {items, totalPrice} = data;
             if (items.length < 1) {
                 renderEmptyIcon();
                 return;
             }
             let itemsDomStr = '';
-            let totalPrice = 0.0;
             items.forEach((item) => {
-                const {sellingPrice, goodsCount} = item;
-                totalPrice = calcPrice(sellingPrice, goodsCount, totalPrice);
                 itemsDomStr += generateShoppingCartItemsDOM(item);
             });
             const summaryDOM = generateSummaryDOM(totalPrice);

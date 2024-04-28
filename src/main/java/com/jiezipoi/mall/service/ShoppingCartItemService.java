@@ -15,16 +15,14 @@ import java.util.List;
 
 @Service
 public class ShoppingCartItemService {
-    private final UserService userService;
     private final ShoppingCartItemDao shoppingCartItemDao;
     private final GoodsService goodsService;
     private final ShoppingCartConfig shoppingCartConfig;
     private static final String TOTAL_CART_ITEMS_EXCEEDED_MESSAGE = "total item exceeds";
     private static final String SINGLE_ITEMS_COUNT_EXCEEDED_MESSAGE = "single item exceeds";
 
-    public ShoppingCartItemService(UserService userService, ShoppingCartItemDao shoppingCartItemDao,
+    public ShoppingCartItemService(ShoppingCartItemDao shoppingCartItemDao,
                                    GoodsService goodsService, ShoppingCartConfig shoppingCartConfig) {
-        this.userService = userService;
         this.shoppingCartItemDao = shoppingCartItemDao;
         this.goodsService = goodsService;
         this.shoppingCartConfig = shoppingCartConfig;
@@ -85,9 +83,7 @@ public class ShoppingCartItemService {
     }
 
     public void removeCartItem(Long userId, Long goodsId) {
-        if (goodsId == null) {
-            throw new NullPointerException();
-        }
+
         shoppingCartItemDao.deleteByGoodsIdAndUserId(userId, goodsId);
     }
 

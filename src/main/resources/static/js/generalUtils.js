@@ -1,20 +1,30 @@
 let buttonClone = null;
 
 jQuery.fn.addSpinner = function() {
+    let button = this;
+    if (!this.hasClass("button")) {
+        button = this.closest(".button");
+    }
     buttonClone = this.clone(true);
-    this.attr("disabled", true);
-    this.unbind();
-    const height = this.height();
-    const width = this.width();
-    const maxSize = width < height ? width : height;
+    button.attr("disabled", true);
+    button.unbind();
+    const btnHeight = button.height();
+    const btnWidth = button.width();
+    const maxSize = btnWidth < btnHeight ? btnWidth : btnHeight;
     const spinnerSize = Math.sqrt((maxSize * maxSize) / 2);
     let spinner = $.parseHTML('<div><div class="spinner-border text-light" role="status"></div></div>');//bootstrap spinner
     spinner = $(spinner);
+    if (button.children().first().prop("tagName") === "svg") {
+        const svg = button.children().first();
+        const svgHeight = svg.height();
+        const svgWidth = svg.width();
+        spinner.height(svgHeight > btnHeight ? svgWidth : btnHeight);
+        spinner.width(svgWidth > btnWidth ? svgWidth : btnWidth);
+        spinner.css({display: "flex", justifyContent: "center", alignContent: "center", flexWrap: "wrap"});
+    }
     spinner.children().first().height(spinnerSize);
     spinner.children().first().width(spinnerSize);
-    //spinner.height(maxSize);
-    //spinner.width(maxSize);
-    this.html(spinner);
+    button.html(spinner);
 };
 
 jQuery.fn.removeSpinner = function () {

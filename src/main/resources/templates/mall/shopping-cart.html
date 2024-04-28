@@ -28,47 +28,68 @@
 </nav>
 <main>
     <div class="floor">
-        <div>
-            <div class="shopping-cart">
-                <th:block th:each="item : ${cartItems}">
-                    <div class="shopping-cart-item" th:attr="goods-id=${item.getGoodsId()}">
-                        <div class="shopping-cart-item-image">
-                            <img th:src="${item.getGoodsCoverImg()}" alt="goods image">
-                        </div>
-                        <div class="shopping-cart-item-info">
-                            <div class="shopping-cart-item-title" th:text="${item.getGoodsName()}"></div>
-                            <div class="shopping-cart-item-price" th:text="${item.getSellingPriceInEuroFormat()}"></div>
-                            <div class="amount-container no-text-select">
-                                <div class="choose-amount">
-                                    <div class="reduce-buy-amount amount-options"><i class="fa-solid fa-minus"></i></div>
-                                    <input class="input-buy-amount note" th:value="${item.getGoodsCount()}" step="1" type="number" min="1">
-                                    <div class="add-buy-amount amount-options"><i class="fa-solid fa-plus"></i></div>
+        <th:block th:unless="${cartItems.isEmpty()}">
+            <div>
+                <div class="shopping-cart">
+                    <th:block th:each="item : ${cartItems}">
+                        <div class="shopping-cart-item" th:attr="goods-id=${item.getGoodsId()}">
+                            <div class="shopping-cart-item-image">
+                                <img th:src="${item.getGoodsCoverImg()}" alt="goods image">
+                            </div>
+                            <div class="shopping-cart-item-info">
+                                <div class="shopping-cart-item-title" th:text="${item.getGoodsName()}"></div>
+                                <div class="shopping-cart-item-price" th:text="${item.getSellingPriceInEuroFormat()}"></div>
+                                <div class="amount-container no-text-select">
+                                    <div class="choose-amount">
+                                        <div class="reduce-buy-amount amount-options"><i class="fa-solid fa-minus"></i></div>
+                                        <input class="input-buy-amount note" th:value="${item.getGoodsCount()}" step="1" type="number" min="1">
+                                        <div class="add-buy-amount amount-options"><i class="fa-solid fa-plus"></i></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="shopping-cart-item-right">
+                                <div>
+                                    <button class="button button-red btn-delete-item"><i class="fa-solid fa-trash"></i></button>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </th:block>
-            </div>
-
-            <div class="summary">
-                <div class="summary-title">Resumen de pedido:</div>
-                <div class="summary-body">
-                    <div class="d-flex justify-content-between">
-                        <div>subtotal artículos</div>
-                        <div class="total-price" th:text="${totalPrice}"></div>
-                    </div>
-                    <hr>
-                    <div class="d-flex justify-content-between">
-                        <div>Total:</div>
-                        <div class="total-price" th:text="${totalPrice}"></div>
-                    </div>
-
+                    </th:block>
                 </div>
-                <div class="">
-                    <button class="button button-xl button-purple btn-create-order">Realizar pedido</button>
+
+                <div class="summary">
+                    <div class="summary-title">Resumen de pedido:</div>
+                    <div class="summary-body">
+                        <div class="d-flex justify-content-between">
+                            <div>subtotal artículos</div>
+                            <div class="total-price" th:text="${totalPrice}"></div>
+                        </div>
+                        <hr>
+                        <div class="d-flex justify-content-between">
+                            <div>Total:</div>
+                            <div class="total-price" th:text="${totalPrice}"></div>
+                        </div>
+
+                    </div>
+                    <div class="">
+                        <button class="button button-xl button-purple btn-create-order">Realizar pedido</button>
+                    </div>
                 </div>
             </div>
-        </div>
+        </th:block>
+        <th:block th:if="${cartItems.isEmpty()}">
+            <div class="shopping-cart-empty-container">
+                <div class="shopping-cart-icon">
+                    <i class="fa-solid fa-cart-shopping"></i>
+                    <div class="x-mark">
+                        <i class="fa-regular fa-circle-xmark"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="shopping-cart-empty-message">
+                <span>Cesta vacía</span>
+            </div>
+        </th:block>
+
     </div>
 </main>
 
@@ -76,11 +97,32 @@
 </body>
 <script>
     $(document).ready(() => {
-
+        initListener();
     });
 
     function initListener() {
         bindAmountSelectorEvent();
+        bindCreateOrderEvent();
+        bindDeleteCartItemEvent()
+    }
+
+    function bindDeleteCartItemEvent() {
+        $(".btn-delete-item").click((e) => {
+            const btn = $(e.target);
+            const container = btn.closest(".shopping-cart-item");
+            const goodsId = container.attr("goods-id");
+            btn.addSpinner();
+            $.ajax({
+                url: "/shopping-cart/delete",
+                method: "POST",
+                data: {goodsId: goodsId},
+            }).then((res) => {
+                if (res.code === 200) {
+                    container.remove();
+                    reloadShoppingCart();
+                }
+            });
+        });
     }
 
     function bindCreateOrderEvent() {
@@ -89,8 +131,10 @@
             Swal.fire({
                 position: "top",
                 title: "Función en desarrollo",
-
-            });
+                icon: "warning"
+            }).then(() => {
+                $(e.target).removeSpinner();
+            })
         });
     }
 
@@ -117,10 +161,24 @@
             async: false,
             success: (res) => {
                 if (res.code === 200) {
+                    reloadShoppingCart();
+                }
+            }
+        });
+    }
+
+    function reloadShoppingCart() {
+        $.ajax({
+            url: "/shopping-cart/list",
+            method: "POST",
+            success: (res) => {
+                if (res.code === 200 && res.data.items.length > 0) {
                     renderPrice(res.data);
+                    hideLoadingScreen();
+                } else {
+                    window.location.reload();
                 }
             },
-            complete: () => hideLoadingScreen()
         });
     }
 
@@ -152,6 +210,7 @@
             const {totalPrice} = data;
             $(".total-price").text(parseNumberToEuro(totalPrice));
         } else {
+            console.log("refresh");
             window.location.reload();
         }
     }
