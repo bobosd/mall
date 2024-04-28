@@ -1,0 +1,12 @@
+.floor > div {
+    font-size: 72px;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    align-items: center;
+    flex-direction: column;
+}
+
+.floor span {
+    font-size: 36px;
+}

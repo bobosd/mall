@@ -135,6 +135,16 @@ public class MallUserController {
         return "redirect:/";
     }
 
+    @GetMapping("/profile")
+    public String profilePage() {
+        return "mall/user-profile";
+    }
+
+    @GetMapping("/order")
+    public String orderHistoryPage() {
+        return "mall/user-order";
+    }
+
     private void setCredentialsCookie(User user, HttpServletResponse response) {
         String accessToken = jwtService.generateAccessToken(user);
         String refreshToken = jwtService.generateAndStoreRefreshToken(user);
