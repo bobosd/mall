@@ -81,17 +81,3 @@ form > *:not(:first-child) {
 .hyperlink:hover {
     text-underline: #0078ff;
 }
-
-.button-sign-up {
-    display: flex;
-    justify-content: center;
-    padding: 7px 0;
-    background-color: var(--mall-color);
-    font-size: 16px;
-    font-weight: bold;
-    color: #FFFFFF;
-    border-radius: 7px;
-    cursor: pointer;
-    border: none;
-    width: 100%;
-}

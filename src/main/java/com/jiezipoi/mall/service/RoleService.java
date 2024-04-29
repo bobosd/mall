@@ -16,6 +16,6 @@ public class RoleService {
         if (userId == null) {
             throw new NullPointerException();
         }
-        roleDao.insertUserHasRole(role.getValue(), userId);
+        roleDao.insertUserHasRole(userId, role.getValue());
     }
 }

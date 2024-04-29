@@ -1,7 +1,5 @@
 package com.jiezipoi.mall.controller.mall;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jiezipoi.mall.config.JwtConfig;
 import com.jiezipoi.mall.dto.MallUserDTO;
 import com.jiezipoi.mall.entity.User;
@@ -19,7 +17,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Duration;
@@ -42,19 +39,17 @@ public class MallUserController {
     }
 
     @GetMapping("/activate-account/{token}")
-    public String userActivation(@PathVariable String token, HttpServletResponse response, ModelMap modelMap) {
+    public String userActivation(@PathVariable String token, HttpServletResponse response) {
         try {
+            if (token == null || token.isBlank()) {
+                throw new VerificationCodeNotFoundException();
+            }
             User user = userService.activateUser(token);
-            MallUserDTO mallUserDTO = new MallUserDTO(user);
             setCredentialsCookie(user, response);
-            ObjectMapper objectMapper = new ObjectMapper();
-            String userJSON = objectMapper.writeValueAsString(mallUserDTO);
-            modelMap.put("mallUser", userJSON);
             return "mall/user-activation-success";
         } catch (VerificationCodeNotFoundException e) {
+            System.out.println("verification failed");
             return "mall/fallback";
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
         }
     }
 
