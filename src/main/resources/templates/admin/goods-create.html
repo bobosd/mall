@@ -83,19 +83,17 @@
     function syncToServer() {
         const goods = collectFormData();
         $.ajax({
-            url: "/goods/temp/upload/sync",
+            url: "/admin/goods/temp/upload/sync",
             method: "POST",
             contentType: "application/json",
             dataType: "json",
             data: JSON.stringify(goods),
             success: (response) => {
-                console.log(response);
             },
             error: (err) => {
                 console.log(err.responseText);
             }
         });
-        console.log("synchronizing");
     }
 
     const syncRequest = debounce(() => {

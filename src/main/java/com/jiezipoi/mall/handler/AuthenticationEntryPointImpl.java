@@ -34,6 +34,7 @@ public class AuthenticationEntryPointImpl implements AuthenticationEntryPoint {
             response.setContentType("application/json");
             response.setCharacterEncoding("utf-8");
             response.getWriter().println(jsonString);
+            authException.printStackTrace();
         }
     }
 }
