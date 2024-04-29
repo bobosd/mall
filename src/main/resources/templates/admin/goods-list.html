@@ -111,6 +111,7 @@
 
         $("#slc-l1").select2({
             placeholder: "[[#{product.category.level1}]]",
+            width: "100%",
             minimumResultsForSearch: -1, //hide search box
             ajax: {
                 url: "/admin/product-category/listByLevelAndParent",
@@ -125,7 +126,7 @@
         });
 
         $("#slc-l2").select2({
-            language: "zh-CN",
+            width: "100%",
             minimumResultsForSearch: -1,//hide search box
             placeholder: "[[#{product.category.level2}]]",
             ajax: {
@@ -139,6 +140,7 @@
 
         $("#slc-l3").select2({
             placeholder: "[[#{product.category.level2}]]",
+            width: "100%",
             minimumResultsForSearch: -1,//hide search box
             ajax: {
                 url: "/admin/product-category/listByLevelAndParent",

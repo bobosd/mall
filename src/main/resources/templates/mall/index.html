@@ -67,7 +67,7 @@
                                                     <img th:src="${product.getGoodsCoverImg()}" alt="product image">
                                                 </div>
                                                 <div class="product-name" th:text="${product.getGoodsName()}"></div>
-                                                <div class="product-price" th:text="${product.getSellingPrice() + '￥'}"></div>
+                                                <div class="product-price" th:text="${product.getEuroFormatPrice()}"></div>
                                             </div>
                                         </a>
                                     </div>
@@ -98,7 +98,7 @@
                                             <img th:src="${product.getGoodsCoverImg()}" alt="product image">
                                         </div>
                                         <div class="product-name" th:text="${product.getGoodsName()}"></div>
-                                        <div class="product-price" th:text="${product.getSellingPrice() + '￥'}"></div>
+                                        <div class="product-price" th:text="${product.getEuroFormatPrice()}"></div>
                                     </div>
                                 </a>
                             </div>
@@ -133,7 +133,7 @@
                                                     <img th:src="${product.getGoodsCoverImg()}" alt="product image">
                                                 </div>
                                                 <div class="product-name" th:text="${product.getGoodsName()}"></div>
-                                                <div class="product-price" th:text="${product.getSellingPrice() + '￥'}"></div>
+                                                <div class="product-price" th:text="${product.getEuroFormatPrice()}"></div>
                                             </div>
                                         </a>
                                     </div>
@@ -149,7 +149,7 @@
         </div>
     </div>
 </main>
-<footer th:replace="~{/mall/footer::footer}"></footer>
+<footer th:replace="~{mall/footer::footer}"></footer>
 <script th:inline="javascript">
     const categories = getCategoriesMap();
     const swiper = new Swiper(".carousel", {

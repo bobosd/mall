@@ -8,8 +8,15 @@
     <script th:replace="~{common/libraries::swal}"></script>
     <script th:replace="~{common/libraries::swal-common-alert}"></script>
     <script th:replace="~{common/libraries::bootstrap-css}"></script>
-    <!-- bootstrap -->
     <script src="/js/generalUtils.js"></script>
+    <script>
+        $(document).ajaxError(function (event, xhr) {
+            console.log(xhr);
+            if (xhr.status === 401) {
+                window.location.href = getBaseUrl() + "/login";
+            }
+        });
+    </script>
     <link th:replace="~{common/libraries::fontawsome-css}"/>
     <link th:replace="~{common/libraries::bootstrap-css}">
     <th:block th:replace="${links} ?: ~{}"/>

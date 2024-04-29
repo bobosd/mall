@@ -53,6 +53,8 @@ public class SecurityConfig {
                                 "/favicon.ico",
                                 "/login",
                                 "/signup",
+                                "/goods/detail/**",
+                                "/search/**",
                                 "/user/login",
                                 "/user/signup",
                                 "/user/activate-account/**").permitAll()

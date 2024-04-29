@@ -50,9 +50,9 @@ public class MallUserController {
             ObjectMapper objectMapper = new ObjectMapper();
             String userJSON = objectMapper.writeValueAsString(mallUserDTO);
             modelMap.put("mallUser", userJSON);
-            return "/mall/user-activation-success";
+            return "mall/user-activation-success";
         } catch (VerificationCodeNotFoundException e) {
-            return "/mall/fallback";
+            return "mall/fallback";
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
