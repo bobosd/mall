@@ -40,49 +40,29 @@ section article:last-child {
     margin-bottom: 0;
 }
 
-.message-content {
-    padding: 8px 0;
-}
-
 .message-logo {
     width: 65px;
     height: 65px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
     border-radius: 20px;
-    background-color: #d7d7d7;
+    background-color: var(--mall-color);
+    color: #ffffff;
     margin-right: 20px;
+    font-size: 40px;
+    flex-shrink: 0;
 }
 
 .message-title {
-    height: 12px;
-    width: 100px;
-    border-radius: 6px;
-    background-color: #a9a9a9;
-}
-
-.message-title {
-    height: 16px;
-    width: 100px;
-    border-radius: 6px;
-    background-color: #a9a9a9;
+    font-size: 16px;
+    font-weight: 600;
 }
 
 .message-text {
-    margin-top: 10px;
-}
-
-.message-text div {
-    height: 12px;
-    background-color: #d7d7d7;
-    border-radius: 6px;
-    margin: 4px 0;
-}
-
-.large-text {
-    width: 235px;
-}
-
-.sort-text {
-    width: 70px;
+    font-size: 14px;
+    font-weight: 500;
 }
 
 form > *:not(:first-child) {

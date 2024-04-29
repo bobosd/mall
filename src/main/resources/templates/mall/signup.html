@@ -18,40 +18,46 @@
     <div class="login-body">
         <section>
             <article>
-                <div class="message-logo"></div>
+                <div class="message-logo">
+                    <i class="fa-solid fa-medal"></i>
+                </div>
                 <div class="message-content">
-                    <div class="message-title"></div>
+                    <div class="message-title">Calidad-precio</div>
                     <div class="message-text">
-                        <div class="large-text"></div>
-                        <div class="large-text"></div>
+                        <div>Tenemos precios son muy competitivos</div>
                     </div>
                 </div>
             </article>
             <article>
-                <div class="message-logo"></div>
+                <div class="message-logo">
+                    <i class="fa-solid fa-face-laugh-beam"></i>
+                </div>
                 <div class="message-content">
-                    <div class="message-title"></div>
+                    <div class="message-title">Servicio postventa</div>
                     <div class="message-text">
-                        <div class="large-text"></div>
-                        <div class="sort-text"></div>
+                        Con una politica de devolución muy flexibles
                     </div>
                 </div>
             </article>
             <article>
-                <div class="message-logo"></div>
+                <div class="message-logo">
+                    <i class="fa-solid fa-truck-fast"></i>
+                </div>
                 <div class="message-content">
-                    <div class="message-title"></div>
+                    <div class="message-title">Entrega imediata</div>
                     <div class="message-text">
-                        <div class="large-text"></div>
+                        Enviamos los pedidos en un plazo máximo de 24 horas
                     </div>
                 </div>
             </article>
             <article>
-                <div class="message-logo"></div>
+                <div class="message-logo">
+                    <i class="fa-solid fa-users-line"></i>
+                </div>
                 <div class="message-content">
-                    <div class="message-title"></div>
+                    <div class="message-title">Comunidad</div>
                     <div class="message-text">
-                        <div class="sort-text"></div>
+                        Comparte tus opiniones y experiencias
                     </div>
                 </div>
             </article>
@@ -98,10 +104,10 @@
     </div>
 <script>
     $(document).ready(() => {
-        addEventListener();
+        initListener();
     });
 
-    function addEventListener() {
+    function initListener() {
         //disable submit
         $("form").submit(function (e) {
             e.preventDefault();
@@ -145,7 +151,7 @@
     function checkPrivacyPolicy() {
         const checkbox = $("#check-privacy-policy");
         if (!checkbox.prop("checked")) {
-            checkbox.setInvalidWithFeedBack("To register, you need to consent our private policy");
+            checkbox.setInvalidWithFeedBack("Para registrarse, debe aceptar nuestra política de privacidad.");
             return false;
         }
         checkbox.setValid();
@@ -155,7 +161,7 @@
     function checkUserTerm() {
         const checkbox = $("#check-user-term");
         if (!checkbox.prop("checked")) {
-            checkbox.setInvalidWithFeedBack("To register, you need to agree the User Agreement");
+            checkbox.setInvalidWithFeedBack("Para registrarse, debe aceptar nuestros Términos y condiciónes");
             return false;
         }
         checkbox.setValid();
@@ -168,7 +174,7 @@
         const originalPassword = $("#input-password").val();
 
         if (originalPassword !== confirmedPassword || confirmedPassword.length === 0) {
-            input.setInvalidWithFeedBack("Passwords do not match");
+            input.setInvalidWithFeedBack("Las contraseñas no coinciden");
             return false;
         }
 
@@ -181,13 +187,13 @@
         const password = input.val();
 
         if (password.length < 8) {
-            input.setInvalidWithFeedBack("The password must be at least 8 characters");
+            input.setInvalidWithFeedBack("Debe contenr almenos 8 caracteres");
             return false;
         }
 
         const regEx = new RegExp("^(?=.*[A-Za-z])(?=.*\\d)(?=.*[~!@#$%^&*()_+=\\-\\[\\]{};:/.,<>?]).*$");
         if (!regEx.test(password)) {
-            input.setInvalidWithFeedBack("The password must contain numbers, letters and special characters");
+            input.setInvalidWithFeedBack("Debe contener almenos una letra, un número y un carácter especial");
             return false;
         }
 
@@ -201,7 +207,7 @@
 
         const regEx = new RegExp("^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4}$");
         if (!regEx.test(email)) {
-            input.setInvalidWithFeedBack("Invalid email format");
+            input.setInvalidWithFeedBack("formato de e-mail es inválido");
             return false;
         }
 
@@ -214,13 +220,13 @@
         const username = input.val();
 
         if (username.length < 3) {
-            input.setInvalidWithFeedBack("The name must have at least 3 characters and numbers");
+            input.setInvalidWithFeedBack("Debe tener al menos 3 caracteres o números.");
             return false;
         }
 
-        const regEx = new RegExp("[a-zA-Z\\d]+(\\s[a-zA-Z]+\\d+)*");
+        const regEx = new RegExp("^([a-zA-Z0-9]{3,})$");
         if (!regEx.test(username)) {
-            input.setInvalidWithFeedBack("The name can't have special characters");
+            input.setInvalidWithFeedBack("No puede tener caracteres especiales.");
             return false;
         }
 
