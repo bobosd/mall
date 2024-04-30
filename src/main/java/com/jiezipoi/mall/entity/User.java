@@ -129,7 +129,7 @@ public class User implements UserDetails, Serializable {
 
     @Override
     public boolean isAccountNonExpired() {
-        return userStatus.getCode() == UserStatus.ACTIVATED.getCode();
+        return userStatus.getCode() == UserStatus.ACTIVATED.getCode() || userStatus.getCode() == UserStatus.UNACTIVATED.getCode();
     }
 
     @Override
