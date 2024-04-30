@@ -29,3 +29,9 @@ Desplegado con AWS EC2: [https://jiezicloud.com/](https://jiezicloud.com/)
 * Desarrollar funcionalidades esenciales: crear pedido, gestión de dirección de usuario, generar factura, etc...
 * Responsive design para adaptar dispositivos móviles.
 * Valoración y comentarios de productos.
+
+# Información de Contacto
+Para cualquier consulta o sugerencia sobre este proyecto, no dudes en ponerte en contacto con el autor:
+
+Autor: Jiajie Li
+Correo Electrónico: jiezipoi@icloud.com
