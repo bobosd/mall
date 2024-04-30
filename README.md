@@ -20,7 +20,8 @@ Desplegado con AWS EC2: [https://jiezicloud.com/](https://jiezicloud.com/)
 * Backend:
     * Java 17, Spring boot 3.0
     * Spring security con JWT
-* DB: 
+* DB:
+    * Mybatis
     * MariaDB
 * Despliegue:
     * Nginx
