@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jiezipoi.mall.dao.VerificationCodeDao">
+    <resultMap id="BaseResultMap" type="com.jiezipoi.mall.entity.UserVerificationCode">
+        <id column="email" jdbcType="VARCHAR" property="email" />
+        <result column="verification_code" jdbcType="VARCHAR" property="verificationCode" />
+        <result column="action_type" typeHandler="com.jiezipoi.mall.handler.VerificationActionTypeHandler" property="ActionType" />
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+        <result column="expired_time" jdbcType="TIMESTAMP" property="expiredTime"/>
+        <result column="is_deleted" jdbcType="TINYINT" property="isDeleted" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        email, verification_code, action_type, create_time, expired_time, is_deleted
+    </sql>
+
+    <insert id="insertSelective" parameterType="com.jiezipoi.mall.entity.UserVerificationCode">
+        INSERT INTO user_verification_code
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="email != null">
+                email,
+            </if>
+            <if test="verificationCode != null">
+                verification_code,
+            </if>
+            <if test="actionType != null">
+                action_type,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="expiredTime != null">
+                expired_time,
+            </if>
+            <if test="isDeleted != null">
+                is_deleted,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="email != null">
+                #{email,jdbcType=VARCHAR},
+            </if>
+            <if test="verificationCode != null">
+                #{verificationCode,jdbcType=VARCHAR},
+            </if>
+            <if test="actionType != null">
+                #{actionType,typeHandler=com.jiezipoi.mall.handler.VerificationActionTypeHandler},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="expiredTime != null">
+                #{expiredTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="isDeleted != null">
+                #{isDeleted,jdbcType=TINYINT},
+            </if>
+        </trim>
+    </insert>
+
+    <select id="selectVerificationCodeByEmail" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM user_verification_code
+        WHERE email = #{email,jdbcType=VARCHAR} AND expired_time >= NOW();
+    </select>
+
+    <select id="selectLastVerificationCodeByEmailAndType" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM user_verification_code
+        WHERE email = #{email,jdbcType=VARCHAR}
+        AND expired_time >= NOW()
+        AND action_type = #{actionType, typeHandler=com.jiezipoi.mall.handler.VerificationActionTypeHandler}
+        ORDER BY expired_time DESC
+        LIMIT 1;
+    </select>
+
+    <update id="deleteVerificationCodeByCode">
+        UPDATE user_verification_code
+        SET is_deleted = 1
+        WHERE verification_code = #{code,jdbcType=VARCHAR}
+    </update>
+
+    <select id="selectVerificationCodeByCode" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM user_verification_code
+        WHERE verification_code = #{code,jdbcType=VARCHAR}
+        AND is_deleted = 0;
+    </select>
+</mapper>

@@ -77,6 +77,11 @@ a {
     background: var(--mall-color);
 }
 
+.button-purple-light {
+    color: #000000;
+    background-color: var(--mall-light-color);
+}
+
 .button-red {
     color: white;
     background-color: #e53b1b;

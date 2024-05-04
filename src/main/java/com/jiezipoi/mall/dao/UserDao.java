@@ -15,9 +15,9 @@ public interface UserDao {
 
     int updateStatusByPrimaryKey(@Param("userId") long userId, @Param("status") UserStatus status);
 
-    int insertVerificationCode(@Param("email") String email, @Param("verificationCode") String verificationCode);
-
     String selectEmailByVerificationCode(@Param("verificationCode") String verificationCode);
 
     int deleteVerificationCodeByEmail(@Param("email") String email);
+
+    int updateUserPasswordByEmail(@Param("email") String email, @Param("password") String password);
 }

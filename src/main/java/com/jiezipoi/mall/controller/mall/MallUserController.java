@@ -4,18 +4,23 @@ import com.jiezipoi.mall.config.JwtConfig;
 import com.jiezipoi.mall.dto.MallUserDTO;
 import com.jiezipoi.mall.entity.User;
 import com.jiezipoi.mall.enums.UserStatus;
+import com.jiezipoi.mall.exception.NotFoundException;
+import com.jiezipoi.mall.exception.UnactivatedUserException;
 import com.jiezipoi.mall.exception.UserNotFoundException;
 import com.jiezipoi.mall.exception.VerificationCodeNotFoundException;
 import com.jiezipoi.mall.service.JwtService;
 import com.jiezipoi.mall.service.UserService;
+import com.jiezipoi.mall.service.VerificationCodeService;
 import com.jiezipoi.mall.utils.CommonResponse;
 import com.jiezipoi.mall.utils.Response;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.CredentialsExpiredException;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,11 +36,13 @@ public class MallUserController {
     private final UserService userService;
     private final JwtConfig jwtConfig;
     private final JwtService jwtService;
+    private final VerificationCodeService verificationCodeService;
 
-    public MallUserController(UserService userService, JwtConfig jwtConfig, JwtService jwtService) {
+    public MallUserController(UserService userService, JwtConfig jwtConfig, JwtService jwtService, VerificationCodeService verificationCodeService) {
         this.userService = userService;
         this.jwtConfig = jwtConfig;
         this.jwtService = jwtService;
+        this.verificationCodeService = verificationCodeService;
     }
 
     @GetMapping("/activate-account/{token}")
@@ -58,37 +65,15 @@ public class MallUserController {
     public Response<?> userSignUp(@RequestParam("nickname") String nickname,
                                   @RequestParam("email") String email,
                                   @RequestParam("password") String password) {
-        Response<String> response = null;
-        Pattern nicknamePattern = Pattern.compile("[a-zA-Z\\d]+(\\s[a-zA-Z]+\\d+)*");
-        Matcher nicknameMatcher = nicknamePattern.matcher(nickname);
-        if (nickname.length() < 3 || !nicknameMatcher.matches()) {
-            response = new Response<>(CommonResponse.INVALID_DATA);
-            response.setMessage("invalid nickname");
+        if (!isValidNickName(nickname) || !isValidEmail(email) || !isValidPassword(password)) {
+            return new Response<>(CommonResponse.INVALID_DATA);
         }
-
-        Pattern emailPattern = Pattern.compile("^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4}$");
-        Matcher emailMatcher = emailPattern.matcher(email);
-        if (!emailMatcher.matches()) {
-            response = new Response<>(CommonResponse.INVALID_DATA);
-            response.setMessage("invalid email");
-        }
-
-        Pattern passwordPattern = Pattern.compile("^(?=.*[A-Za-z])(?=.*\\d)(?=.*[~!@#$%^&*()_+=\\-\\[\\]{};:/.,<>?]).*$");
-        Matcher passwordMatcher = passwordPattern.matcher(password);
-        if (password.length() < 8 || !passwordMatcher.matches()) {
-            response = new Response<>(CommonResponse.INVALID_DATA);
-            response.setMessage("invalid password");
-        }
-
-        if (response != null) {
-            return response;
-        }
-
-        if (userService.isExistingEmail(email)) {
+        try {
+            userService.createUser(nickname, email, password);
+        } catch (DuplicateKeyException e) {
             return new Response<>(CommonResponse.DATA_ALREADY_EXISTS);
         }
 
-        userService.createUser(nickname, email, password);
         return new Response<>(CommonResponse.SUCCESS);
     }
 
@@ -97,6 +82,9 @@ public class MallUserController {
     public Response<?> login(@RequestParam("email") String email,
                              @RequestParam("password") String password,
                              HttpServletResponse httpServletResponse) {
+        if (email == null || password == null) {
+            return new Response<>(CommonResponse.INVALID_DATA);
+        }
         User user;
         try {
             user = userService.getUserByEmailAndPassword(email, password);
@@ -140,6 +128,53 @@ public class MallUserController {
         return "mall/user-order";
     }
 
+    @GetMapping("/forgot-password")
+    public String forgotPasswordPage() {
+        return "mall/forgot-password";
+    }
+
+    @PostMapping("/forgot-password")
+    @ResponseBody
+    public Response<?> forgotPassword(@RequestParam("email") String email) {
+        if (!isValidEmail(email)) {
+            return new Response<>(CommonResponse.INVALID_DATA);
+        }
+        try {
+            userService.sendResetPasswordEmail(email);
+            return new Response<>(CommonResponse.SUCCESS);
+        } catch (NotFoundException e) {
+            return new Response<>(CommonResponse.DATA_NOT_EXIST);
+        } catch (UnactivatedUserException e) {
+            return new Response<>(CommonResponse.FORBIDDEN);
+        }
+    }
+
+    @GetMapping("/reset-password/{token}")
+    public String resetPasswordPage(@PathVariable String token) {
+        if (verificationCodeService.isValidCode(token)) {
+            return "mall/reset-password";
+        } else {
+            return "mall/fallback";
+        }
+
+    }
+
+    @PostMapping("/reset-password")
+    @ResponseBody
+    public Response<?> resetPassword(@RequestParam("token") String token, @RequestParam("password") String password) {
+        if (token == null || token.isBlank() || !isValidPassword(password)) {
+            return new Response<>(CommonResponse.INVALID_DATA);
+        }
+        try {
+            userService.resetPassword(token, password);
+            return new Response<>(CommonResponse.SUCCESS);
+        } catch (NotFoundException e) {
+            return new Response<>(CommonResponse.DATA_NOT_EXIST);
+        } catch (CredentialsExpiredException e) {
+            return new Response<>(CommonResponse.INVALID_DATA);
+        }
+    }
+
     private void setCredentialsCookie(User user, HttpServletResponse response) {
         String accessToken = jwtService.generateAccessToken(user);
         String refreshToken = jwtService.generateAndStoreRefreshToken(user);
@@ -147,5 +182,32 @@ public class MallUserController {
         ResponseCookie refreshCookie = jwtService.createJwtCookie(refreshToken, jwtConfig.getRefreshCookieName(), jwtConfig.getRefreshCookieAge());
         response.addHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
         response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
+    }
+
+    private boolean isValidNickName(String nickname) {
+        if (nickname == null) {
+            return false;
+        }
+        Pattern nicknamePattern = Pattern.compile("^([a-zA-Z0-9]{3,})$");
+        Matcher nicknameMatcher = nicknamePattern.matcher(nickname);
+        return nickname.length() >= 3 && nicknameMatcher.matches();
+    }
+
+    private boolean isValidEmail(String email) {
+        if (email == null) {
+            return false;
+        }
+        Pattern emailPattern = Pattern.compile("^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4}$");
+        Matcher emailMatcher = emailPattern.matcher(email);
+        return emailMatcher.matches();
+    }
+
+    private boolean isValidPassword(String password) {
+        if (password == null) {
+            return false;
+        }
+        Pattern passwordPattern = Pattern.compile("^(?=.*[A-Za-z])(?=.*\\d)(?=.*[~!@#$%^&*()_+=\\-\\[\\]{};:/.,<>?]).*$");
+        Matcher passwordMatcher = passwordPattern.matcher(password);
+        return password.length() >= 8 && passwordMatcher.matches();
     }
 }

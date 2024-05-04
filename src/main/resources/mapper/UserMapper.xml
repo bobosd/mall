@@ -111,11 +111,6 @@
         WHERE user_id = #{userId,jdbcType=BIGINT};
     </update>
 
-    <insert id="insertVerificationCode">
-        INSERT INTO user_verification_code
-        VALUES (#{email,jdbcType=VARCHAR}, #{verificationCode,jdbcType=VARCHAR}, NULL);
-    </insert>
-
     <select id="selectEmailByVerificationCode" resultType="java.lang.String">
         SELECT email
         FROM user_verification_code
@@ -126,4 +121,10 @@
         DELETE FROM user_verification_code
         WHERE email = #{email,jdbcType=VARCHAR}
     </delete>
+
+    <update id="updateUserPasswordByEmail">
+        UPDATE user
+        SET password = #{password,jdbcType=VARCHAR}
+        WHERE email = #{email,jdbcType=VARCHAR}
+    </update>
 </mapper>

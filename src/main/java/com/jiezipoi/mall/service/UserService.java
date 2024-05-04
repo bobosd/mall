@@ -1,16 +1,17 @@
 package com.jiezipoi.mall.service;
 
-import com.amazonaws.services.simpleemail.AmazonSimpleEmailService;
-import com.amazonaws.services.simpleemail.model.*;
+import com.jiezipoi.mall.component.EmailComponent;
 import com.jiezipoi.mall.dao.UserDao;
 import com.jiezipoi.mall.entity.User;
+import com.jiezipoi.mall.entity.UserVerificationCode;
 import com.jiezipoi.mall.enums.Role;
 import com.jiezipoi.mall.enums.UserStatus;
-import com.jiezipoi.mall.exception.UserNotFoundException;
-import com.jiezipoi.mall.exception.VerificationCodeNotFoundException;
+import com.jiezipoi.mall.exception.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.CredentialsExpiredException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -18,72 +19,64 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.thymeleaf.TemplateEngine;
-import org.thymeleaf.context.Context;
 
-import java.util.UUID;
+import java.time.LocalDateTime;
+import java.util.HashMap;
 
 @Service
 @Lazy
 public class UserService implements UserDetailsService {
-    private final AmazonSimpleEmailService emailService;
     private final UserDao mallUserDao;
-    private final TemplateEngine templateEngine;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
     private final RoleService roleService;
+    private final EmailComponent emailComponent;
+    private final VerificationCodeService verificationCodeService;
 
     @Value("${mall.domain}")
     private String domain;
 
-    public UserService(AmazonSimpleEmailService emailService,
-                       UserDao mallUserDao,
-                       TemplateEngine templateEngine,
+    public UserService(UserDao mallUserDao,
                        PasswordEncoder passwordEncoder,
-                       @Lazy AuthenticationManager authenticationManager, JwtService jwtService, RoleService roleService) {
-        this.emailService = emailService;
+                       @Lazy AuthenticationManager authenticationManager,
+                       JwtService jwtService,
+                       RoleService roleService,
+                       EmailComponent emailComponent,
+                       VerificationCodeService verificationCodeService) {
         this.mallUserDao = mallUserDao;
-        this.templateEngine = templateEngine;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
         this.jwtService = jwtService;
         this.roleService = roleService;
+        this.emailComponent = emailComponent;
+        this.verificationCodeService = verificationCodeService;
     }
 
     @Transactional
     public void createUser(String nickname, String email, String password) {
-        User unactivatedUser = createUnactivatedUser(nickname, email, password);
-        String verificationCode = generateAndStoreVerificationCode(unactivatedUser);
+        if (isExistingEmail(email)) {
+            throw new DuplicateKeyException("duplicated email '" + email + "'");
+        }
+        createUnactivatedUser(nickname, email, password);
+        String verificationCode = verificationCodeService.generateAndSaveUserActivationCode(email);
         String verificationUrl = generateUserVerificationUrl(verificationCode);
         sendVerificationEmail(email, verificationUrl, nickname);
     }
 
-    private String generateAndStoreVerificationCode(User user) {
-        String uuid = UUID.randomUUID().toString().replaceAll("-", "");
-        mallUserDao.insertVerificationCode(user.getEmail(), uuid);
-        return uuid;
-    }
-
     private void sendVerificationEmail(String email, String verificationUrl, String nickname) {
-        Destination destination = new Destination().withToAddresses(email);
-        Body htmlContent = new Body().withHtml(generateSignUpEmailContent(nickname, verificationUrl));
-        Message message = new Message()
-                .withSubject(new Content("[JieziCloud] Email verification"))
-                .withBody(htmlContent);
-
-        SendEmailRequest emailRequest = new SendEmailRequest()
-                .withSource("no-reply@jiezicloud.com")
-                .withDestination(destination)
-                .withMessage(message);
-        emailService.sendEmail(emailRequest);
+        HashMap<String, Object> variables = new HashMap<>();
+        variables.put("nickName", nickname);
+        variables.put("verificationUrl", verificationUrl);
+        String emailBody = emailComponent.processEmailTemplate("email/sign-up-activation.html", variables);
+        emailComponent.sendEmail(email, "verificación de correo", emailBody);
     }
 
     private String generateUserVerificationUrl(String verificationCode) {
         return this.domain + "/user/activate-account/" + verificationCode;
     }
 
-    private User createUnactivatedUser(String nickname, String email, String password) {
+    private void createUnactivatedUser(String nickname, String email, String password) {
         String BCryptPassword = passwordEncoder.encode(password);
         User user = new User();
         user.setNickName(nickname);
@@ -91,14 +84,6 @@ public class UserService implements UserDetailsService {
         user.setPassword(BCryptPassword);
         user.setUserStatus(UserStatus.UNACTIVATED);
         mallUserDao.insertSelective(user);
-        return user;
-    }
-
-    private Content generateSignUpEmailContent(String nickname, String verificationUrl) {
-        Context thymeleafContext = new Context();
-        thymeleafContext.setVariable("nickName", nickname);
-        thymeleafContext.setVariable("verificationUrl", verificationUrl);
-        return new Content(templateEngine.process("email/sign-up-activation.html", thymeleafContext));
     }
 
     public long getUserIdByEmail(String email) throws UserNotFoundException {
@@ -169,5 +154,45 @@ public class UserService implements UserDetailsService {
 
     public void updateUserStatus(Long userId, UserStatus status) {
         mallUserDao.updateStatusByPrimaryKey(userId, status);
+    }
+
+    @Transactional
+    public void sendResetPasswordEmail(String email) throws UnactivatedUserException, NotFoundException {
+        User user = mallUserDao.selectByEmail(email);
+        if (user == null) {
+            throw new NotFoundException();
+        }
+        if (user.getUserStatus() == UserStatus.UNACTIVATED) {
+            throw new UnactivatedUserException();
+        }
+        String verificationToken = verificationCodeService.generateAndSaveResetPasswordCode(email);
+        String url = generateResetPasswordUrl(verificationToken);
+        sendResetPasswordEmail(email, url, user.getNickName());
+    }
+
+    private void sendResetPasswordEmail(String email, String resetUrl, String nickName) {
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("resetUrl", resetUrl);
+        map.put("nickname", nickName);
+        String bodyStr = emailComponent.processEmailTemplate("email/reset-password.html", map);
+        emailComponent.sendEmail(email, "restablecer tu contraseña", bodyStr);
+    }
+
+    private String generateResetPasswordUrl(String verificationCode) {
+        return this.domain + "/user/reset-password/" + verificationCode;
+    }
+
+    public void resetPassword(String token, String password) throws NotFoundException {
+        UserVerificationCode verificationCode = verificationCodeService.getVerificationCode(token);
+        if (verificationCode == null) {
+            throw new NotFoundException();
+        }
+        if (verificationCode.isDeleted() || verificationCode.getExpiredTime().isBefore(LocalDateTime.now())) {
+            throw new CredentialsExpiredException("");
+        }
+        String email = verificationCode.getEmail();
+        password = passwordEncoder.encode(password);
+        mallUserDao.updateUserPasswordByEmail(email, password);
+        verificationCodeService.setCodeDeleted(token);
     }
 }

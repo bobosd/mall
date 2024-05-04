@@ -13,8 +13,8 @@
     <div class="background">
         <div class="login-panel">
             <div class="login-panel-header">
-                <div class="sign-up-container">
-                    <div class="button-sign-up">Crear cuenta</div>
+                <div class="d-flex flex-row-reverse">
+                    <button class="button button-purple-light button-sign-up">Crear cuenta</button>
                 </div>
                 <div class="logo">
                     <img src="/assets/img/poi.png" alt="mall icon">
@@ -25,7 +25,7 @@
                     <input class="form-control input-email" placeholder="E-mail" id="input-email">
                     <input class="form-control input-password" placeholder="Contraseña" type="password"
                            autocomplete="password" id="input-password">
-                    <div class="forgot-password"><a>¿Has olvidado la contraseña?</a></div>
+                    <div class="forgot-password">¿Has olvidado la contraseña?</div>
                     <button class="button button-xl button-purple button-login" type="submit">Login</button>
                 </form>
             </div>
@@ -42,6 +42,13 @@
         bindLoginEvent();
         bindSignUpEvent();
         bindGoHomeEvent();
+        bindForgotPasswordEvent();
+    }
+
+    function bindForgotPasswordEvent() {
+        $(".forgot-password").click(() => {
+            window.location.replace('/user/forgot-password');
+        })
     }
 
     function bindGoHomeEvent() {

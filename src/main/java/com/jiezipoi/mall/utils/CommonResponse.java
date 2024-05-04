@@ -16,6 +16,7 @@ public enum CommonResponse {
     DATA_NOT_EXIST("data.not.exists", 404),
     DATA_ALREADY_EXISTS("data.already.exists", 409),
     DATA_INTEGRITY_VIOLATION("data.integrity.violation", 409),
+    TO_MANY_REQUEST("data.too.many.request", 429),
     INTERNAL_SERVER_ERROR("error.server", 500),
     ;
 

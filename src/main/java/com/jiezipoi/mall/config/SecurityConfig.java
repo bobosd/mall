@@ -57,6 +57,8 @@ public class SecurityConfig {
                                 "/search/**",
                                 "/user/login",
                                 "/user/signup",
+                                "/user/reset-password/**",
+                                "/user/forgot-password",
                                 "/user/activate-account/**").permitAll()
                         .requestMatchers(resourcePath).permitAll()
                         .anyRequest().authenticated());
