@@ -11,4 +11,6 @@ public interface JwtDao {
     int deleteRefreshToken(@Param("uuid") String uuid);
 
     List<UserRefreshToken> selectRefreshTokenByEmail(@Param("email") String email);
+
+    int deleteAllRefreshTokenOfUser(@Param("email") String email);
 }

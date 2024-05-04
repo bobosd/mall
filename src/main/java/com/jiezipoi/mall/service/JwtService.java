@@ -84,6 +84,10 @@ public class JwtService {
                 .build();
     }
 
+    public void invalidateAllRefreshTokenOfUser(String email) {
+        jwtDao.deleteAllRefreshTokenOfUser(email);
+    }
+
     private String generateUUID() {
         return UUID.randomUUID().toString().replaceAll("-", "");
     }

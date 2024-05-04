@@ -182,6 +182,7 @@ public class UserService implements UserDetailsService {
         return this.domain + "/user/reset-password/" + verificationCode;
     }
 
+    @Transactional
     public void resetPassword(String token, String password) throws NotFoundException {
         UserVerificationCode verificationCode = verificationCodeService.getVerificationCode(token);
         if (verificationCode == null) {
@@ -191,6 +192,7 @@ public class UserService implements UserDetailsService {
             throw new CredentialsExpiredException("");
         }
         String email = verificationCode.getEmail();
+        jwtService.invalidateAllRefreshTokenOfUser(email);
         password = passwordEncoder.encode(password);
         mallUserDao.updateUserPasswordByEmail(email, password);
         verificationCodeService.setCodeDeleted(token);
