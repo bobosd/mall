@@ -55,6 +55,7 @@ public class SecurityConfig {
                                 "/signup",
                                 "/goods/detail/**",
                                 "/search/**",
+                                "/category/**",
                                 "/user/login",
                                 "/user/signup",
                                 "/user/reset-password/**",
