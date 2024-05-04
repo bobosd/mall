@@ -29,7 +29,7 @@
     </select>
 
     <delete id="deleteAllRefreshTokenOfUser">
-        DELETE FROM user_verification_code
-        WHERE email = #{email,jdbcType=VARCHAR}
+        DELETE FROM user_refresh_token
+        WHERE mall_user_email = #{email,jdbcType=VARCHAR}
     </delete>
 </mapper>
