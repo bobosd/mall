@@ -92,6 +92,7 @@ public class MallGoodsController {
         modelMap.put("categories", categorySet);
         modelMap.put("priceFrom", priceFrom == null ? minPrice.get().intValue() : priceFrom);
         modelMap.put("priceTo", priceTo == null ? maxPrice.get().intValue() : priceTo);
+        modelMap.put("noResult", goodsList.isEmpty());
     }
 
     private boolean doGoodsSearchFilter(MallGoodsDTO goods,
