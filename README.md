@@ -32,7 +32,7 @@ Desplegado con AWS EC2: [https://jiezicloud.com/](https://jiezicloud.com/)
 * Valoración y comentarios de productos.
 
 # Información de Contacto
-Para cualquier consulta o sugerencia sobre este proyecto, no dudes en ponerte en contacto con el autor:
+Para cualquier consulta o sugerencia sobre este proyecto, no dudes en ponerte en contacto conmigo:
 
 Autor: Jiajie Li\
 Correo Electrónico: jiezipoi@icloud.com
