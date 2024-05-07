@@ -1,7 +1,7 @@
 # Projecto E-commerce
 Este es un proyecto de comercio electrónico que consta de componentes frontend y backend. 
 El frontend utiliza el motor de plantillas Thymeleaf con HTML, CSS y JavaScript; mientras que el backend está desarrollado utilizando el framework Spring Boot. 
-El proyecto es desarrollado de forma independiente por un único individuo y actualmente se encuentra en desarrollo.
+El proyecto se encuentra en desarrollo y puede que falte funcionalidades.
 
 # Demo
 Desplegado con AWS EC2: [https://jiezicloud.com/](https://jiezicloud.com/)
@@ -32,7 +32,7 @@ Desplegado con AWS EC2: [https://jiezicloud.com/](https://jiezicloud.com/)
 * Valoración y comentarios de productos.
 
 # Información de Contacto
-Para cualquier consulta o sugerencia sobre este proyecto, no dudes en ponerte en contacto con el autor:
+Para cualquier consulta o sugerencia sobre este proyecto, no dudes en ponerte en contacto conmigo:
 
 Autor: Jiajie Li\
 Correo Electrónico: jiezipoi@icloud.com
