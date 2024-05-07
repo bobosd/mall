@@ -262,21 +262,21 @@ public class GoodsService {
 
     public List<MallGoodsDTO> getGoodsListByTag(String keyword) {
         String[] keywordArray = keyword.split(" ");
-        return goodsDao.selectGoodsByTagContaining(keywordArray);
+        return goodsDao.findByTagContaining(keywordArray);
     }
 
     public List<MallGoodsDTO> getGoodsListByCategory(Long categoryId) {
         if (categoryId == null) {
             throw new NullPointerException();
         }
-        return goodsDao.selectGoodsByCategory(categoryId);
+        return goodsDao.findByCategory(categoryId);
     }
 
     public List<Goods> getGoodsListById(long... ids) {
-        return goodsDao.selectGoodsByIds(ids);
+        return goodsDao.findGoodsByIds(ids);
     }
 
     public List<Goods> getGoodsListByGoodsName(String keyword) {
-        return goodsDao.selectGoodsByNameContaining(keyword);
+        return goodsDao.findByNameContaining(keyword);
     }
 }

@@ -27,8 +27,8 @@ public interface GoodsDao {
      * @param level level of this category
      * @return List of goods
      */
-    List<Goods> listGoodsByCategory(@Param("start") int start, @Param("limit") int limit,
-                                    @Param("path") String path, @Param("level") int level);
+    List<Goods> listByCategory(@Param("start") int start, @Param("limit") int limit,
+                               @Param("path") String path, @Param("level") int level);
 
     int getGoodsCount();
 
@@ -38,13 +38,13 @@ public interface GoodsDao {
 
     Goods selectGoodsWithTagByGoodsId(@Param("goodsId") long goodsId);
 
-    List<Goods> selectGoodsByIds(@Param("ids") long[] goodsId);
+    List<Goods> findGoodsByIds(@Param("ids") long[] goodsId);
 
     int updateByPrimaryKeySelective(Goods goods);
 
-    List<MallGoodsDTO> selectGoodsByTagContaining(@Param("keywordArr") String[] keywordArr);
+    List<MallGoodsDTO> findByTagContaining(@Param("keywordArr") String[] keywordArr);
 
-    List<MallGoodsDTO> selectGoodsByCategory(@Param("categoryId") Long categoryId);
+    List<MallGoodsDTO> findByCategory(@Param("categoryId") Long categoryId);
 
-    List<Goods> selectGoodsByNameContaining(@Param("goodsName") String goodsName);
+    List<Goods> findByNameContaining(@Param("goodsName") String goodsName);
 }

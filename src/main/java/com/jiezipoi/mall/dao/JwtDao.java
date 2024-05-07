@@ -8,9 +8,9 @@ import java.util.List;
 public interface JwtDao {
     int insertRefreshToken(UserRefreshToken userRefreshToken);
 
-    int deleteRefreshToken(@Param("uuid") String uuid);
+    int deleteByUUID(@Param("uuid") String uuid);
 
-    List<UserRefreshToken> selectRefreshTokenByEmail(@Param("email") String email);
+    List<UserRefreshToken> findByEmail(@Param("email") String email);
 
-    int deleteAllRefreshTokenOfUser(@Param("email") String email);
+    int deleteAllByEmail(@Param("email") String email);
 }

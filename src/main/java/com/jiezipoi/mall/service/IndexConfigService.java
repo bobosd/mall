@@ -8,7 +8,6 @@ import com.jiezipoi.mall.exception.NotFoundException;
 import com.jiezipoi.mall.utils.CommonResponse;
 import com.jiezipoi.mall.utils.Response;
 import com.jiezipoi.mall.utils.dataTable.DataTableResult;
-import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -31,7 +30,7 @@ public class IndexConfigService {
             return new Response<>(CommonResponse.INVALID_DATA);
         }
 
-        List<IndexConfigDTO> indexConfigs = indexConfigDao.findIndexConfigList(start, limit, configType);
+        List<IndexConfigDTO> indexConfigs = indexConfigDao.listIndexConfig(start, limit, configType);
         int count = indexConfigDao.getTotalIndexConfigs(configType);
         DataTableResult dataTableResult = new DataTableResult(indexConfigs, count);
         Response<DataTableResult> response = new Response<>(CommonResponse.SUCCESS);
@@ -60,7 +59,7 @@ public class IndexConfigService {
     }
 
     public List<MallGoodsDTO> getConfigGoodsForIndex(int configType) {
-        List<IndexConfig> indexConfigs = indexConfigDao.findIndexConfigByType(configType);
+        List<IndexConfig> indexConfigs = indexConfigDao.findByType(configType);
         if (indexConfigs.isEmpty()) {
             return new ArrayList<>();
         }

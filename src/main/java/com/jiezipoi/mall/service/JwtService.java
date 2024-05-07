@@ -67,11 +67,11 @@ public class JwtService {
     }
 
     public void invalidateRefreshToken(String email, String refreshToken) {
-        List<UserRefreshToken> userRefreshTokenList = jwtDao.selectRefreshTokenByEmail(email);
+        List<UserRefreshToken> userRefreshTokenList = jwtDao.findByEmail(email);
         Optional<UserRefreshToken> optionalUserRefreshToken = findMatchingToken(userRefreshTokenList, refreshToken);
         if (optionalUserRefreshToken.isPresent()) {
             UserRefreshToken userRefreshToken = optionalUserRefreshToken.get();
-            jwtDao.deleteRefreshToken(userRefreshToken.getUuid());
+            jwtDao.deleteByUUID(userRefreshToken.getUuid());
         }
     }
 
@@ -85,7 +85,7 @@ public class JwtService {
     }
 
     public void invalidateAllRefreshTokenOfUser(String email) {
-        jwtDao.deleteAllRefreshTokenOfUser(email);
+        jwtDao.deleteAllByEmail(email);
     }
 
     private String generateUUID() {
@@ -135,7 +135,7 @@ public class JwtService {
     }
 
     public boolean isRegisteredRefreshToken(String email, String refreshToken) {
-        List<UserRefreshToken> registeredTokenList = jwtDao.selectRefreshTokenByEmail(email);
+        List<UserRefreshToken> registeredTokenList = jwtDao.findByEmail(email);
         Optional<UserRefreshToken> optional = findMatchingToken(registeredTokenList, refreshToken);
         return optional.isPresent();
     }

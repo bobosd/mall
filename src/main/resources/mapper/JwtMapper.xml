@@ -16,19 +16,19 @@
                 #{createTime,jdbcType=TIMESTAMP}, #{expireTime,jdbcType=TIMESTAMP});
     </insert>
 
-    <delete id="deleteRefreshToken">
+    <delete id="deleteByUUID">
         DELETE
         FROM user_refresh_token
         WHERE uuid = #{uuid,jdbcType=VARCHAR};
     </delete>
 
-    <select id="selectRefreshTokenByEmail" resultMap="RefreshTokenResultMap">
+    <select id="findByEmail" resultMap="RefreshTokenResultMap">
         SELECT *
         FROM user_refresh_token
         WHERE mall_user_email = #{email,jdbcType=VARCHAR};
     </select>
 
-    <delete id="deleteAllRefreshTokenOfUser">
+    <delete id="deleteAllByEmail">
         DELETE FROM user_refresh_token
         WHERE mall_user_email = #{email,jdbcType=VARCHAR}
     </delete>

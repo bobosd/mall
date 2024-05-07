@@ -96,7 +96,7 @@
         AND shopping_cart_item.goods_id = #{item.goodsId,jdbcType=BIGINT}
     </update>
 
-    <select id="selectByUserId" resultMap="ShoppingCartItemDTO">
+    <select id="findByUserId" resultMap="ShoppingCartItemDTO">
         SELECT shopping_cart_item.goods_id, goods_count, goods_name, goods_cover_img, selling_price
         FROM shopping_cart_item
         JOIN goods_info ON goods_info.goods_id = shopping_cart_item.goods_id

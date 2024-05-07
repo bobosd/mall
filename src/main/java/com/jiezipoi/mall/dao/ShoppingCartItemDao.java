@@ -15,7 +15,7 @@ public interface ShoppingCartItemDao {
 
     int updateByUserIdAndGoodsIdSelective(@Param("item") ShoppingCartItem item);
 
-    List<ShoppingCartItemDTO> selectByUserId(@Param("userId") Long mallUserId);
+    List<ShoppingCartItemDTO> findByUserId(@Param("userId") Long mallUserId);
 
     int deleteByGoodsIdAndUserId(@Param("userId") Long userId, @Param("goodsId") Long goodsId);
 }

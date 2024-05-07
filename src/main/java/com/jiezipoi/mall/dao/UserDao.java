@@ -17,7 +17,7 @@ public interface UserDao {
 
     String selectEmailByVerificationCode(@Param("verificationCode") String verificationCode);
 
-    int deleteVerificationCodeByEmail(@Param("email") String email);
+    int deleteByEmail(@Param("email") String email);
 
-    int updateUserPasswordByEmail(@Param("email") String email, @Param("password") String password);
+    int updateByEmail(@Param("email") String email, @Param("password") String password);
 }

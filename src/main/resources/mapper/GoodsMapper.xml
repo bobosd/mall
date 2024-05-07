@@ -191,7 +191,7 @@
         FROM goods_info;
     </select>
 
-    <select id="listGoodsByCategory" resultMap="BaseResultMap">
+    <select id="listByCategory" resultMap="BaseResultMap">
         SELECT <include refid="base_column_list"/>
         FROM goods_info
         JOIN goods_category gc on gc.goods_category_id = goods_info.goods_category_id
@@ -274,7 +274,7 @@
         WHERE goods_id = #{goodsId,jdbcType=BIGINT}
     </update>
 
-    <select id="selectGoodsByIds" resultMap="BaseResultMap">
+    <select id="findGoodsByIds" resultMap="BaseResultMap">
         SELECT <include refid="base_column_list"/>
         FROM goods_info
         WHERE goods_id IN
@@ -302,7 +302,7 @@
     </resultMap>
 
     <!--suppress checkSelectColumnExistInMybatisResultmap -->
-    <select id="selectGoodsByTagContaining" resultMap="GoodsSearchDTO">
+    <select id="findByTagContaining" resultMap="GoodsSearchDTO">
         SELECT goods_info.goods_id,
         goods_info.goods_name,
         goods_info.goods_brand_id,
@@ -326,7 +326,7 @@
         ORDER BY accuracy DESC;
     </select>
     
-    <select id="selectGoodsByCategory" resultMap="GoodsSearchDTO">
+    <select id="findByCategory" resultMap="GoodsSearchDTO">
         <bind name="level1path" value="categoryId+'.%'"/>
         <bind name="level2path" value="'%.'+categoryId + '.%'"/>
         <bind name="level3path" value="'%.'+categoryId"/>
@@ -350,7 +350,7 @@
         GROUP BY goods_info.goods_id
     </select>
 
-    <select id="selectGoodsByNameContaining" resultMap="BaseResultMap">
+    <select id="findByNameContaining" resultMap="BaseResultMap">
         <bind name="keyword" value="'%' + goodsName + '%'"/>
         SELECT goods_id, goods_name
         FROM goods_info

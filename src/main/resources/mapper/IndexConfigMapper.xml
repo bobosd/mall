@@ -30,7 +30,7 @@
     </sql>
 
 
-    <select id="findIndexConfigList" resultMap="IndexConfigDtoResultMap">
+    <select id="listIndexConfig" resultMap="IndexConfigDtoResultMap">
         SELECT index_config_id, config_name, index_config.goods_id, goods_info.goods_name, config_rank, index_config.create_time
         FROM index_config
         JOIN goods_info ON goods_info.goods_id = index_config.goods_id
@@ -57,7 +57,7 @@
         </where>
     </select>
 
-    <select id="findIndexConfigByType" resultMap="BaseResultMap">
+    <select id="findByType" resultMap="BaseResultMap">
         SELECT <include refid="Base_Column_List"/>
         FROM index_config
         WHERE config_type = #{configType} AND is_deleted = 0

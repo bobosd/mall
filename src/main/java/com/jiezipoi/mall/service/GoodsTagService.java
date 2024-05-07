@@ -46,11 +46,11 @@ public class GoodsTagService {
     }
 
     public List<GoodsTag> getGoodsTagByName(String... tagName) {
-        return goodsTagDao.selectGoodsTagByName(tagName);
+        return goodsTagDao.findByName(tagName);
     }
 
     public List<GoodsTag> getRecordedGoodsHasTag(Long goodsId) {
-        return goodsTagDao.selectGoodsHasTagByGoodsId(goodsId);
+        return goodsTagDao.findByGoodsId(goodsId);
     }
 
     public void updateGoodsHasTag(Long goodsId, List<GoodsTag> tagsToLink) {

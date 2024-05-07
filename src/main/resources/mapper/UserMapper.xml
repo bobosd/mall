@@ -117,12 +117,12 @@
         WHERE verification_code = #{verificationCode,jdbcType=VARCHAR}
     </select>
 
-    <delete id="deleteVerificationCodeByEmail">
+    <delete id="deleteByEmail">
         DELETE FROM user_verification_code
         WHERE email = #{email,jdbcType=VARCHAR}
     </delete>
 
-    <update id="updateUserPasswordByEmail">
+    <update id="updateByEmail">
         UPDATE user
         SET password = #{password,jdbcType=VARCHAR}
         WHERE email = #{email,jdbcType=VARCHAR}

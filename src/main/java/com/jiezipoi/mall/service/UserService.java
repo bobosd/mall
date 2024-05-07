@@ -144,7 +144,7 @@ public class UserService implements UserDetailsService {
         if (email == null) {
             throw new VerificationCodeNotFoundException();
         }
-        mallUserDao.deleteVerificationCodeByEmail(email);
+        mallUserDao.deleteByEmail(email);
         User user = mallUserDao.selectByEmail(email);
         user.setUserStatus(UserStatus.ACTIVATED);
         updateUserStatus(user.getUserId(), UserStatus.ACTIVATED);
@@ -194,7 +194,7 @@ public class UserService implements UserDetailsService {
         String email = verificationCode.getEmail();
         jwtService.invalidateAllRefreshTokenOfUser(email);
         password = passwordEncoder.encode(password);
-        mallUserDao.updateUserPasswordByEmail(email, password);
+        mallUserDao.updateByEmail(email, password);
         verificationCodeService.setCodeDeleted(token);
     }
 }

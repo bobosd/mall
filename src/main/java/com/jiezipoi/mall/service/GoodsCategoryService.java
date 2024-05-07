@@ -88,7 +88,7 @@ public class GoodsCategoryService {
         GoodsCategory category = goodsCategoryDao.selectByPrimaryKey(categoryId);
         if (category != null) {
             long[] ids = category.getParentIdAsArray();
-            result = goodsCategoryDao.selectByIds(ids);
+            result = goodsCategoryDao.findByIds(ids);
         }
         return result;
     }
@@ -98,19 +98,19 @@ public class GoodsCategoryService {
     }
 
     public List<GoodsCategory> selectByLevelAndParentIdsAndNumber(Long parentId, int categoryLevel) {
-        return goodsCategoryDao.selectByLevelAndParentIdsAndNumber(parentId, categoryLevel, 0);
+        return goodsCategoryDao.findByLevelAndParentIdsAndNumber(parentId, categoryLevel, 0);
     }
 
     public List<IndexGoodsCategoryDTO> getIndexCategory() {
-        List<IndexGoodsCategoryDTO> level1Categories = goodsCategoryDao.selectByCategoryLevel(1)
+        List<IndexGoodsCategoryDTO> level1Categories = goodsCategoryDao.findByCategoryLevel(1)
                 .stream()
                 .map(IndexGoodsCategoryDTO::new)
                 .toList();
-        List<IndexGoodsCategoryDTO> level2Categories = goodsCategoryDao.selectByCategoryLevel(2)
+        List<IndexGoodsCategoryDTO> level2Categories = goodsCategoryDao.findByCategoryLevel(2)
                 .stream()
                 .map(IndexGoodsCategoryDTO::new)
                 .toList();
-        List<IndexGoodsCategoryDTO> level3Categories = goodsCategoryDao.selectByCategoryLevel(3)
+        List<IndexGoodsCategoryDTO> level3Categories = goodsCategoryDao.findByCategoryLevel(3)
                 .stream()
                 .map(IndexGoodsCategoryDTO::new)
                 .toList();

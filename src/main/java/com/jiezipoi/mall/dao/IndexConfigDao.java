@@ -19,13 +19,13 @@ public interface IndexConfigDao {
 
     int updateByPrimaryKey(IndexConfig record);
 
-    List<IndexConfigDTO> findIndexConfigList(@Param("start") int start,
-                                             @Param("limit") int limit,
-                                             @Param("config_type") int configType);
+    List<IndexConfigDTO> listIndexConfig(@Param("start") int start,
+                                         @Param("limit") int limit,
+                                         @Param("config_type") int configType);
 
     int getTotalIndexConfigs(@Param("config_type") int configType);
 
     int deleteBatch(long[] ids);
 
-    List<IndexConfig> findIndexConfigByType(@Param("configType") int configType);
+    List<IndexConfig> findByType(@Param("configType") int configType);
 }

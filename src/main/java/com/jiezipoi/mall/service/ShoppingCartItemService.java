@@ -88,7 +88,7 @@ public class ShoppingCartItemService {
     }
 
     public List<ShoppingCartItemDTO> getUserShoppingCart(Long userId) {
-        return shoppingCartItemDao.selectByUserId(userId);
+        return shoppingCartItemDao.findByUserId(userId);
     }
 
     public void updateShoppingCartItem(ShoppingCartItem shoppingCartItem) throws NotFoundException {

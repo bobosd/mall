@@ -25,20 +25,20 @@ public interface GoodsCategoryDao {
                                               @Param("colNumber") Integer orderBy,
                                               @Param("dir") String dir);
 
-    List<GoodsCategory> selectAllCategory();
+    List<GoodsCategory> findAllCategory();
 
     int getTotalGoodsCategories(@Param("categoryLevel") Integer categoryLevel,
                                 @Param("parentId") Long parentId);
 
     int deleteBatch(Integer[] ids);
 
-    List<GoodsCategory> selectByLevelAndParentIdsAndNumber(@Param("parentIds") Long parentIds,
-                                                           @Param("categoryLevel") int categoryLevel,
-                                                           @Param("number") int number);
+    List<GoodsCategory> findByLevelAndParentIdsAndNumber(@Param("parentIds") Long parentIds,
+                                                         @Param("categoryLevel") int categoryLevel,
+                                                         @Param("number") int number);
 
-    List<GoodsCategory> selectByIds(@Param("ids") long[] ids);
+    List<GoodsCategory> findByIds(@Param("ids") long[] ids);
 
-    List<GoodsCategory> selectByCategoryLevel(@Param("level") int level);
+    List<GoodsCategory> findByCategoryLevel(@Param("level") int level);
 
     int updatePathById(@Param("id") Long id, @Param("path") String path);
 }

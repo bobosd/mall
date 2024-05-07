@@ -73,7 +73,7 @@
         FROM goods_category WHERE category_name = #{categoryName,jdbcType=VARCHAR};
     </select>
 
-    <select id="selectByLevelAndParentIdsAndNumber" resultMap="BaseResultMap">
+    <select id="findByLevelAndParentIdsAndNumber" resultMap="BaseResultMap">
         SELECT
         <include refid="Base_column_list"/>
         FROM goods_category
@@ -232,7 +232,7 @@
         WHERE goods_category_id = #{goodsCategoryId,jdbcType=BIGINT}
     </update>
 
-    <select id="selectByIds" resultMap="BaseResultMap">
+    <select id="findByIds" resultMap="BaseResultMap">
         SELECT
         <include refid="Base_column_list"/>
         FROM goods_category
@@ -243,7 +243,7 @@
         ORDER BY category_level DESC;
     </select>
 
-    <select id="selectByCategoryLevel" resultMap="BaseResultMap">
+    <select id="findByCategoryLevel" resultMap="BaseResultMap">
         SELECT
         <include refid="Base_column_list"/>
         FROM goods_category
@@ -258,7 +258,7 @@
         WHERE goods_category_id = #{id,jdbcType=BIGINT}
     </update>
 
-    <select id="selectAllCategory" resultMap="BaseResultMap">
+    <select id="findAllCategory" resultMap="BaseResultMap">
         SELECT *
         FROM goods_category
         WHERE is_deleted = 0;

@@ -18,7 +18,7 @@
         VALUES #{tagName,jdbcType=VARCHAR};
     </insert>
 
-    <select id="selectGoodsTagByName" resultMap="GoodsTagResultMap">
+    <select id="findByName" resultMap="GoodsTagResultMap">
         SELECT *
         FROM goods_tag
         WHERE tag_name IN
@@ -49,7 +49,7 @@
             </foreach>
     </insert>
 
-    <select id="selectGoodsHasTagByGoodsId" resultMap="GoodsTagResultMap">
+    <select id="findByGoodsId" resultMap="GoodsTagResultMap">
         SELECT goods_tag.*
         FROM goods_tag
         JOIN goods_has_tag ON goods_tag_id = goods_has_tag.tag_id
