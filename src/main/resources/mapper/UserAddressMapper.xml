@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jiezipoi.mall.dao.UserAddressDao">
+    <resultMap id="BaseResultMap" type="com.jiezipoi.mall.entity.UserAddress">
+        <id column="user_address_id" jdbcType="BIGINT" property="userAddressId"/>
+        <result column="user_id" jdbcType="BIGINT" property="userId"/>
+        <result column="first_name" jdbcType="VARCHAR" property="firstName"/>
+        <result column="sur_name" jdbcType="VARCHAR" property="surName"/>
+        <result column="phone_number" jdbcType="VARCHAR" property="phoneNumber"/>
+        <result column="province" jdbcType="VARCHAR" property="province"/>
+        <result column="city" jdbcType="VARCHAR" property="city"/>
+        <result column="street_address" jdbcType="VARCHAR" property="streetAddress"/>
+        <result column="postal_code" jdbcType="VARCHAR" property="postalCode"/>
+        <result column="additional_information" jdbcType="VARCHAR" property="additionalInformation"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="is_deleted" jdbcType="TINYINT" property="isDeleted"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        user_address_id, user_id, first_name, sur_name, phone_number, province, city, street_address, postal_code,
+        additional_information, create_time, is_deleted
+    </sql>
+
+    <insert id="insert" parameterType="com.jiezipoi.mall.entity.UserAddress">
+        INSERT INTO user_address (<include refid="Base_Column_List"/>)
+        VALUE (null,
+        #{userId, jdbcType=BIGINT},
+        #{firstName,jdbcType=VARCHAR},
+        #{surName,jdbcType=VARCHAR},
+        #{phoneNumber,jdbcType=VARCHAR},
+        #{province,jdbcType=VARCHAR},
+        #{city,jdbcType=VARCHAR},
+        #{streetAddress,jdbcType=VARCHAR},
+        #{postalCode,jdbcType=VARCHAR},
+        #{additionalInformation,jdbcType=VARCHAR},
+        #{createTime,jdbcType=TIMESTAMP},
+        #{isDeleted, jdbcType=TINYINT})
+    </insert>
+
+    <update id="updateByPrimaryKeySelective" parameterType="com.jiezipoi.mall.entity.UserAddress">
+        UPDATE user_address
+        <set>
+            <if test="userId != null">
+                user_id = #{userId,jdbcType=BIGINT},
+            </if>
+            <if test="firstName != null">
+                first_name = #{firstName,jdbcType=VARCHAR},
+            </if>
+            <if test="surName != null">
+                sur_name = #{surName,jdbcType=VARCHAR},
+            </if>
+            <if test="phoneNumber != null">
+                phone_number = #{phoneNumber,jdbcType=VARCHAR},
+            </if>
+            <if test="province != null">
+                province = #{province,jdbcType=VARCHAR},
+            </if>
+            <if test="city != null">
+                city = #{city,jdbcType=VARCHAR},
+            </if>
+            <if test="streetAddress != null">
+                street_address = #{streetAddress,jdbcType=VARCHAR},
+            </if>
+            <if test="postalCode != null">
+                postal_code = #{postalCode,jdbcType=VARCHAR},
+            </if>
+            <if test="additionalInformation != null">
+                additional_information = #{additionalInformation,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="isDeleted != null">
+                is_deleted = #{isDeleted,jdbcType=TINYINT},
+            </if>
+        </set>
+        where user_address_id = #{userAddressId,jdbcType=BIGINT}
+    </update>
+
+    <select id="findByUserId" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM user_address
+        WHERE user_id = #{userId,jdbcType=BIGINT};
+    </select>
+</mapper>
