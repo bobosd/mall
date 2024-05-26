@@ -5,17 +5,532 @@
     <title>Mall</title>
     <link rel="stylesheet" href="/styles/mall/all.css"/>
     <link rel="stylesheet" href="/styles/mall/user-profile.css"/>
+    <link rel="stylesheet" href="/styles/common/modal.css">
+    <link rel="stylesheet" th:replace="~{common/libraries::select2-css}">
+    <script th:replace="~{common/libraries::select2-js}"></script>
 </head>
 <body>
 <nav th:replace="~{mall/navbar::navbar}"></nav>
 <main>
     <div class="floor">
-        <div>
-            <i class="fa-solid fa-person-digging"></i>
-            <span>Funcionalidad en desarrollo</span>
-        </div>
+        <section class="account-data">
+            <div class="section-header">
+                Mis datos
+            </div>
+            <div class="section-body">
+                <div>
+                    <div>Email</div>
+                    <div>Nombre</div>
+                    <div>Fecha de alta</div>
+                </div>
+                <div>
+                    <div th:text="${user.getEmail()}"></div>
+                    <div th:text="${user.getNickName()}"></div>
+                    <div th:text="${user.getCreateTime().toLocalDate()}"></div>
+                </div>
+            </div>
+        </section>
+    </div>
+    <div class="floor">
+        <section>
+            <div class="section-header">Mis direcciones</div>
+            <div class="section-body">
+                <div class="address-list">
+                    <th:block th:each="address: ${addresses}">
+                        <div class="address" th:classappend="${address.isDefaultAddress() ? 'default' : null}" th:data-id="${address.getUserAddressId()}">
+                            <div class="address-info">
+                                <div class="address-receiver" th:text="${address.getFirstName() + ' ' + address.getSurname()}"></div>
+                                <div class="address-street">
+                                    <span th:text="${address.getStreetAddress()}"></span><span th:if="!${address.getAdditionalInformation().isBlank()}" th:text="', ' +${address.getAdditionalInformation()}"></span>
+                                </div>
+                                <div class="address-city" th:text="${address.getCity()}"></div>
+                                <div class="address-province" th:text="${address.getProvince()}"></div>
+                            </div>
+                            <div class="address-option">
+                                <button class="button button-purple btn-edit-address" th:data-id="${address.getUserAddressId()}">Editar</button>
+                                <button class="button button-red btn-remove-address" th:data-id="${address.getUserAddressId()}">Eliminar</button>
+                            </div>
+                        </div>
+                    </th:block>
+                </div>
+            </div>
+            <div class="section-footer">
+                <button class="button button-purple btn-open-address-modal">Añadir dirección</button>
+            </div>
+        </section>
     </div>
 </main>
 <footer th:replace="~{mall/footer::footer}"></footer>
+
+<div class="modal fade" id="modal-address" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Dirección de envio</h5>
+                <span class="close-btn-dot" data-bs-dismiss="modal" data-backdrop="false"></span>
+            </div>
+            <div class="modal-body">
+                <form class="needs-validation">
+                    <div class="row">
+                        <div class="col-6">
+                            <label>Nombre*</label>
+                            <input class="form-control form-control-sm input-first-name" placeholder="Nombre*">
+                            <div class="invalid-feedback"></div>
+                        </div>
+                        <div class="col-6">
+                            <label>Apellido*</label>
+                            <input class="form-control form-control-sm input-surname" placeholder="Apellido*">
+                            <div class="invalid-feedback"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <label>Dirección*</label>
+                        <input class="form-control form-control-sm input-street-address" placeholder="Dirección*">
+                        <div class="invalid-feedback"></div>
+                    </div>
+                    <div>
+                        <input class="form-control form-control-sm input-additional-information" placeholder="Edificio, piso, puerta...">
+                        <div class="invalid-feedback"></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <label>Código postal*</label>
+                            <input class="form-control form-control-sm input-postal-code" placeholder="Código postal*">
+                            <div class="invalid-feedback"></div>
+                        </div>
+                        <div class="col-6">
+                            <label>Población*</label>
+                            <input class="form-control form-control-sm input-city" id="city" placeholder="Población*">
+                            <div class="invalid-feedback"></div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <label>Provincia*</label>
+                            <select class="select2 slc-province" lang="es">
+                                <option></option>
+                                <option value="Álava/Araba">Álava/Araba</option>
+                                <option value="Albacete">Albacete</option>
+                                <option value="Alicante">Alicante</option>
+                                <option value="Almería">Almería</option>
+                                <option value="Asturias">Asturias</option>
+                                <option value="Ávila">Ávila</option>
+                                <option value="Badajoz">Badajoz</option>
+                                <option value="Baleares">Baleares</option>
+                                <option value="Barcelona">Barcelona</option>
+                                <option value="Burgos">Burgos</option>
+                                <option value="Cáceres">Cáceres</option>
+                                <option value="Cádiz">Cádiz</option>
+                                <option value="Cantabria">Cantabria</option>
+                                <option value="Castellón">Castellón</option>
+                                <option value="Ceuta">Ceuta</option>
+                                <option value="Ciudad Real">Ciudad Real</option>
+                                <option value="Córdoba">Córdoba</option>
+                                <option value="Cuenca">Cuenca</option>
+                                <option value="Gerona/Girona">Gerona/Girona</option>
+                                <option value="Granada">Granada</option>
+                                <option value="Guadalajara">Guadalajara</option>
+                                <option value="Guipúzcoa/Gipuzkoa">Guipúzcoa/Gipuzkoa</option>
+                                <option value="Huelva">Huelva</option>
+                                <option value="Huesca">Huesca</option>
+                                <option value="Jaén">Jaén</option>
+                                <option value="La Coruña/A Coruña">La Coruña/A Coruña</option>
+                                <option value="La Rioja">La Rioja</option>
+                                <option value="Las Palmas">Las Palmas</option>
+                                <option value="León">León</option>
+                                <option value="Lérida/Lleida">Lérida/Lleida</option>
+                                <option value="Lugo">Lugo</option>
+                                <option value="Madrid">Madrid</option>
+                                <option value="Málaga">Málaga</option>
+                                <option value="Melilla">Melilla</option>
+                                <option value="Murcia">Murcia</option>
+                                <option value="Navarra">Navarra</option>
+                                <option value="Orense/Ourense">Orense/Ourense</option>
+                                <option value="Palencia">Palencia</option>
+                                <option value="Pontevedra">Pontevedra</option>
+                                <option value="Salamanca">Salamanca</option>
+                                <option value="Segovia">Segovia</option>
+                                <option value="Sevilla">Sevilla</option>
+                                <option value="Soria">Soria</option>
+                                <option value="Tarragona">Tarragona</option>
+                                <option value="Tenerife">Tenerife</option>
+                                <option value="Teruel">Teruel</option>
+                                <option value="Toledo">Toledo</option>
+                                <option value="Valencia">Valencia</option>
+                                <option value="Valladolid">Valladolid</option>
+                                <option value="Vizcaya/Bizkaia">Vizcaya/Bizkaia</option>
+                                <option value="Zamora">Zamora</option>
+                                <option value="Zaragoza">Zaragoza</option>
+                            </select>
+                            <div class="invalid-feedback"></div>
+                        </div>
+                        <div class="col-6">
+                            <label>Teléfono*</label>
+                            <input class="form-control form-control-sm input-phone-number" placeholder="Teléfono*">
+                            <div class="invalid-feedback"></div>
+                        </div>
+                    </div>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" role="switch" id="chk-default-address">
+                        <label class="form-check-label" for="chk-default-address">Predeterminada</label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="button button-purple-light btn-close-address-modal">Cancelar</button>
+                <button class="button button-purple btn-update-address">Actualizar</button>
+                <button class="button button-purple btn-add-address">Agregar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script th:inline="javascript" th:charset="UTF-8">
+    const addressModal = new bootstrap.Modal(document.getElementById("modal-address"));
+    const addresses = [[${addresses}]];
+
+    $(document).ready(() => {
+        initListener();
+        initSelect2();
+    });
+
+    function initSelect2() {
+        $(".slc-province").select2({
+            width: "100%",
+            placeholder: "Provincia*",
+            dropdownParent: $("#modal-address"),
+        });
+    }
+
+    function initListener() {
+        bindAddressModalListener();
+        bindAddressManagementListener();
+    }
+
+    function bindAddressManagementListener() {
+        $(".btn-remove-address").click((e) => {
+            const id = $(e.target).data('id');
+            removeAddress(id);
+        });
+        $(".btn-edit-address").click((e) => {
+            const id = $(e.target).data('id');
+            const address = addresses.find((a) => a.userAddressId === id);
+            showEditAddressModal(address);
+        });
+    }
+
+    function bindAddressModalListener() {
+        //show modal
+        $(".btn-open-address-modal").click(() => showAddressModal());
+        //close modal
+        $(".btn-close-address-modal").click(() => addressModal.hide());
+        //add address
+        $(".btn-add-address").click(() => createAddress());
+        $(".btn-update-address").click((e) => {
+            const id = $(e.target).data("id");
+            updateAddress(id);
+        })
+        //on modal hide, clear inputs
+        $("#modal-address").on("hidden.bs.modal", () => {
+            $("#modal-address input").val("");
+            $("#modal-address select").val(null).trigger("change");
+            $("#modal-address #chk-default-address").prop("checked", false);
+        });
+    }
+
+    function collectAddressData() {
+        return  {
+            firstName: $(".input-first-name").val(),
+            surname: $(".input-surname").val(),
+            phoneNumber: $(".input-phone-number").val(),
+            province: $(".slc-province").val(),
+            city: $(".input-city").val(),
+            streetAddress: $(".input-street-address").val(),
+            postalCode: $(".input-postal-code").val(),
+            additionalInformation: $(".input-additional-information").val(),
+            defaultAddress: $("#chk-default-address").prop("checked")
+        };
+    }
+
+    function validateAddressForm() {
+        const validationChecks = [
+            checkFirstName,
+            checkSurname,
+            checkPhoneNumber,
+            checkProvince,
+            checkCity,
+            checkStreetAddress,
+            checkPostalCode,
+        ];
+        let isAllValid = true;
+        validationChecks.forEach((f) => {
+            const valid = f();
+            if (!valid) {
+                isAllValid = false;
+                $(".is-invalid").on("focus click", function () {
+                    $(this).removeClass("is-invalid");
+                    $(this).unbind();
+                });
+            }
+        });
+        return isAllValid;
+    }
+
+    function checkFirstName() {
+        const input = $(".input-first-name");
+        const firstName = input.val();
+        if (firstName == null || firstName.trim().length < 1) {
+            input.setInvalidWithFeedBack("El nombre no puede ser vacío");
+            return false;
+        }
+        return true;
+    }
+
+    function checkSurname() {
+        const input = $(".input-surname");
+        const surname = input.val();
+        if (surname == null || surname.trim().length < 1) {
+            input.setInvalidWithFeedBack("El apellido no puede ser vacío");
+            return false;
+        }
+        return true;
+    }
+
+    function checkPhoneNumber() {
+        const input = $(".input-phone-number");
+        const phoneNumber = input.val();
+        if (phoneNumber == null || phoneNumber.length !== 9 || !Validator.isPositiveNumber(phoneNumber)) {
+            input.setInvalidWithFeedBack("Debe contener al menos 9 números");
+            return false;
+        }
+        return true;
+    }
+
+    function checkProvince() {
+        const select = $(".slc-province");
+        const province = select.val();
+        if (province == null || province.trim().length === 0) {
+            select.next().setInvalidWithFeedBack("Selecciona una provincia");
+            return false;
+        }
+        return true;
+    }
+
+    function checkCity() {
+        const input = $(".input-city");
+        const surname = input.val();
+        if (surname == null || surname.trim().length < 1) {
+            input.setInvalidWithFeedBack("La población no puede ser vacío");
+            return false;
+        }
+        return true;
+    }
+
+    function checkStreetAddress() {
+        const input = $(".input-street-address");
+        const surname = input.val();
+        if (surname == null || surname.trim().length < 1) {
+            input.setInvalidWithFeedBack("Introduce una dirección");
+            return false;
+        }
+        return true;
+    }
+
+    function checkPostalCode() {
+        const input = $(".input-postal-code");
+        const postalCode = input.val();
+        if (postalCode == null || postalCode.length !== 5 || !Validator.isPositiveNumber(postalCode)) {
+            input.setInvalidWithFeedBack("Debe tener al menos 5 dígitos");
+            return false;
+        }
+        return true;
+    }
+
+    function createAddress() {
+        const btn = $(".btn-add-address");
+        const address = collectAddressData();
+        if (validateAddressForm() === false) {
+            return;
+        }
+        btn.addSpinner();
+
+        $.ajax({
+            url: "/user/address/create",
+            method: "POST",
+            data: JSON.stringify(address),
+            contentType: "application/json",
+            success: (res) => {
+                if (res.code === 200) {
+                    Swal.fire({
+                        title: "Guardado!",
+                        text: "La dirección se ha guardado correctamente,",
+                        icon: "success",
+                        showConfirmButton: false,
+                        timer: 1500,
+                    });
+                    renderAddressDom(res.data);
+                    addressModal.hide();
+                } else {
+                    showServerErrorSwal();
+                }
+            },
+            error: () => showServerErrorSwal(),
+            complete: () => btn.removeSpinner(),
+        });
+    }
+
+    function updateAddress(addressId) {
+        if (validateAddressForm() === false) {
+            return;
+        }
+        const address = collectAddressData();
+        address.userAddressId = addressId;
+        const btn = $(".btn-update-address");
+        btn.addSpinner();
+        $.ajax({
+            url: "/user/address/update",
+            method: "POST",
+            data: JSON.stringify(address),
+            contentType: "application/json",
+            success: (res) => {
+                if (res.code === 200) {
+                    syncAddressArr(address);
+                    updateAddressDom(address);
+                    Swal.fire({
+                        title: "Actualizado!",
+                        text: "La dirección se ha actualizado correctamente,",
+                        icon: "success",
+                        showConfirmButton: false,
+                        timer: 1500,
+                    });
+                    addressModal.hide();
+                } else {
+                    showServerErrorSwal();
+                }
+            },
+            complete: () => btn.removeSpinner(),
+        });
+    }
+
+    function removeAddress(addressId) {
+        Swal.fire({
+            title: "Eliminar dirección",
+            text: "¿Seguro que deseas eliminar la dirección de facturación?",
+            icon: "warning",
+            showConfirmButton: true,
+            showDenyButton: true,
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: "/user/address/delete",
+                    method: "POST",
+                    data: {addressId},
+                    success: (res) => {
+                        if (res.code === 200) {
+                            showDeleteSuccessSwal();
+                            $(".address[data-id=" + addressId + "]").remove();
+                            addresses.filter((a) => {
+                                return a.userAddressId !== addressId;
+                            });
+                            if (res.data != null) { //return object of new default address if deleted address was default,
+                                syncAddressArr(res.data);
+                                setAddressAsDefault(res.data.userAddressId);
+                            }
+                        } else {
+                            showServerErrorSwal();
+                        }
+                    }
+                });
+            }
+        });
+    }
+
+    function updateAddressDom(address) {
+        const addressDOM = $(".address[data-id=" + address.userAddressId + "]");
+        let streetAddress = address.streetAddress;
+        if (address.additionalInformation != null && address.additionalInformation.length > 1) {
+            streetAddress += ", " + address.additionalInformation;
+        }
+        addressDOM.find(".address-receiver").text(address.firstName + " " + address.surname);
+        addressDOM.find(".address-street").text(streetAddress);
+        addressDOM.find(".address-city").text(address.city);
+        addressDOM.find(".address-province").text(address.province);
+        if (address.defaultAddress) {
+            setAddressAsDefault(address.userAddressId);
+        }
+    }
+
+    function renderAddressDom(address) {
+        let {userAddressId, firstName, surname, streetAddress, additionalInformation, city, province, defaultAddress} = address;
+        if (additionalInformation != null && additionalInformation.length > 0) {
+            streetAddress += ", " + additionalInformation;
+        }
+        const domStr =
+            `<div class="address" data-id="${userAddressId}">
+                <div class="address-info">
+                    <div class="address-receiver">${firstName} ${surname}</div>
+                    <div class="address-street">
+                        <span>${streetAddress}</span>
+                    </div>
+                    <div class="address-city">${city}</div>
+                    <div class="address-province">${province}</div>
+                </div>
+                <div class="address-option">
+                    <button class="button button-purple btn-edit-address" data-id="${userAddressId}">Editar</button>
+                    <button class="button button-red btn-remove-address" data-id="${userAddressId}">Eliminar</button>
+                </div>
+            </div>`;
+        const htmlDom = $.parseHTML(domStr);
+        $(htmlDom).find(".btn-edit-address").click(() => showEditAddressModal(address));
+        $(htmlDom).find(".btn-remove-address").click(() => removeAddress(userAddressId));
+        $(".address-list").append(htmlDom);
+        if (defaultAddress) {
+            setAddressAsDefault(address.userAddressId);
+        }
+    }
+
+    function showAddressModal() {
+        $(".btn-add-address").show();
+        $(".btn-update-address").hide();
+        addressModal.show();
+    }
+
+    function showEditAddressModal(address) {
+        const modal = $("#modal-address");
+        const btnUpdate = $(".btn-update-address");
+        $(".btn-add-address").hide();
+        btnUpdate.data("id", address.userAddressId);
+        btnUpdate.show();
+        modal.find(".input-first-name").val(address.firstName);
+        modal.find(".input-surname").val(address.surname);
+        modal.find(".input-street-address").val(address.streetAddress);
+        modal.find(".input-additional-information").val(address.additionalInformation);
+        modal.find(".input-postal-code").val(address.postalCode);
+        modal.find(".input-city").val(address.city);
+        modal.find(".slc-province").val(address.province).trigger("change");
+        modal.find(".input-phone-number").val(address.phoneNumber);
+        modal.find("#chk-default-address").prop("checked", address.defaultAddress);
+        addressModal.show();
+    }
+
+    function setAddressAsDefault(addressId) {
+        const currentDefault = $(".address.default");
+        console.log(currentDefault.data("id"), addressId);
+        if (currentDefault.data("id") !== addressId) {
+            currentDefault.removeClass("default");
+            $(".address[data-id=" + addressId + "]").addClass("default");
+        }
+    }
+
+    function syncAddressArr(address) {
+        addresses.some((a, index) => {
+            if (a.userAddressId === address.userAddressId) {
+                addresses[index] = address;
+                return true;
+            }
+            return false;
+        });
+    }
+</script>
 </body>
 </html>

@@ -14,14 +14,12 @@ jQuery.fn.addSpinner = function() {
     const spinnerSize = Math.sqrt((maxSize * maxSize) / 2);
     let spinner = $.parseHTML('<div><div class="spinner-border text-light" role="status"></div></div>');//bootstrap spinner
     spinner = $(spinner);
-    if (button.children().first().prop("tagName") === "svg") {
-        const svg = button.children().first();
-        const svgHeight = svg.height();
-        const svgWidth = svg.width();
-        spinner.height(svgHeight > btnHeight ? svgWidth : btnHeight);
-        spinner.width(svgWidth > btnWidth ? svgWidth : btnWidth);
-        spinner.css({display: "flex", justifyContent: "center", alignContent: "center", flexWrap: "wrap"});
-    }
+    const svg = button.children().first();
+    const svgHeight = svg.height();
+    const svgWidth = svg.width();
+    spinner.height(svgHeight > btnHeight ? svgWidth : btnHeight);
+    spinner.width(svgWidth > btnWidth ? svgWidth : btnWidth);
+    spinner.css({display: "flex", justifyContent: "center", alignContent: "center", flexWrap: "wrap"});
     spinner.children().first().height(spinnerSize);
     spinner.children().first().width(spinnerSize);
     button.html(spinner);

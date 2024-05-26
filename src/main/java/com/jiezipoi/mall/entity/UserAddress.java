@@ -8,16 +8,17 @@ public class UserAddress {
     private Long userAddressId;
     private Long userId;
     private String firstName;
-    private String surName;
+    private String surname;
     private String phoneNumber;
     private String province;
     private String city;
     private String streetAddress;
     private String postalCode;
+    private Boolean defaultAddress;
     private String additionalInformation;
+
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createTime;
-    private boolean isDeleted;
 
     public Long getUserAddressId() {
         return userAddressId;
@@ -43,12 +44,12 @@ public class UserAddress {
         this.firstName = firstName;
     }
 
-    public String getSurName() {
-        return surName;
+    public String getSurname() {
+        return surname;
     }
 
-    public void setSurName(String surName) {
-        this.surName = surName;
+    public void setSurname(String surname) {
+        this.surname = surname;
     }
 
     public String getPhoneNumber() {
@@ -99,19 +100,19 @@ public class UserAddress {
         this.additionalInformation = additionalInformation;
     }
 
+    public Boolean isDefaultAddress() {
+        return this.defaultAddress;
+    }
+
+    public void setDefaultAddress(Boolean defaultAddress) {
+        this.defaultAddress = defaultAddress;
+    }
+
     public LocalDateTime getCreateTime() {
         return createTime;
     }
 
     public void setCreateTime(LocalDateTime createTime) {
         this.createTime = createTime;
-    }
-
-    public boolean isDeleted() {
-        return isDeleted;
-    }
-
-    public void setDeleted(boolean deleted) {
-        isDeleted = deleted;
     }
 }

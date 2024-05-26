@@ -5,36 +5,36 @@
         <id column="user_address_id" jdbcType="BIGINT" property="userAddressId"/>
         <result column="user_id" jdbcType="BIGINT" property="userId"/>
         <result column="first_name" jdbcType="VARCHAR" property="firstName"/>
-        <result column="sur_name" jdbcType="VARCHAR" property="surName"/>
+        <result column="surname" jdbcType="VARCHAR" property="surname"/>
         <result column="phone_number" jdbcType="VARCHAR" property="phoneNumber"/>
         <result column="province" jdbcType="VARCHAR" property="province"/>
         <result column="city" jdbcType="VARCHAR" property="city"/>
         <result column="street_address" jdbcType="VARCHAR" property="streetAddress"/>
         <result column="postal_code" jdbcType="VARCHAR" property="postalCode"/>
         <result column="additional_information" jdbcType="VARCHAR" property="additionalInformation"/>
+        <result column="default_address" jdbcType="TINYINT" property="defaultAddress"/>
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
-        <result column="is_deleted" jdbcType="TINYINT" property="isDeleted"/>
     </resultMap>
 
     <sql id="Base_Column_List">
-        user_address_id, user_id, first_name, sur_name, phone_number, province, city, street_address, postal_code,
-        additional_information, create_time, is_deleted
+        user_address_id, user_id, first_name, surname, phone_number, province, city, street_address, postal_code,
+        additional_information, default_address,create_time
     </sql>
 
-    <insert id="insert" parameterType="com.jiezipoi.mall.entity.UserAddress">
+    <insert id="insert" parameterType="com.jiezipoi.mall.entity.UserAddress" useGeneratedKeys="true" keyProperty="userAddressId">
         INSERT INTO user_address (<include refid="Base_Column_List"/>)
         VALUE (null,
         #{userId, jdbcType=BIGINT},
         #{firstName,jdbcType=VARCHAR},
-        #{surName,jdbcType=VARCHAR},
+        #{surname,jdbcType=VARCHAR},
         #{phoneNumber,jdbcType=VARCHAR},
         #{province,jdbcType=VARCHAR},
         #{city,jdbcType=VARCHAR},
         #{streetAddress,jdbcType=VARCHAR},
         #{postalCode,jdbcType=VARCHAR},
         #{additionalInformation,jdbcType=VARCHAR},
-        #{createTime,jdbcType=TIMESTAMP},
-        #{isDeleted, jdbcType=TINYINT})
+        #{defaultAddress,jdbcType=BOOLEAN},
+        #{createTime,jdbcType=TIMESTAMP});
     </insert>
 
     <update id="updateByPrimaryKeySelective" parameterType="com.jiezipoi.mall.entity.UserAddress">
@@ -46,8 +46,8 @@
             <if test="firstName != null">
                 first_name = #{firstName,jdbcType=VARCHAR},
             </if>
-            <if test="surName != null">
-                sur_name = #{surName,jdbcType=VARCHAR},
+            <if test="surname != null">
+                surname = #{surname,jdbcType=VARCHAR},
             </if>
             <if test="phoneNumber != null">
                 phone_number = #{phoneNumber,jdbcType=VARCHAR},
@@ -67,14 +67,14 @@
             <if test="additionalInformation != null">
                 additional_information = #{additionalInformation,jdbcType=VARCHAR},
             </if>
+            <if test="defaultAddress != null">
+                default_address = #{defaultAddress,jdbcType=BOOLEAN},
+            </if>
             <if test="createTime != null">
                 create_time = #{createTime,jdbcType=TIMESTAMP},
             </if>
-            <if test="isDeleted != null">
-                is_deleted = #{isDeleted,jdbcType=TINYINT},
-            </if>
         </set>
-        where user_address_id = #{userAddressId,jdbcType=BIGINT}
+        WHERE user_address_id = #{userAddressId,jdbcType=BIGINT}
     </update>
 
     <select id="findByUserId" resultMap="BaseResultMap">
@@ -82,5 +82,37 @@
         <include refid="Base_Column_List"/>
         FROM user_address
         WHERE user_id = #{userId,jdbcType=BIGINT};
+    </select>
+
+    <delete id="deleteByPrimaryKeyAndUserId">
+        DELETE FROM user_address
+        WHERE user_id = #{userId,jdbcType=BIGINT} AND user_address_id = #{userAddressId,jdbcType=BIGINT};
+    </delete>
+
+    <update id="unsetDefaultAddressByUserId">
+        UPDATE user_address
+        SET default_address = 0
+        WHERE user_id = #{userId,jdbcType=BIGINT}
+    </update>
+
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List">
+        </include>
+        FROM user_address
+        WHERE user_address_id = #{userAddressId,jdbcType=BIGINT};
+    </select>
+
+    <update id="setAnyAsDefaultAddress">
+        UPDATE user_address
+        SET default_address = 1
+        WHERE user_id = #{userId,jdbcType=BIGINT}
+        LIMIT 1
+    </update>
+
+    <select id="countByUserId" resultType="int">
+        SELECT COUNT(*)
+        FROM user_address
+        WHERE user_id = #{userId,jdbcType=BIGINT}
     </select>
 </mapper>

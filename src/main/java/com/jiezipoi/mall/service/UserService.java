@@ -86,6 +86,12 @@ public class UserService implements UserDetailsService {
         mallUserDao.insertSelective(user);
     }
 
+    /**
+     * 根据Email返回对应的用户ID
+     * @param email 用户邮箱
+     * @return 用户在数据库中的ID
+     * @throws UserNotFoundException 如果该email不存在，则抛出NullPointer异常
+     */
     public long getUserIdByEmail(String email) throws UserNotFoundException {
         Long id = mallUserDao.selectUserIdByEmail(email);
         if (id == null) {

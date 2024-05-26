@@ -3,12 +3,14 @@ package com.jiezipoi.mall.controller.mall;
 import com.jiezipoi.mall.config.JwtConfig;
 import com.jiezipoi.mall.dto.MallUserDTO;
 import com.jiezipoi.mall.entity.User;
+import com.jiezipoi.mall.entity.UserAddress;
 import com.jiezipoi.mall.enums.UserStatus;
 import com.jiezipoi.mall.exception.NotFoundException;
 import com.jiezipoi.mall.exception.UnactivatedUserException;
 import com.jiezipoi.mall.exception.UserNotFoundException;
 import com.jiezipoi.mall.exception.VerificationCodeNotFoundException;
 import com.jiezipoi.mall.service.JwtService;
+import com.jiezipoi.mall.service.UserAddressService;
 import com.jiezipoi.mall.service.UserService;
 import com.jiezipoi.mall.service.VerificationCodeService;
 import com.jiezipoi.mall.utils.CommonResponse;
@@ -22,10 +24,13 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.CredentialsExpiredException;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.time.Duration;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -37,12 +42,14 @@ public class MallUserController {
     private final JwtConfig jwtConfig;
     private final JwtService jwtService;
     private final VerificationCodeService verificationCodeService;
+    private final UserAddressService userAddressService;
 
-    public MallUserController(UserService userService, JwtConfig jwtConfig, JwtService jwtService, VerificationCodeService verificationCodeService) {
+    public MallUserController(UserService userService, JwtConfig jwtConfig, JwtService jwtService, VerificationCodeService verificationCodeService, UserAddressService userAddressService) {
         this.userService = userService;
         this.jwtConfig = jwtConfig;
         this.jwtService = jwtService;
         this.verificationCodeService = verificationCodeService;
+        this.userAddressService = userAddressService;
     }
 
     @GetMapping("/activate-account/{token}")
@@ -119,7 +126,15 @@ public class MallUserController {
     }
 
     @GetMapping("/profile")
-    public String profilePage() {
+    public String profilePage(Principal principal, ModelMap modelMap) {
+        User user = userService.getUserByEmail(principal.getName());
+        List<UserAddress> addresses = userAddressService.getUserAddresList(user.getUserId());
+        addresses.forEach(userAddress -> {
+            userAddress.setCreateTime(null);
+            userAddress.setUserId(null);
+        });
+        modelMap.put("user", user);
+        modelMap.put("addresses", addresses);
         return "mall/user-profile";
     }
 

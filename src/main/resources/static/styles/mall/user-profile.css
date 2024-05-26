@@ -7,6 +7,94 @@
     flex-direction: column;
 }
 
-.floor span {
-    font-size: 36px;
+.section-header {
+    font-weight: 400;
+    font-size: 32px;
+}
+
+.section-body {
+    margin-top: 20px;
+}
+
+.section-footer {
+    margin-top: 20px;
+}
+
+section {
+    margin-top: 30px;
+}
+
+section:first-child {
+    margin-top: 0;
+}
+
+#input-nickname {
+    width: 200px;
+}
+
+.account-data .section-body {
+    display: flex;
+    justify-content: space-between;
+    width: 500px;
+}
+
+.account-data .section-body > div {
+    display: flex;
+    width: 500px;
+    flex-direction: column;
+}
+
+.account-data .section-body > div:first-child {
+    font-weight: 500;
+}
+
+button {
+    font-weight: 500;
+}
+
+.input-additional-information {
+    margin-top: 5px;
+}
+
+.address {
+    border: 1px solid var(--mall-light-color);
+    position: relative;
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    width: 900px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.address.default {
+    border-color: var(--mall-color);
+}
+
+.address.default:before {
+    content: "Predeterminada";
+    display: block;
+    position: absolute;
+    top: -10px;
+    left: 20px;
+    background: #ffffff;
+    border-radius: 5px;
+    border:1px solid var(--mall-color);
+    padding: 2px 5px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.address-option {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.address-option button {
+    margin: 3px;
+}
+
+#modal-address .form-switch {
+    margin-top: 10px;
 }

@@ -93,7 +93,7 @@ nav .btn-shopping-cart:hover {
     color: #FFFFFF;
 }
 
-input[type="search"] {
+.search-input {
     flex-grow: 1;
     border: none;
     border-radius: inherit;
@@ -101,7 +101,7 @@ input[type="search"] {
     text-indent: 15px;
 }
 
-input[type="search"]:focus{
+.search-input:focus{
     outline: none;
 }
 
