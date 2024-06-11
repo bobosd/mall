@@ -2,6 +2,7 @@ package com.jiezipoi.mall.service;
 
 import com.jiezipoi.mall.dao.UserAddressDao;
 import com.jiezipoi.mall.entity.UserAddress;
+import com.jiezipoi.mall.exception.LimitExceededException;
 import com.jiezipoi.mall.exception.NotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,7 +27,10 @@ public class UserAddressService {
     }
 
     @Transactional
-    public void createUserAddress(UserAddress userAddress) throws NotFoundException {
+    public void createUserAddress(UserAddress userAddress) throws NotFoundException, LimitExceededException {
+        if (getUserAddressCount(userAddress.getUserId()) >= 5) {
+            throw new LimitExceededException();
+        }
         if (userAddress.isDefaultAddress()) {
             userAddressDao.unsetDefaultAddressByUserId(userAddress.getUserId());
         }

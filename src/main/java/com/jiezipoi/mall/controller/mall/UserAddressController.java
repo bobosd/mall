@@ -1,6 +1,7 @@
 package com.jiezipoi.mall.controller.mall;
 
 import com.jiezipoi.mall.entity.UserAddress;
+import com.jiezipoi.mall.exception.LimitExceededException;
 import com.jiezipoi.mall.exception.NotFoundException;
 import com.jiezipoi.mall.service.UserAddressService;
 import com.jiezipoi.mall.service.UserService;
@@ -42,6 +43,10 @@ public class UserAddressController {
             return response;
         } catch (NotFoundException e) {
             return new Response<>(CommonResponse.DATA_NOT_EXIST);
+        } catch (LimitExceededException e) {
+            Response<String> response = new Response<>(CommonResponse.FORBIDDEN);
+            response.setData("limit exceeded");
+            return response;
         }
     }
 

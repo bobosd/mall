@@ -104,6 +104,14 @@ public class UserService implements UserDetailsService {
         return mallUserDao.selectByEmail(email) != null;
     }
 
+    /**
+     * 通过Email和密码获得用户实体类，DB的密码是加密的，所以使用Spring Security帮助验证，该方法会调用LoadUserByUserName($email)
+     * 然后通过返回的UserDetails获得密码，然后进行密码匹配。如果是密码错误则会抛出 BadCredentialsException
+     * @param email 用户邮箱
+     * @param password 用户密码
+     * @throws org.springframework.security.authentication.BadCredentialsException 密码不匹配
+     * @return 用户实体类
+     */
     public User getUserByEmailAndPassword(String email, String password) {
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(email, password);
         Authentication authentication = authenticationManager.authenticate(authenticationToken);

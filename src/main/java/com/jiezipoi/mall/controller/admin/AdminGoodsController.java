@@ -160,7 +160,7 @@ public class AdminGoodsController {
     public Response<?> uploadTempDetails(@RequestParam("file") MultipartFile file, Principal principal) {
         try {
             long userId = userService.getUserIdByEmail(principal.getName());
-            String url = goodsService.saveTempDetailsFile(file, userId);
+            String url = goodsService.saveTempCKEditorFile(file, userId);
             Response<String> response = new Response<>(CommonResponse.SUCCESS);
             response.setData(url);
             return response;
@@ -174,7 +174,7 @@ public class AdminGoodsController {
     public Response<?> uploadDetails(@RequestParam("file") MultipartFile file,
                                      @RequestParam("goodsId") String goodsId) {
         try {
-            String url = goodsService.saveDetailsFile(file, goodsId);
+            String url = goodsService.saveCKEditorFile(file, goodsId);
             Response<String> response = new Response<>(CommonResponse.SUCCESS);
             response.setData(url);
             return response;

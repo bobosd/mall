@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jiezipoi.mall.dao.UserPaymentDao">
+    <resultMap id="BaseResultMap" type="com.jiezipoi.mall.entity.UserPayment">
+        <id column="user_payment_id" jdbcType="BIGINT" property="userPaymentId" />
+        <result column="user_id" jdbcType="BIGINT" property="userId" />
+        <result column="payment_type" typeHandler="com.jiezipoi.mall.handler.PaymentTypeHandler" property="paymentType" />
+        <result column="card_number" jdbcType="VARCHAR" property="cardNumber" />
+        <result column="card_holder_name" jdbcType="VARCHAR" property="cardHolderName" />
+        <result column="expiration_date" jdbcType="DATE" property="expirationDate" />
+        <result column="cvv" jdbcType="VARCHAR" property="CVV" />
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+        <result column="default_payment" jdbcType="TINYINT" property="defaultPayment" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        user_payment_id, user_id, payment_type, card_number, card_holder_name, expiration_date,
+        cvv, create_time, default_payment
+    </sql>
+
+    <insert id="insert" keyColumn="user_payment_id" keyProperty="userPaymentId" parameterType="com.jiezipoi.mall.entity.UserPayment" useGeneratedKeys="true">
+        INSERT INTO user_payment (user_id, payment_type, card_number,
+        card_holder_name, expiration_date, cvv,
+        create_time, default_payment)
+        VALUES (#{userId,jdbcType=BIGINT}, #{paymentType,jdbcType=VARCHAR}, #{cardNumber,jdbcType=VARCHAR},
+        #{cardHolderName,jdbcType=VARCHAR}, #{expirationDate,jdbcType=DATE}, #{CVV,jdbcType=VARCHAR},
+        #{createTime,jdbcType=TIMESTAMP},#{defaultPayment,jdbcType=BOOLEAN})
+    </insert>
+
+    <select id="findByUserId" resultType="com.jiezipoi.mall.entity.UserPayment">
+        SELECT
+        <include refid="Base_Column_List">
+        </include>
+        FROM user_payment
+        WHERE user_id = #{userId,jdbcType=BIGINT}
+    </select>
+
+    <delete id="deleteByPrimaryKey">
+        DELETE FROM user_payment
+        WHERE user_id = #{userId,jdbcType=BIGINT} AND user_payment_id = #{paymentId,jdbcType=BIGINT}
+    </delete>
+</mapper>

@@ -139,14 +139,14 @@ public class GoodsService {
      * @param userId    用户ID
      * @return 对应的地址
      */
-    public String saveTempDetailsFile(MultipartFile file, long userId) throws IOException {
+    public String saveTempCKEditorFile(MultipartFile file, long userId) throws IOException {
         Path uploadDir = getUserTempDir(userId);
         String filename = FileNameGenerator.generateFileName() + goodsConfig.getUserTempFilePrefix();
         Path savedLocation = saveFile(uploadDir, filename, file);
         return goodsConfig.getExposeUrl(savedLocation);
     }
 
-    public String saveDetailsFile(MultipartFile file, String goodsId) throws IOException {
+    public String saveCKEditorFile(MultipartFile file, String goodsId) throws IOException {
         Path uploadDir = goodsConfig.getGoodsFilePath();
         String filename = generateImageFileName(goodsId);
         Path savedLocation = saveFile(uploadDir, filename, file);

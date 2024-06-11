@@ -59,6 +59,29 @@
             </div>
         </section>
     </div>
+    <div class="floor">
+        <section>
+            <div class="section-header">Mis pagos</div>
+            <div class="section-body">
+                <th:block th:each="payment: ${payments}">
+                    <div class="payment" th:classappend="${payment.isDefaultPayment() ? 'default' : null}" th:data-id="${payment.getUserPaymentId()}">
+                        <div class="payment-logo">
+                            <div th:switch="${payment.getPaymentType()}">
+
+                            </div>
+                        </div>
+                        <div class="payment-info">
+                            <div class="payment-title" th:text="${payment.getPaymentType()}"></div>
+                            <div class="payment-owner" th:text="${payment.getCardHolderName()}"></div>
+                        </div>
+                    </div>
+                </th:block>
+            </div>
+            <div class="section-footer">
+                <button class="button button-purple btn-open-payment-modal">Añadir forma de pago</button>
+            </div>
+        </section>
+    </div>
 </main>
 <footer th:replace="~{mall/footer::footer}"></footer>
 
@@ -185,8 +208,27 @@
     </div>
 </div>
 
+<div class="modal fade" id="modal-payment" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Forma de pago</h5>
+                <span class="close-btn-dot" data-bs-dismiss="modal" data-backdrop="false"></span>
+            </div>
+            <div class="modal-body">
+                JieziCloud no guarda ninguna información de pago. Al hacer clic en "Generar", generaremos un método de pago aleatorio para pruebas.
+            </div>
+            <div class="modal-footer">
+                <button class="button button-purple-light" data-bs-dismiss="modal">Cancelar</button>
+                <button class="button button-purple" id="btn-create-category">Generar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script th:inline="javascript" th:charset="UTF-8">
     const addressModal = new bootstrap.Modal(document.getElementById("modal-address"));
+    const paymentModal = new bootstrap.Modal(document.getElementById("modal-payment"));
     const addresses = [[${addresses}]];
 
     $(document).ready(() => {
@@ -205,6 +247,11 @@
     function initListener() {
         bindAddressModalListener();
         bindAddressManagementListener();
+        bindPaymentModalListener();
+    }
+
+    function bindPaymentModalListener() {
+        $(".btn-open-address-modal").click(() => paymentModal.show());
     }
 
     function bindAddressManagementListener() {
@@ -370,6 +417,13 @@
                     });
                     renderAddressDom(res.data);
                     addressModal.hide();
+                } else if (res.data === "limit exceeded") {
+                    Swal.fire({
+                        title: "¡Ha superado el límite",
+                        text: "Como máximo puedes agregar 5 direcciones.",
+                        icon: "Error",
+                        showConfirmButton: true,
+                    });
                 } else {
                     showServerErrorSwal();
                 }
@@ -530,6 +584,32 @@
             }
             return false;
         });
+    }
+
+    function renderPaymentDom(payment) {
+        const {userPaymentId, paymentType} = payment;
+        const domStr =
+            `<div class="payment" data-id="${userPaymentId}">
+                <div class="payment-logo">
+                    <div th:switch="${payment.getPaymentType()}">
+                    </div>
+                </div>
+                <div class="payment-info">
+                    <div class="payment-title" th:text="${payment.getPaymentType()}"></div>
+                    <div class="payment-owner" th:text="${payment.getCardHolderName()}"></div>
+                </div>
+            </div>`;
+    }
+
+    function createPayment() {
+        $.ajax({
+            url: "/user/payment/create",
+            method: "POST",
+            success: (res) => {
+                console.log(res);
+            }
+
+        })
     }
 </script>
 </body>

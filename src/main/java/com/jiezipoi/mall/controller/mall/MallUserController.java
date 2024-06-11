@@ -4,15 +4,13 @@ import com.jiezipoi.mall.config.JwtConfig;
 import com.jiezipoi.mall.dto.MallUserDTO;
 import com.jiezipoi.mall.entity.User;
 import com.jiezipoi.mall.entity.UserAddress;
+import com.jiezipoi.mall.entity.UserPayment;
 import com.jiezipoi.mall.enums.UserStatus;
 import com.jiezipoi.mall.exception.NotFoundException;
 import com.jiezipoi.mall.exception.UnactivatedUserException;
 import com.jiezipoi.mall.exception.UserNotFoundException;
 import com.jiezipoi.mall.exception.VerificationCodeNotFoundException;
-import com.jiezipoi.mall.service.JwtService;
-import com.jiezipoi.mall.service.UserAddressService;
-import com.jiezipoi.mall.service.UserService;
-import com.jiezipoi.mall.service.VerificationCodeService;
+import com.jiezipoi.mall.service.*;
 import com.jiezipoi.mall.utils.CommonResponse;
 import com.jiezipoi.mall.utils.Response;
 import jakarta.servlet.http.Cookie;
@@ -43,13 +41,17 @@ public class MallUserController {
     private final JwtService jwtService;
     private final VerificationCodeService verificationCodeService;
     private final UserAddressService userAddressService;
+    private final UserPaymentService userPaymentService;
 
-    public MallUserController(UserService userService, JwtConfig jwtConfig, JwtService jwtService, VerificationCodeService verificationCodeService, UserAddressService userAddressService) {
+    public MallUserController(UserService userService, JwtConfig jwtConfig, JwtService jwtService,
+                              VerificationCodeService verificationCodeService, UserAddressService userAddressService,
+                              UserPaymentService userPaymentService) {
         this.userService = userService;
         this.jwtConfig = jwtConfig;
         this.jwtService = jwtService;
         this.verificationCodeService = verificationCodeService;
         this.userAddressService = userAddressService;
+        this.userPaymentService = userPaymentService;
     }
 
     @GetMapping("/activate-account/{token}")
@@ -129,12 +131,10 @@ public class MallUserController {
     public String profilePage(Principal principal, ModelMap modelMap) {
         User user = userService.getUserByEmail(principal.getName());
         List<UserAddress> addresses = userAddressService.getUserAddresList(user.getUserId());
-        addresses.forEach(userAddress -> {
-            userAddress.setCreateTime(null);
-            userAddress.setUserId(null);
-        });
+        List<UserPayment> payments = userPaymentService.getUserPaymentList(user.getUserId());
         modelMap.put("user", user);
         modelMap.put("addresses", addresses);
+        modelMap.put("payments", payments);
         return "mall/user-profile";
     }
 
