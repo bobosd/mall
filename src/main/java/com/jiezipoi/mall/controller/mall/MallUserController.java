@@ -2,9 +2,9 @@ package com.jiezipoi.mall.controller.mall;
 
 import com.jiezipoi.mall.config.JwtConfig;
 import com.jiezipoi.mall.dto.MallUserDTO;
+import com.jiezipoi.mall.dto.UserPaymentDTO;
 import com.jiezipoi.mall.entity.User;
 import com.jiezipoi.mall.entity.UserAddress;
-import com.jiezipoi.mall.entity.UserPayment;
 import com.jiezipoi.mall.enums.UserStatus;
 import com.jiezipoi.mall.exception.NotFoundException;
 import com.jiezipoi.mall.exception.UnactivatedUserException;
@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/user")
@@ -131,7 +132,10 @@ public class MallUserController {
     public String profilePage(Principal principal, ModelMap modelMap) {
         User user = userService.getUserByEmail(principal.getName());
         List<UserAddress> addresses = userAddressService.getUserAddresList(user.getUserId());
-        List<UserPayment> payments = userPaymentService.getUserPaymentList(user.getUserId());
+        List<UserPaymentDTO> payments = userPaymentService.getUserPaymentList(user.getUserId())
+                .stream()
+                .map(UserPaymentDTO::new)
+                .collect(Collectors.toList());
         modelMap.put("user", user);
         modelMap.put("addresses", addresses);
         modelMap.put("payments", payments);

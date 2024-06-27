@@ -38,8 +38,9 @@ public class CardDetailGenerator {
         LocalDate fiveYearsLater = currentDate.plusYears(5);
         long minDay = oneYearLater.toEpochDay();
         long maxDay = fiveYearsLater.toEpochDay();
-        long randomDay = ThreadLocalRandom.current().nextLong(minDay, maxDay);
-        return LocalDate.ofEpochDay(randomDay);
+        long randomDayEpoch = ThreadLocalRandom.current().nextLong(minDay, maxDay);
+        LocalDate randomDay = LocalDate.ofEpochDay(randomDayEpoch);
+        return randomDay.withDayOfMonth(1);
     }
 
     private static int generateCheckDigit(String cardNumber) {

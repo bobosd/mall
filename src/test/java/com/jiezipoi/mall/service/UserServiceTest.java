@@ -294,7 +294,6 @@ class UserServiceTest {
         String token = "NOT_FOUND_TOKEN";
         when(verificationCodeService.getVerificationCode(token)).thenReturn(null);
 
-        // When & Then
         assertThrows(NotFoundException.class, () -> userService.resetPassword(token, "PASSWORD"));
 
         verify(verificationCodeService).getVerificationCode(token);

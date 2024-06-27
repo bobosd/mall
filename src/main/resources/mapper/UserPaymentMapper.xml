@@ -14,8 +14,7 @@
     </resultMap>
 
     <sql id="Base_Column_List">
-        user_payment_id, user_id, payment_type, card_number, card_holder_name, expiration_date,
-        cvv, create_time, default_payment
+        user_payment_id, user_id, payment_type, card_number, card_holder_name, expiration_date, cvv, create_time, default_payment
     </sql>
 
     <insert id="insert" keyColumn="user_payment_id" keyProperty="userPaymentId" parameterType="com.jiezipoi.mall.entity.UserPayment" useGeneratedKeys="true">
@@ -27,10 +26,8 @@
         #{createTime,jdbcType=TIMESTAMP},#{defaultPayment,jdbcType=BOOLEAN})
     </insert>
 
-    <select id="findByUserId" resultType="com.jiezipoi.mall.entity.UserPayment">
-        SELECT
-        <include refid="Base_Column_List">
-        </include>
+    <select id="findByUserId" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
         FROM user_payment
         WHERE user_id = #{userId,jdbcType=BIGINT}
     </select>
@@ -39,4 +36,54 @@
         DELETE FROM user_payment
         WHERE user_id = #{userId,jdbcType=BIGINT} AND user_payment_id = #{paymentId,jdbcType=BIGINT}
     </delete>
+
+    <update id="setAsDefaultPayment">
+        UPDATE user_payment
+        SET default_payment = TRUE
+        WHERE user_id = #{userId} AND user_payment_id = #{paymentId};
+    </update>
+
+    <update id="unsetDefaultPaymentByUserId">
+        UPDATE user_payment
+        SET default_payment = FALSE
+        WHERE user_id = #{userId}
+    </update>
+
+    <select id="selectByPaymentIdAndUserId" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM user_payment
+        WHERE user_payment_id = #{paymentId} AND user_id = #{userId}
+    </select>
+
+    <update id="updateByPrimaryKeySelective" parameterType="com.jiezipoi.mall.entity.UserPayment">
+        UPDATE user_payment
+        <set>
+            <if test="userId != null">
+                user_id = #{userId,jdbcType=BIGINT},
+            </if>
+            <if test="paymentType != null">
+                payment_type = #{paymentType,jdbcType=VARCHAR},
+            </if>
+            <if test="cardNumber != null">
+                card_number = #{cardNumber,jdbcType=VARCHAR},
+            </if>
+            <if test="cardHolderName != null">
+                card_holder_name = #{cardHolderName,jdbcType=VARCHAR},
+            </if>
+            <if test="expirationDate != null">
+                expiration_date = #{expirationDate,jdbcType=DATE},
+            </if>
+            <if test="CVV != null">
+                cvv = #{CVV,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="defaultPayment != null">
+                default_payment = #{defaultPayment,jdbcType=TINYINT},
+            </if>
+        </set>
+        WHERE user_payment_id = #{userPaymentId,jdbcType=BIGINT}
+    </update>
 </mapper>

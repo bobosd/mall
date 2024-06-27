@@ -98,3 +98,69 @@ button {
 #modal-address .form-switch {
     margin-top: 10px;
 }
+
+#modal-payment .payment-warning-icon {
+    margin: auto;
+    width: max-content;
+    font-size: 72px;
+    color: #FFD082FF;
+}
+
+.payment {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    background-color: var(--mall-light-color);
+    width: 320px;
+    height: 220px;
+    border-radius: 15px;
+    padding: 10px 20px;
+    margin-bottom: 20px;
+}
+
+.payment-top {
+    display: flex;
+    height: max-content;
+}
+
+.payment-logo {
+    font-size: 72px;
+    line-height: 72px;
+    color: #ffffff;
+}
+
+.payment-type {
+    padding: 5px 10px;
+    font-weight: 500;
+    font-size: 24px;
+    display: flex;
+    flex-wrap: wrap;
+    align-content: center;
+}
+
+.payment-type div {
+    height: max-content;
+}
+
+.payment-digit {
+    display: flex;
+    justify-content: space-between;
+    font-size: 20px;
+    letter-spacing: 3px;
+}
+
+.payment-holder {
+    font-weight: 500;
+    font-size: 18px;
+}
+
+.payment-middle {
+    padding: 0 10px;
+}
+
+.payment-bottom {
+    padding: 10px 0;
+    display: flex;
+    justify-content: space-between;
+}

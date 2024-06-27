@@ -7,10 +7,12 @@
     <link rel="stylesheet" href="/styles/mall/user-profile.css"/>
     <link rel="stylesheet" href="/styles/common/modal.css">
     <link rel="stylesheet" th:replace="~{common/libraries::select2-css}">
+    <link rel="stylesheet" th:replace="~{common/loading-screen::css}">
     <script th:replace="~{common/libraries::select2-js}"></script>
 </head>
 <body>
 <nav th:replace="~{mall/navbar::navbar}"></nav>
+<div th:replace="~{common/loading-screen::body}"></div>
 <main>
     <div class="floor">
         <section class="account-data">
@@ -65,14 +67,44 @@
             <div class="section-body">
                 <th:block th:each="payment: ${payments}">
                     <div class="payment" th:classappend="${payment.isDefaultPayment() ? 'default' : null}" th:data-id="${payment.getUserPaymentId()}">
-                        <div class="payment-logo">
-                            <div th:switch="${payment.getPaymentType()}">
-
+                        <div class="payment-top">
+                            <div class="payment-logo" th:switch="${payment.getPaymentType().name()}">
+                                <th:block th:case="'VISA'">
+                                    <i class="fa-brands fa-cc-visa"></i>
+                                </th:block>
+                                <th:block th:case="'MASTERCARD'">
+                                    <i class="fa-brands fa-cc-mastercard"></i>
+                                </th:block>
+                                <th:block th:case="'PAYPAL'">
+                                    <i class="fa-brands fa-cc-paypal"></i>
+                                </th:block>
+                                <th:block th:case="'AMERICAN_EXPRESS'">
+                                    <i class="fa-brands fa-cc-amex"></i>
+                                </th:block>
+                            </div>
+                            <div class="payment-type">
+                                <div th:text="${payment.getPaymentType()}"></div>
                             </div>
                         </div>
-                        <div class="payment-info">
-                            <div class="payment-title" th:text="${payment.getPaymentType()}"></div>
-                            <div class="payment-owner" th:text="${payment.getCardHolderName()}"></div>
+                        <div class="payment-middle d-flex flex-column">
+                            <div class="payment-digit">
+                                <div>••••</div>
+                                <div>••••</div>
+                                <div>••••</div>
+                                <div th:text="${payment.getLastFourDigit()}"></div>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <div class="payment-holder" th:text="${payment.getCardHolderName()}"></div>
+                                <div class="payment-expire-date" th:text="${payment.getExpirationInCardFormat()}"></div>
+                            </div>
+                        </div>
+                        <div class="payment-bottom">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input payment-default" type="checkbox" role="switch" id="payment-default"
+                                       th:checked="${payment.isDefaultPayment()}" th:disabled="${payment.isDefaultPayment()}">
+                                <label class="form-check-label" for="payment-default">Predeterminada</label>
+                            </div>
+                            <button class="button button-red payment-delete">Eliminar</button>
                         </div>
                     </div>
                 </th:block>
@@ -216,11 +248,16 @@
                 <span class="close-btn-dot" data-bs-dismiss="modal" data-backdrop="false"></span>
             </div>
             <div class="modal-body">
-                JieziCloud no guarda ninguna información de pago. Al hacer clic en "Generar", generaremos un método de pago aleatorio para pruebas.
+                <div class="payment-warning-icon">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                </div>
+                <div>
+                    JieziCloud no guarda ninguna información de pago. Al hacer clic en "Generar", generaremos un método de pago aleatorio para pruebas.
+                </div>
             </div>
             <div class="modal-footer">
                 <button class="button button-purple-light" data-bs-dismiss="modal">Cancelar</button>
-                <button class="button button-purple" id="btn-create-category">Generar</button>
+                <button class="button button-purple btn-create-payment">Generar</button>
             </div>
         </div>
     </div>
@@ -248,10 +285,24 @@
         bindAddressModalListener();
         bindAddressManagementListener();
         bindPaymentModalListener();
+        bindPaymentManagementListener();
+    }
+
+    function bindPaymentManagementListener() {
+        $(".payment-default").change((e) => {
+            const paymentId = $(e.target).closest(".payment").data("id");
+            setAsDefaultPayment(paymentId);
+        });
+
+        $(".payment-delete").click((e) => {
+            const paymentId = $(e.target).closest(".payment").data("id");
+            deletePayment(paymentId);
+        });
     }
 
     function bindPaymentModalListener() {
-        $(".btn-open-address-modal").click(() => paymentModal.show());
+        $(".btn-open-payment-modal").click(() => paymentModal.show());
+        $(".btn-create-payment").click(() => createPayment());
     }
 
     function bindAddressManagementListener() {
@@ -421,7 +472,7 @@
                     Swal.fire({
                         title: "¡Ha superado el límite",
                         text: "Como máximo puedes agregar 5 direcciones.",
-                        icon: "Error",
+                        icon: "error",
                         showConfirmButton: true,
                     });
                 } else {
@@ -574,6 +625,9 @@
             currentDefault.removeClass("default");
             $(".address[data-id=" + addressId + "]").addClass("default");
         }
+        addresses.forEach((a) => {
+            a.defaultAddress = a.userAddressId === addressId;
+        })
     }
 
     function syncAddressArr(address) {
@@ -586,30 +640,117 @@
         });
     }
 
-    function renderPaymentDom(payment) {
-        const {userPaymentId, paymentType} = payment;
-        const domStr =
-            `<div class="payment" data-id="${userPaymentId}">
-                <div class="payment-logo">
-                    <div th:switch="${payment.getPaymentType()}">
-                    </div>
-                </div>
-                <div class="payment-info">
-                    <div class="payment-title" th:text="${payment.getPaymentType()}"></div>
-                    <div class="payment-owner" th:text="${payment.getCardHolderName()}"></div>
-                </div>
-            </div>`;
-    }
-
     function createPayment() {
+        const button = $(".btn-create-payment");
+        button.addSpinner();
         $.ajax({
-            url: "/user/payment/create",
+            url: "/user/payment",
             method: "POST",
             success: (res) => {
-                console.log(res);
-            }
-
+                if (res.code === 200) {
+                    paymentModal.hide();
+                    Swal.fire({
+                        title: "Guardado!",
+                        text: "Se ha generado un método de pago.",
+                        icon: "success",
+                        timer: 2000,
+                        showConfirmButton: false,
+                    }).then(() => {
+                        window.location.reload();
+                    });
+                } else if (res.code === 403 && res.data === "limit exceeded") {
+                    paymentModal.hide();
+                    Swal.fire({
+                        title: "¡Ha superado el límite",
+                        text: "Como máximo puedes agregar 5 métodos de pago.",
+                        icon: "error",
+                        showConfirmButton: true,
+                    });
+                } else {
+                    showServerErrorSwal();
+                }
+            },
+            error: () => {
+                showServerErrorSwal();
+            },
+            complete: () => button.removeSpinner(),
         })
+    }
+
+    function showLoadingScreen() {
+        $(".loading-background").addClass("d-flex");
+    }
+
+    function hideLoadingScreen() {
+        $(".loading-background").removeClass("d-flex");
+    }
+
+    function setAsDefaultPayment(paymentId) {
+        showLoadingScreen();
+        $.ajax({
+            method: "PUT",
+            url: "/user/payment/default",
+            data: {paymentId},
+            success: (res) => {
+                hideLoadingScreen();
+                if (res.code === 200) {
+                    $(".payment").each((i, e) => {
+                        const thisPaymentId = $(e).data("id");
+                        const checkBox = $(e).find(".payment-default");
+                        if (thisPaymentId !== paymentId) {
+                            checkBox.prop("disabled", false);
+                            checkBox.prop("checked", false);
+                        } else {
+                            checkBox.prop("disabled", true);
+                            checkBox.prop("checked", true);
+                        }
+                    });
+                } else {
+                    showServerErrorSwal();
+                }
+            },
+            error: () => showServerErrorSwal(),
+        });
+    }
+
+    function deletePayment(paymentId) {
+        Swal.fire({
+            title: "Eliminar método de pago",
+            text: "¿Seguro que deseas eliminar este método de pago?",
+            icon: "warning",
+            showConfirmButton: true,
+            showDenyButton: true,
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    method: "DELETE",
+                    url: "/user/payment",
+                    data: {paymentId},
+                    success: (res) => {
+                        if (res.code === 200) {
+                            Swal.fire({
+                                title: "Eliminado",
+                                text: " ",
+                                icon: "success",
+                                timer: 1000,
+                                showConfirmButton: false,
+                            });
+                            $(".payment[data-id=" + paymentId + "]").remove();
+                            if (res.data != null) {
+                                const newDefaultId = res.data.userPaymentId;
+                                $(".payment[data-id=" + newDefaultId + "]")
+                                    .find(".payment-default")
+                                    .prop("checked", true)
+                                    .prop("disabled", true);
+                            }
+                        } else {
+                            showServerErrorSwal();
+                        }
+                    },
+                    error: () => showServerErrorSwal(),
+                });
+            }
+        });
     }
 </script>
 </body>

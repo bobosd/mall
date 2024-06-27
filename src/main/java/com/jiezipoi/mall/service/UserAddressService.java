@@ -66,7 +66,7 @@ public class UserAddressService {
         return userAddressDao.countByUserId(userId);
     }
 
-    public UserAddress setAnyAsDefaultAddress(Long userId) throws NotFoundException {
+    public UserAddress setAnyAsDefaultAddress(Long userId) {
         List<UserAddress> list = getUserAddresList(userId);
         if (list.isEmpty()) {
             return null;

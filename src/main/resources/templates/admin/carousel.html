@@ -402,17 +402,17 @@
 
     function validateCreateCarouselForm() {
         let isValid = true;
+
         const selectGoods = $(".slc-goods");
-        const inputOrder = $("#input-rank-order");
-
         const goodsId = selectGoods.val();
-
         if (goodsId == null) {
             selectGoods.next().setInvalid();
             isValid = false;
         }
 
-        if (!validator.isInteger() || !validator.isPositiveNumber()) {
+        const inputOrder = $("#input-rank-order");
+        const order = inputOrder.val();
+        if (!order || !Validator.isPositiveNumber(order)) {
             inputOrder.setInvalid();
             isValid = false;
         }
