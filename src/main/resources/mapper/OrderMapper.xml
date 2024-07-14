@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.jiezipoi.mall.dao.OrderDao">
+    <resultMap id="BaseResultMap" type="com.jiezipoi.mall.entity.Order">
+        <id column="order_id" jdbcType="BIGINT" property="orderId" />
+        <result column="order_number" jdbcType="VARCHAR" property="orderNumber" />
+        <result column="user_id" jdbcType="BIGINT" property="userId" />
+        <result column="total_price" jdbcType="INTEGER" property="totalPrice" />
+        <result column="pay_status" typeHandler="com.jiezipoi.mall.handler.mybatis.PaymentStatusHandler" property="payStatus" />
+        <result column="pay_type" jdbcType="TINYINT" property="payType" />
+        <result column="pay_time" jdbcType="TIMESTAMP" property="payTime" />
+        <result column="order_status" typeHandler="com.jiezipoi.mall.handler.mybatis.OrderStatusHandler" property="orderStatus" />
+        <result column="extra_info" jdbcType="VARCHAR" property="extraInfo" />
+        <result column="name" jdbcType="VARCHAR" property="name" />
+        <result column="surname" jdbcType="VARCHAR" property="surname" />
+        <result column="shipping_phone_number" jdbcType="VARCHAR" property="shippingPhoneNumber" />
+        <result column="shipping_province" jdbcType="VARCHAR" property="shippingProvince" />
+        <result column="shipping_city" jdbcType="VARCHAR" property="shippingCity" />
+        <result column="shipping_street_address" jdbcType="VARCHAR" property="shippingStreetAddress" />
+        <result column="shipping_postal_code" jdbcType="VARCHAR" property="shippingPostalCode" />
+        <result column="is_deleted" jdbcType="TINYINT" property="isDeleted" />
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        order_id, order_number, user_id, total_price, pay_status, pay_type, pay_time, order_status,
+        extra_info, `name`, surname, shipping_phone_number, shipping_province, shipping_city,
+        shipping_street_address, shipping_postal_code, is_deleted, create_time, update_time
+    </sql>
+
+    <insert id="insert" parameterType="com.jiezipoi.mall.entity.Order" useGeneratedKeys="true" keyProperty="orderId">
+        insert into `order` (order_id, order_number, user_id,
+        total_price, pay_status, pay_type,
+        pay_time, order_status, extra_info,
+        `name`, surname, shipping_phone_number,
+        shipping_province, shipping_city, shipping_street_address,
+        shipping_postal_code, is_deleted, create_time,
+        update_time)
+        values (#{orderId,jdbcType=BIGINT}, #{orderNumber,jdbcType=VARCHAR}, #{userId,jdbcType=BIGINT},
+        #{totalPrice,jdbcType=INTEGER}, #{payStatus,jdbcType=VARCHAR}, #{payType,jdbcType=TINYINT},
+        #{payTime,jdbcType=TIMESTAMP}, #{orderStatus,jdbcType=VARCHAR}, #{extraInfo,jdbcType=VARCHAR},
+        #{name,jdbcType=VARCHAR}, #{surname,jdbcType=VARCHAR}, #{shippingPhoneNumber,jdbcType=VARCHAR},
+        #{shippingProvince,jdbcType=VARCHAR}, #{shippingCity,jdbcType=VARCHAR}, #{shippingStreetAddress,jdbcType=VARCHAR},
+        #{shippingPostalCode,jdbcType=VARCHAR}, #{isDeleted,jdbcType=TINYINT}, #{createTime,jdbcType=TIMESTAMP},
+        #{updateTime,jdbcType=TIMESTAMP})
+    </insert>
+
+    <update id="updateByPrimaryKeySelective" parameterType="com.jiezipoi.mall.entity.Order">
+        update `order`
+        <set>
+            <if test="orderNumber != null and orderNumber != ''">
+                order_number = #{orderNumber,jdbcType=VARCHAR},
+            </if>
+            <if test="userId != null">
+                user_id = #{userId,jdbcType=BIGINT},
+            </if>
+            <if test="totalPrice != null">
+                total_price = #{totalPrice,jdbcType=INTEGER},
+            </if>
+            <if test="payStatus != null and payStatus != ''">
+                pay_status = #{payStatus,jdbcType=VARCHAR},
+            </if>
+            <if test="payType != null">
+                pay_type = #{payType,jdbcType=TINYINT},
+            </if>
+            <if test="payTime != null">
+                pay_time = #{payTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="orderStatus != null and orderStatus != ''">
+                order_status = #{orderStatus,jdbcType=VARCHAR},
+            </if>
+            <if test="extraInfo != null and extraInfo != ''">
+                extra_info = #{extraInfo,jdbcType=VARCHAR},
+            </if>
+            <if test="name != null and name != ''">
+                `name` = #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="surname != null and surname != ''">
+                surname = #{surname,jdbcType=VARCHAR},
+            </if>
+            <if test="shippingPhoneNumber != null and shippingPhoneNumber != ''">
+                shipping_phone_number = #{shippingPhoneNumber,jdbcType=VARCHAR},
+            </if>
+            <if test="shippingProvince != null and shippingProvince != ''">
+                shipping_province = #{shippingProvince,jdbcType=VARCHAR},
+            </if>
+            <if test="shippingCity != null and shippingCity != ''">
+                shipping_city = #{shippingCity,jdbcType=VARCHAR},
+            </if>
+            <if test="shippingStreetAddress != null and shippingStreetAddress != ''">
+                shipping_street_address = #{shippingStreetAddress,jdbcType=VARCHAR},
+            </if>
+            <if test="shippingPostalCode != null and shippingPostalCode != ''">
+                shipping_postal_code = #{shippingPostalCode,jdbcType=VARCHAR},
+            </if>
+            <if test="isDeleted != null">
+                is_deleted = #{isDeleted,jdbcType=TINYINT},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where order_id = #{orderId,jdbcType=BIGINT}
+    </update>
+</mapper>
