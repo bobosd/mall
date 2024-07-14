@@ -4,7 +4,7 @@
     <resultMap id="BaseResultMap" type="com.jiezipoi.mall.entity.UserPayment">
         <id column="user_payment_id" jdbcType="BIGINT" property="userPaymentId" />
         <result column="user_id" jdbcType="BIGINT" property="userId" />
-        <result column="payment_type" typeHandler="com.jiezipoi.mall.handler.PaymentTypeHandler" property="paymentType" />
+        <result column="payment_type" typeHandler="com.jiezipoi.mall.handler.mybatis.PaymentTypeHandler" property="paymentType" />
         <result column="card_number" jdbcType="VARCHAR" property="cardNumber" />
         <result column="card_holder_name" jdbcType="VARCHAR" property="cardHolderName" />
         <result column="expiration_date" jdbcType="DATE" property="expirationDate" />

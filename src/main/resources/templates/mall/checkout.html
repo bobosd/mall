@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{mall/header::general-libraries-and-styles(~{::title}, ~{::link}, ~{this::head/script})}">
+    <meta charset="UTF-8">
+    <title>Mall</title>
+    <link rel="stylesheet" href="/styles/mall/all.css"/>
+    <link rel="stylesheet" href="/styles/mall/checkout.css"/>
+    <link th:replace="~{common/loading-screen::css}">
+</head>
+<body>
+<div th:replace="~{common/loading-screen::body}"></div>
+<nav>
+    <div class="navbar">
+        <div class="navbar-lft">
+            <a href="/">
+                <img class="navbar-mall-icon" src="/assets/img/poi_128x128.png" alt="mall icon">
+            </a>
+        </div>
+        <div class="navbar-center">
+            Tramitar pedido
+        </div>
+        <div class="navbar-rgt">
+            <a class="btn-cancel" href="/">Cancelar</a>
+        </div>
+    </div>
+</nav>
+<main>
+    <div class="floor">
+        <div>
+            <div class="select-section">
+                <section>
+                    <div class="section-title">Dirección de entrega</div>
+                    <ul class="addresses">
+                        <li th:each="address: ${addresses}"
+                            th:classappend="${address.isDefaultAddress()} ? 'selected' : ''"
+                            th:data-id="${address.getUserAddressId()}" class="address">
+                            <div class="section-radio-container">
+                                <input type="radio" class="section-radio" name="address-group"
+                                       th:checked="${address.isDefaultAddress()}">
+                            </div>
+                            <div class="section-body">
+                                <div>
+                                    <span th:text="${address.getStreetAddress()}"></span><span th:if="!${address.getAdditionalInformation().isBlank()}"
+                                                                                               th:text="', ' +${address.getAdditionalInformation()}"></span>
+                                </div>
+                                <div>
+                                    <span th:text="${address.getCity()}"></span>
+                                    <span th:text="${address.getPostalCode()}"></span>
+                                </div>
+                                <div>
+                                    <span th:text="${address.getProvince()}"></span>
+                                </div>
+                                <div class="address-receiver">
+                                    <span th:text="${address.getFirstName()}"></span>
+                                    <span th:text="${address.getSurname()}"></span>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </section>
+
+                <section>
+                    <div class="section-title">Método de pago</div>
+                    <ul class="payments">
+                        <li th:each="payment : ${payments}"
+                            th:classappend="${payment.isDefaultPayment()} ? 'selected': ''"
+                            th:data-id="${payment.getUserPaymentId()}" class="payment">
+                            <div class="section-radio-container">
+                                <input type="radio" class="section-radio" name="payment-group"
+                                       th:checked="${payment.isDefaultPayment()}">
+                            </div>
+                            <div class="section-body">
+                                <div class="payment-type" th:text="${payment.getPaymentType().toString()}">
+                                </div>
+                                <div class="payment-name">
+                                    <span>Tarjeta que termina con</span>
+                                    <span th:text="${payment.getLastFourDigit()}"></span>
+                                </div>
+                                <div class="payment-owner" th:text="${payment.getCardHolderName()}">
+                                </div>
+                                <div class="payment-expire-date" th:text="${payment.getExpirationInCardFormat()}">
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </section>
+            </div>
+
+            <div class="summary">
+                <div class="summary-title">Resumen de pedido:</div>
+                <div class="summary-body">
+                    <div class="d-flex justify-content-between">
+                        <div>subtotal artículos</div>
+                        <div class="total-price" th:text="${totalPrice}"></div>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between">
+                        <div>Total:</div>
+                        <div class="total-price" th:text="${totalPrice}"></div>
+                    </div>
+
+                </div>
+                <div class="">
+                    <button class="button button-xl button-purple btn-pay">Pagar y continuar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+<footer th:replace="~{mall/footer::footer}"></footer>
+
+<script>
+    $(document).ready(() => {
+        bindSectionEvent();
+        bindPayEvent();
+    });
+
+    function bindPayEvent() {
+        $(".btn-pay").click(() => {
+            Swal.fire({
+                icon: "warning",
+                title: "Confirmar dirección de entrega",
+                text: "Una vez realizado pedido, no podrás modificar dirección de entrega",
+                showConfirmButton: true,
+                showDenyButton: true,
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    checkout();
+                }
+            });
+        });
+    }
+
+    function bindSectionEvent() {
+        $("section ul li").click((e) => {
+            const list = $(e.target).closest("ul");
+            const listItem = $(e.target).closest("li");
+            if (!listItem.hasClass("selected")) {
+                list.find(".selected").removeClass("selected");
+                listItem.find(".section-radio").prop("checked", true);
+                listItem.addClass("selected");
+            }
+        });
+    }
+
+    function showLoadingScreen() {
+        $(".loading-background").addClass("d-flex");
+    }
+
+    function hideLoadingScreen() {
+        $(".loading-background").removeClass("d-flex");
+    }
+
+    function checkout() {
+        showLoadingScreen();
+        const paymentId = $(".payment.selected").data("id");
+        const addressId = $(".address.selected").data("id");
+        $.ajax({
+            url: "/checkout",
+            method: "POST",
+            data: {paymentId, addressId},
+            success: (res) => {
+                if (res.code === 200) {
+                    window.location.replace(getBaseUrl() + "/user/order");
+                } else if (res.code === 404) {
+                    Swal.fire({
+                        title: "No se ha podido realizar pedido",
+                        text: "El pedido contiene producto que no está disponible",
+                        showConfirmButton: true,
+                        showDenyButton: false
+                    }).then(() => {
+                        window.location.replace(getBaseUrl() + "/checkout");
+                    });
+                } else if (res.code === 409) {
+                    Swal.fire({
+                        title: "No se ha podido realizar pedido",
+                        text: "El pedido contiene producto que está agotado.",
+                        showConfirmButton: true,
+                        showDenyButton: false
+                    }).then(() => {
+                        window.location.replace(getBaseUrl() + "/checkout");
+                    });
+                }
+            },
+            error: () => showServerErrorSwal(),
+            complete: () => hideLoadingScreen()
+        });
+    }
+</script>
+</body>
+</html>

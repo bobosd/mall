@@ -29,6 +29,10 @@ public class CarouselService {
         this.carouselConfig = carouselConfig;
     }
 
+    public List<Carousel> getCarouselList() {
+        return carouselDao.findAllCarousel();
+    }
+
     public DataTableResult getCarouselPage(DataTableRequest request) {
         Integer start = request.getStart();
         Integer limit = request.getLength();

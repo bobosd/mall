@@ -71,7 +71,7 @@
 
                     </div>
                     <div class="">
-                        <button class="button button-xl button-purple btn-create-order">Realizar pedido</button>
+                        <button class="button button-xl button-purple btn-checkout">Realizar pedido</button>
                     </div>
                 </div>
             </div>
@@ -102,8 +102,8 @@
 
     function initListener() {
         bindAmountSelectorEvent();
-        bindCreateOrderEvent();
-        bindDeleteCartItemEvent()
+        bindCheckoutEvent();
+        bindDeleteCartItemEvent();
     }
 
     function bindDeleteCartItemEvent() {
@@ -125,16 +125,10 @@
         });
     }
 
-    function bindCreateOrderEvent() {
-        $(".btn-create-order").click((e) => {
+    function bindCheckoutEvent() {
+        $(".btn-checkout").click((e) => {
             $(e.target).addSpinner();
-            Swal.fire({
-                position: "top",
-                title: "Función en desarrollo",
-                icon: "warning"
-            }).then(() => {
-                $(e.target).removeSpinner();
-            })
+            window.location.replace(getBaseUrl() + '/checkout');
         });
     }
 

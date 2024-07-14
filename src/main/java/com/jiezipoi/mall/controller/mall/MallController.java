@@ -1,13 +1,12 @@
 package com.jiezipoi.mall.controller.mall;
 
 import com.jiezipoi.mall.config.CarouselConfig;
-import com.jiezipoi.mall.dao.CarouselDao;
 import com.jiezipoi.mall.dto.IndexGoodsCategoryDTO;
 import com.jiezipoi.mall.dto.MallGoodsDTO;
 import com.jiezipoi.mall.entity.Carousel;
 import com.jiezipoi.mall.enums.IndexConfigType;
+import com.jiezipoi.mall.service.CarouselService;
 import com.jiezipoi.mall.service.GoodsCategoryService;
-import com.jiezipoi.mall.service.GoodsService;
 import com.jiezipoi.mall.service.IndexConfigService;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -20,14 +19,14 @@ import java.util.List;
 
 @Controller
 public class MallController {
-    private final CarouselDao carouselDao;
+    private final CarouselService carouselService;
     private final CarouselConfig carouselConfig;
     private final GoodsCategoryService categoryService;
     private final IndexConfigService indexConfigService;
 
-    public MallController(CarouselDao carouselDao, CarouselConfig carouselConfig, GoodsCategoryService categoryService,
+    public MallController(CarouselService carouselService, CarouselConfig carouselConfig, GoodsCategoryService categoryService,
                           IndexConfigService indexConfigService) {
-        this.carouselDao = carouselDao;
+        this.carouselService = carouselService;
         this.carouselConfig = carouselConfig;
         this.categoryService = categoryService;
         this.indexConfigService = indexConfigService;
@@ -35,7 +34,7 @@ public class MallController {
 
     @GetMapping({"/index", "/", "/index.html"})
     public String indexPage(ModelMap modelMap) {
-        List<Carousel> carousels = carouselDao.findAllCarousel();
+        List<Carousel> carousels = carouselService.getCarouselList();
         String baseExposeUrl = carouselConfig.getExposeUrl();
         List<IndexGoodsCategoryDTO> categories = categoryService.getIndexCategory();
 

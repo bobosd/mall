@@ -8,6 +8,7 @@ import com.jiezipoi.mall.exception.QuantityExceededException;
 import com.jiezipoi.mall.service.ShoppingCartItemService;
 import com.jiezipoi.mall.service.UserService;
 import com.jiezipoi.mall.utils.CommonResponse;
+import com.jiezipoi.mall.utils.CurrencyFormatter;
 import com.jiezipoi.mall.utils.Response;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -35,8 +36,8 @@ public class ShoppingCartItemController {
     public String shoppingCartPage(Principal principal, ModelMap modelMap) {
         Long userId = userService.getUserIdByEmail(principal.getName());
         List<ShoppingCartItemDTO> itemList = shoppingCartItemService.getUserShoppingCart(userId);
-        BigDecimal totalPrice = calcTotalPrice(itemList);
-        String priceString = totalPrice.toString().replaceAll("\\.", ",") + "€";
+        BigDecimal totalValue = shoppingCartItemService.calcShoppingCartTotalValue(itemList);
+        String priceString = CurrencyFormatter.formatCurrency(totalValue);
         modelMap.put("totalPrice", priceString);
         modelMap.put("cartItems", itemList);
         return "mall/shopping-cart";
@@ -73,7 +74,7 @@ public class ShoppingCartItemController {
         List<ShoppingCartItemDTO> cartItems = shoppingCartItemService.getUserShoppingCart(userId);
         Map<String, Object> data = new HashMap<>();
         data.put("items", cartItems);
-        data.put("totalPrice", calcTotalPrice(cartItems));
+        data.put("totalPrice", shoppingCartItemService.calcShoppingCartTotalValue(cartItems));
         Response<Map<String, Object>> response = new Response<>(CommonResponse.SUCCESS);
         response.setData(data);
         return response;
@@ -114,11 +115,5 @@ public class ShoppingCartItemController {
                 item.getGoodsCount() == null ||
                 item.getGoodsCount() < 0 ||
                 item.getGoodsCount() > 9;
-    }
-
-    private BigDecimal calcTotalPrice(List<ShoppingCartItemDTO> itemList) {
-        return itemList.stream()
-                .map((item) -> item.getSellingPrice().multiply(BigDecimal.valueOf(item.getGoodsCount())))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 }

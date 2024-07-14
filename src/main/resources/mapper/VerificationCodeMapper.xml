@@ -4,7 +4,7 @@
     <resultMap id="BaseResultMap" type="com.jiezipoi.mall.entity.UserVerificationCode">
         <id column="email" jdbcType="VARCHAR" property="email" />
         <result column="verification_code" jdbcType="VARCHAR" property="verificationCode" />
-        <result column="action_type" typeHandler="com.jiezipoi.mall.handler.VerificationActionTypeHandler" property="ActionType" />
+        <result column="action_type" typeHandler="com.jiezipoi.mall.handler.mybatis.VerificationActionTypeHandler" property="ActionType" />
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
         <result column="expired_time" jdbcType="TIMESTAMP" property="expiredTime"/>
         <result column="is_deleted" jdbcType="TINYINT" property="isDeleted" />
@@ -44,7 +44,7 @@
                 #{verificationCode,jdbcType=VARCHAR},
             </if>
             <if test="actionType != null">
-                #{actionType,typeHandler=com.jiezipoi.mall.handler.VerificationActionTypeHandler},
+                #{actionType,typeHandler=com.jiezipoi.mall.handler.mybatis.VerificationActionTypeHandler},
             </if>
             <if test="createTime != null">
                 #{createTime,jdbcType=TIMESTAMP},
@@ -70,7 +70,7 @@
         FROM user_verification_code
         WHERE email = #{email,jdbcType=VARCHAR}
         AND expired_time >= NOW()
-        AND action_type = #{actionType, typeHandler=com.jiezipoi.mall.handler.VerificationActionTypeHandler}
+        AND action_type = #{actionType, typeHandler=com.jiezipoi.mall.handler.mybatis.VerificationActionTypeHandler}
         ORDER BY expired_time DESC
         LIMIT 1;
     </select>

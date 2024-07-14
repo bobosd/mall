@@ -11,7 +11,7 @@
         <result column="address" jdbcType="VARCHAR" property="address"/>
         <result column="is_deleted" jdbcType="TINYINT" property="isDeleted"/>
         <result column="locked_flag" jdbcType="TINYINT" property="lockedFlag"/>
-        <result column="user_status" typeHandler="com.jiezipoi.mall.handler.UserStatusTypeHandler" property="userStatus"/>
+        <result column="user_status" typeHandler="com.jiezipoi.mall.handler.mybatis.UserStatusTypeHandler" property="userStatus"/>
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
         <collection property="permissions" ofType="java.lang.String">
             <result column="permission_key"/>

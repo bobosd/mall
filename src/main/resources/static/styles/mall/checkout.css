@@ -65,91 +65,78 @@ nav a {
     font-weight: 500;
 }
 
-.shopping-cart {
+.select-section {
     flex-grow: 1;
     margin-right: 30px;
-}
-
-.shopping-cart-item {
-    padding: 20px;
+    border: #d9d9d9 1px solid;
     border-radius: 8px;
-    border: 1px solid #d9d9d9;
+}
+
+.select-section input[type='radio'] {
+    accent-color: var(--mall-color);
+}
+
+section {
+    padding: 20px;
+}
+
+.section-title {
+    font-size: 24px;
+    font-weight: 700;
+}
+
+section ul li {
     display: flex;
-    margin-top: 15px;
     font-size: 14px;
+    font-weight: 400;
+    padding: 10px 20px;
+    width: 500px;
+    border-radius: 12px;
+    cursor: pointer;
 }
 
-.shopping-cart-item:first-child {
-    margin-top: 0;
+section ul li.selected {
+    background-color: var(--mall-light-color);
 }
 
-.shopping-cart-item-image img {
-    width: 130px;
-}
-
-.shopping-cart-item-info {
+.section-radio-container {
+    width: 30px;
     display: flex;
-    flex-direction: column;
-    margin-left: 10px;
+    flex-wrap: wrap;
+    align-content: center;
 }
 
-.shopping-cart-item-title {
-    font-size: 16px;
+.address-receiver {
+    margin-top: 5px;
     font-weight: 500;
 }
 
-.shopping-cart-item-price {
-    padding: 10px 0;
-    font-size: 17px;
-    font-weight: 500;
-}
-
-.amount-container {
+.payment .section-body{
     display: flex;
-    height: 100%;
-    flex-direction: column-reverse;
+    justify-content: space-between;
+    width: 100%;
 }
 
-.input-buy-amount {
-    width: 20px;
+.payment-type {
+    width: 80px;
 }
 
-.shopping-cart-item-right {
-    display: flex;
+.payment-name {
     flex-grow: 1;
-    flex-direction: row-reverse;
-}
-
-.shopping-cart-empty-container {
-    padding-top: 70px;
     display: flex;
-    justify-content: center;
-}
-
-.shopping-cart-empty-container .shopping-cart-icon {
-    position: relative;
-    font-size: 72px;
-}
-
-.shopping-cart-empty-container .x-mark {
-    display: flex;
-    justify-content: center;
     align-content: center;
     flex-wrap: wrap;
-    position: absolute;
-    top: 0;
-    right: 0;
-    z-index: 2;
-    font-size: 32px;
-    height: 38px;
-    width: 38px;
-    background-color: #ffffff;
-    border-radius: 50%;
 }
 
-.shopping-cart-empty-message {
+.payment-owner {
+    width: 110px;
     display: flex;
-    justify-content: center;
-    font-weight: 700;
-    font-size: 32px;
+    align-content: center;
+    flex-wrap: wrap;
+}
+
+.payment-expire-date {
+    display: flex;
+    align-content: center;
+    flex-wrap: wrap;
 }

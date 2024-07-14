@@ -5,6 +5,7 @@ import com.jiezipoi.mall.entity.Goods;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 public interface GoodsDao {
     long insertSelective(Goods goods);
@@ -38,7 +39,7 @@ public interface GoodsDao {
 
     Goods selectGoodsWithTagByGoodsId(@Param("goodsId") long goodsId);
 
-    List<Goods> findGoodsByIds(@Param("ids") long[] goodsId);
+    List<Goods> findGoodsByIds(@Param("ids") List<Long> goodsId);
 
     int updateByPrimaryKeySelective(Goods goods);
 
@@ -47,4 +48,6 @@ public interface GoodsDao {
     List<MallGoodsDTO> findByCategory(@Param("categoryId") Long categoryId);
 
     List<Goods> findByNameContaining(@Param("goodsName") String goodsName);
+
+    int reduceStockByPrimaryKey(Map<Long, Integer> map);
 }

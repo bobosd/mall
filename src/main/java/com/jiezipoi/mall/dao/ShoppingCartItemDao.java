@@ -18,4 +18,6 @@ public interface ShoppingCartItemDao {
     List<ShoppingCartItemDTO> findByUserId(@Param("userId") Long mallUserId);
 
     int deleteByGoodsIdAndUserId(@Param("userId") Long userId, @Param("goodsId") Long goodsId);
+
+    int deleteAllByUserId(@Param("userId") Long userId);
 }

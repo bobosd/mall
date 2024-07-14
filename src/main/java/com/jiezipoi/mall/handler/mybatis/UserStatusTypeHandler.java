@@ -1,4 +1,4 @@
-package com.jiezipoi.mall.handler;
+package com.jiezipoi.mall.handler.mybatis;
 
 import com.jiezipoi.mall.enums.UserStatus;
 import org.apache.ibatis.type.JdbcType;

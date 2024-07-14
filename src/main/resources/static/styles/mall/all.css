@@ -181,3 +181,60 @@ label {
 .form-switch .form-check-input:checked {
     --bs-form-switch-bg: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='%23fff'/%3e%3c/svg%3e");
 }
+
+ul {
+    margin: 0;
+    padding: 0;
+}
+
+ul li {
+    display: flex;
+}
+
+.swal2-container {
+    padding: 1.75rem !important;
+    backdrop-filter: blur(2px) !important;
+    background-color: rgba(240, 240, 240, 0.6) !important;
+}
+
+.swal2-modal {
+    -webkit-box-shadow: 0 5px 15px rgba(0, 0, 0, 0);
+    -moz-box-shadow: 0 5px 15px rgba(0, 0, 0, 0);
+    -o-box-shadow: 0 5px 15px rgba(0, 0, 0, 0);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0);
+    border: 1px solid rgba(0,0,0,.2);
+    border-radius: 14px;
+}
+
+.swal2-styled {
+    font-weight: 800;
+    border-radius: 7px !important;
+    font-size: 12px !important;
+    background-color: #c6c6c6;
+    color: #3d3d3d;
+    padding: 2px 12px;
+}
+
+.swal2-actions button {
+    display: block;
+    width: 350px;
+    padding: 5px 0;
+    font-size: 16px !important;
+}
+
+.swal2-styled.swal2-confirm {
+    background-color: var(--mall-color) !important;
+    color: #ffffff;
+}
+
+.swal2-styled.swal2-confirm:focus {
+    box-shadow: 0 0 0 3px var(--mall-light-color);
+}
+
+.swal2-styled.swal2-deny {
+    background-color: #b4b4b4 !important;
+}
+
+.swal2-styled.swal2-deny:focus {
+    box-shadow: 0 0 0 3px rgb(198 198 198 / 50%);
+}

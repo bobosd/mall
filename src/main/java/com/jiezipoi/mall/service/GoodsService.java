@@ -1,7 +1,6 @@
 package com.jiezipoi.mall.service;
 
 import com.jiezipoi.mall.config.GoodsConfig;
-import com.jiezipoi.mall.dao.GoodsCategoryDao;
 import com.jiezipoi.mall.dao.GoodsDao;
 import com.jiezipoi.mall.dto.MallGoodsDTO;
 import com.jiezipoi.mall.entity.Goods;
@@ -19,18 +18,17 @@ import java.io.*;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Service
 public class GoodsService {
-    final GoodsDao goodsDao;
-    final GoodsCategoryDao goodsCategoryDao;
-    final GoodsConfig goodsConfig;
-    final GoodsTagService goodsTagService;
+    private final GoodsDao goodsDao;
+    private final GoodsConfig goodsConfig;
+    private final GoodsTagService goodsTagService;
 
-    public GoodsService(GoodsDao goodsDao, GoodsConfig goodsConfig, GoodsCategoryDao goodsCategoryDao, GoodsTagService goodsTagService) {
-        this.goodsCategoryDao = goodsCategoryDao;
+    public GoodsService(GoodsDao goodsDao, GoodsConfig goodsConfig, GoodsTagService goodsTagService) {
         this.goodsDao = goodsDao;
         this.goodsConfig = goodsConfig;
         this.goodsTagService = goodsTagService;
@@ -272,11 +270,15 @@ public class GoodsService {
         return goodsDao.findByCategory(categoryId);
     }
 
-    public List<Goods> getGoodsListById(long... ids) {
+    public List<Goods> getGoodsListById(List<Long> ids) {
         return goodsDao.findGoodsByIds(ids);
     }
 
     public List<Goods> getGoodsListByGoodsName(String keyword) {
         return goodsDao.findByNameContaining(keyword);
+    }
+
+    public void reduceGoodsStock(Map<Long, Integer> quantityList) {
+        goodsDao.reduceStockByPrimaryKey(quantityList);
     }
 }

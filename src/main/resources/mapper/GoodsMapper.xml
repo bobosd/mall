@@ -20,7 +20,7 @@
         <result column="update_user" jdbcType="INTEGER" property="updateUser"/>
         <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
     </resultMap>
-    
+
     <resultMap id="GoodsResultWithTags" type="com.jiezipoi.mall.entity.Goods" extends="BaseResultMap">
         <collection property="tag" ofType="com.jiezipoi.mall.entity.GoodsTag"
                     resultMap="com.jiezipoi.mall.dao.GoodsTagDao.GoodsTagResultMap">
@@ -325,7 +325,7 @@
         GROUP BY goods_info.goods_id
         ORDER BY accuracy DESC;
     </select>
-    
+
     <select id="findByCategory" resultMap="GoodsSearchDTO">
         <bind name="level1path" value="categoryId+'.%'"/>
         <bind name="level2path" value="'%.'+categoryId + '.%'"/>
@@ -356,4 +356,12 @@
         FROM goods_info
         WHERE goods_name LIKE #{keyword,jdbcType=VARCHAR}
     </select>
+
+    <update id="reduceStockByPrimaryKey" parameterType="java.util.Map">
+        <foreach collection="_parameter.keySet()" index="goods_id" item="quantity" open="" separator="" close="">
+            UPDATE goods_info
+            SET stock_num = stock_num - #{quantity, jdbcType=INTEGER}
+            WHERE goods_id = #{goods_id, jdbcType=BIGINT};
+        </foreach>
+    </update>
 </mapper>

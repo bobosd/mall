@@ -20,7 +20,7 @@
     <sql id="Base_Column_List">
         user_id, goods_id, goods_count, create_time, update_time
     </sql>
-    
+
     <select id="selectByUserIdAndGoodsId" resultMap="BaseResultMap">
         SELECT
         <include refid="Base_Column_List"/>
@@ -29,7 +29,7 @@
         AND goods_id = #{mallGoodsId,jdbcType=BIGINT}
         LIMIT 1;
     </select>
-    
+
     <select id="selectCountByUserId" resultType="int">
         SELECT COUNT(*)
         FROM shopping_cart_item
@@ -106,5 +106,10 @@
     <delete id="deleteByGoodsIdAndUserId">
         DELETE FROM shopping_cart_item
         WHERE goods_id = #{goodsId,jdbcType=BIGINT} AND user_id = #{userId,jdbcType=BIGINT}
+    </delete>
+
+    <delete id="deleteAllByUserId">
+        DELETE FROM shopping_cart_item
+        WHERE user_id = #{userId,jdbcType=BIGINT}
     </delete>
 </mapper>

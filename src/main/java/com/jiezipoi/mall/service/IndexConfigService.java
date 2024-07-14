@@ -67,11 +67,7 @@ public class IndexConfigService {
         List<Long> goodsIds = indexConfigs.stream()
                 .map(IndexConfig::getGoodsId)
                 .toList();
-        long[] idsArray = new long[goodsIds.size()];
-        for (int i = 0; i < goodsIds.size(); i++) {
-            idsArray[i] = goodsIds.get(i);
-        }
-        return goodsService.getGoodsListById(idsArray)
+        return goodsService.getGoodsListById(goodsIds)
                 .stream()
                 .map(MallGoodsDTO::new)
                 .toList();

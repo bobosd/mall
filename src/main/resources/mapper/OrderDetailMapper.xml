@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.jiezipoi.mall.dao.OrderDetailDao">
+    <resultMap id="BaseResultMap" type="com.jiezipoi.mall.entity.OrderDetail">
+        <id column="order_detail_id" jdbcType="BIGINT" property="orderDetailId"/>
+        <result column="order_id" jdbcType="BIGINT" property="orderId" />
+        <result column="goods_id" jdbcType="BIGINT" property="goodsId" />
+        <result column="goods_name" jdbcType="VARCHAR" property="goodsName" />
+        <result column="goods_cover_img" jdbcType="VARCHAR" property="goodsCoverImg" />
+        <result column="selling_price" jdbcType="DECIMAL" property="sellingPrice" />
+        <result column="quantity" jdbcType="INTEGER" property="quantity" />
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    </resultMap>
+    <sql id="Base_Column_List">
+        order_detail_id, order_id, goods_id, goods_name, goods_cover_img, selling_price,
+        quantity, create_time
+    </sql>
+
+    <insert id="insert" keyColumn="order_detail_id" keyProperty="orderDetailId" parameterType="com.jiezipoi.mall.entity.OrderDetail" useGeneratedKeys="true">
+        insert into order_detail (order_id, goods_id, goods_name,
+        goods_cover_img, selling_price, quantity,
+        create_time)
+        values (#{orderId,jdbcType=BIGINT}, #{goodsId,jdbcType=BIGINT}, #{goodsName,jdbcType=VARCHAR},
+        #{goodsCoverImg,jdbcType=VARCHAR}, #{sellingPrice,jdbcType=INTEGER}, #{quantity,jdbcType=INTEGER},
+        #{createTime,jdbcType=TIMESTAMP});
+
+    </insert>
+
+    <update id="updateByPrimaryKeySelective" parameterType="com.jiezipoi.mall.entity.OrderDetail">
+        update order_detail
+        <set>
+            <if test="orderId != null">
+                order_id = #{orderId,jdbcType=BIGINT},
+            </if>
+            <if test="goodsId != null">
+                goods_id = #{goodsId,jdbcType=BIGINT},
+            </if>
+            <if test="goodsName != null and goodsName != ''">
+                goods_name = #{goodsName,jdbcType=VARCHAR},
+            </if>
+            <if test="goodsCoverImg != null and goodsCoverImg != ''">
+                goods_cover_img = #{goodsCoverImg,jdbcType=VARCHAR},
+            </if>
+            <if test="sellingPrice != null">
+                selling_price = #{sellingPrice,jdbcType=INTEGER},
+            </if>
+            <if test="quantity != null">
+                quantity = #{quantity,jdbcType=INTEGER},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where order_detail_id = #{orderDetailId,jdbcType=BIGINT}
+    </update>
+
+    <insert id="insertBatch">
+        INSERT INTO order_detail VALUES
+        <foreach collection="list" separator="," item="detail">
+            (null, #{detail.orderId,jdbcType=BIGINT}, #{detail.goodsId,jdbcType=BIGINT}, #{detail.goodsName,jdbcType=VARCHAR},
+            #{detail.goodsCoverImg,jdbcType=VARCHAR}, #{detail.sellingPrice,jdbcType=INTEGER},
+            #{detail.quantity,jdbcType=INTEGER},
+            #{detail.createTime,jdbcType=TIMESTAMP})
+        </foreach>
+    </insert>
+</mapper>

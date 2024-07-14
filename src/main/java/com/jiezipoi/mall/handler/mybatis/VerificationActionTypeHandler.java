@@ -1,4 +1,4 @@
-package com.jiezipoi.mall.handler;
+package com.jiezipoi.mall.handler.mybatis;
 
 import com.jiezipoi.mall.enums.VerificationActionType;
 import org.apache.ibatis.type.JdbcType;

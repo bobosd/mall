@@ -9,6 +9,7 @@ import com.jiezipoi.mall.exception.NotFoundException;
 import com.jiezipoi.mall.exception.QuantityExceededException;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -83,8 +84,11 @@ public class ShoppingCartItemService {
     }
 
     public void removeCartItem(Long userId, Long goodsId) {
-
         shoppingCartItemDao.deleteByGoodsIdAndUserId(userId, goodsId);
+    }
+
+    public void removeAllCartItem(Long userId) {
+        shoppingCartItemDao.deleteAllByUserId(userId);
     }
 
     public List<ShoppingCartItemDTO> getUserShoppingCart(Long userId) {
@@ -96,5 +100,16 @@ public class ShoppingCartItemService {
         if (affectedRow == 0) {
             throw new NotFoundException();
         }
+    }
+
+    public BigDecimal getShoppingCartTotalValue(Long userId) {
+        List<ShoppingCartItemDTO> cartItems = getUserShoppingCart(userId);
+        return calcShoppingCartTotalValue(cartItems);
+    }
+
+    public BigDecimal calcShoppingCartTotalValue(List<ShoppingCartItemDTO> items) {
+        return items.stream()
+                .map((item) -> item.getSellingPrice().multiply(BigDecimal.valueOf(item.getGoodsCount())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 }
